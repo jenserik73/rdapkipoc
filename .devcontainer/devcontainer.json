@@ -1,5 +1,6 @@
 {
-	"image": "mcr.microsoft.com/devcontainers/universal:2",
+	"name": "Ubuntu",
+	"image": "mcr.microsoft.com/devcontainers/base:noble",
 	"features": {
 		"ghcr.io/devcontainer-config/features/dot-config:4": {}
 	},
