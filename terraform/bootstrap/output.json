@@ -1,0 +1,22 @@
+{
+  "bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "rdap-chatbot-terraform-state"
+  },
+  "namespace": {
+    "sensitive": false,
+    "type": "string",
+    "value": "axpqbvkhoxdj"
+  },
+  "rdap_chatbotdev_cmp_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "rdap-chatbot-cmp"
+  },
+  "rdap_chatbotdev_cmp_ocid": {
+    "sensitive": false,
+    "type": "string",
+    "value": "ocid1.compartment.oc19..aaaaaaaaw7nfek7szdgjrdidzqhkjzx7bw4txy2y3kdydjryavxmei52t5xq"
+  }
+}
