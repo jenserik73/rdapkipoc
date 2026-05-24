@@ -3,8 +3,8 @@ module "oke" {
   version = "5.4.3"
 
   # general oci parameters
-  tenancy_id = module.tenancy.tenancy_id
-  compartment_id = module.tenancy.compartment_id
+  tenancy_id = module.shared_resources.tenancy_id
+  compartment_id = local.compartment_id
   timezone       = "Europe/Oslo"
 
   # networking
