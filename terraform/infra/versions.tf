@@ -9,7 +9,7 @@ terraform {
 
   backend "s3" {
     bucket   = "rdap-chatbot-terraform-state"
-    key      = "rdap_chatbot/terraform.tfstate"
+    key      = "rdap_chatbot_infra/terraform.tfstate"
     region   = "eu-frankfurt-2"
     endpoint = "https://axpqbvkhoxdj.compat.objectstorage.eu-frankfurt-2.oraclecloud.eu"
     skip_region_validation      = true
