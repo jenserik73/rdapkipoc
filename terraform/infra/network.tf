@@ -15,7 +15,6 @@ resource "oci_core_vcn" "rdap_chatbot_vcn" {
     cidr_blocks = var.vcn_cidr_blocks
     display_name = var.vcn_display_name
     dns_label = var.vcn_dns_label
-    freeform_tags = {"Department"= "Finance"}
     ipv6private_cidr_blocks = var.vcn_ipv6private_cidr_blocks
     is_ipv6enabled = var.vcn_is_ipv6enabled
     security_attributes = var.vcn_security_attributes
@@ -65,6 +64,7 @@ resource "oci_core_subnet" "KubernetesAPIendpointSubnet" {
   display_name               = "Kubernetes-API-endpoint-subnet"
   dns_label                  = "k8sapiendpoint"
   prohibit_public_ip_on_vnic = false # Allows public IPs (Public Subnet)
+  prohibit_internet_ingress  = "false"
 
   # Optional: Attach specific Route Table and Security Lists
   route_table_id             = oci_core_route_table.routetable_KubernetesAPIendpoint.id
@@ -94,7 +94,7 @@ resource "oci_core_subnet" "loadbalancers_subnet" {
   display_name               = "load-balancers-subnet"
   dns_label                  = "loadbalancers"
   prohibit_public_ip_on_vnic = false # Allows public IPs (Public Subnet)
-
+  prohibit_internet_ingress  = "false"
   # Optional: Attach specific Route Table and Security Lists
   route_table_id             = oci_core_route_table.routetable_serviceloadbalancers.id
   security_list_ids          = [oci_core_security_list.seclist_loadbalancers.id]
