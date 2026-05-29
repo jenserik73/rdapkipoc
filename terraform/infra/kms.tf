@@ -32,3 +32,16 @@ resource "oci_vault_secret" "rdapkipocdb_wallet" {
     content      = filebase64("/home/vscode/oracle_wallet/Wallet_rdapkipocdb_min.zip")
   }
 }
+
+resource "oci_vault_secret" "rdapkipocdb_password" {
+  compartment_id = local.compartment_id
+  description    = "Password for Oracle Wallet used by RDAP Chatbot"
+  key_id         = oci_kms_key.rdap_chatbot_master_encryption_key.id
+  secret_name = "rdapkipocdb-password"
+  vault_id    = oci_kms_vault.rdap_chatbot_vault.id
+  secret_content {
+    content_type = "BASE64"
+    # Base64 encode the password
+    content      = base64encode("YourSecurePassword123!")
+  }
+}
