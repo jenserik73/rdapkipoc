@@ -1,9 +1,0 @@
-variable fault_domain--FAULT-DOMAIN-3 { default = "FAULT-DOMAIN-3" }
-variable oci_core_instance--source_details-source_id--export_oke-cfs3mbzxrwa-nlirgea6hia-sw6blhgi4za-1_1 { default = "ocid1.image.oc19.eu-frankfurt-2.aaaaaaaarcspkcorcbd5lapcsyykog63utmpu3so5gmrpaaiycnnkledrdwq" }
-variable oci_core_instance--source_details-source_id--export_oke-cfs3mbzxrwa-nlirgea6hia-sw6blhgi4za-2_1 { default = "ocid1.image.oc19.eu-frankfurt-2.aaaaaaaarcspkcorcbd5lapcsyykog63utmpu3so5gmrpaaiycnnkledrdwq" }
-variable fault_domain--FAULT-DOMAIN-1 { default = "FAULT-DOMAIN-1" }
-variable region { default = "eu-frankfurt-2" }
-variable compartment_ocid { default = "ocid1.compartment.oc19..aaaaaaaacceqqlruqbgq3hw3jksmecdmkvefvssmdqsppr5rhws4ow5xkrfq" }
-variable oci_core_instance--source_details-source_id--export_oke-cfs3mbzxrwa-nlirgea6hia-sw6blhgi4za-0_1 { default = "ocid1.image.oc19.eu-frankfurt-2.aaaaaaaarcspkcorcbd5lapcsyykog63utmpu3so5gmrpaaiycnnkledrdwq" }
-variable availability_domain--uOWN-eu-frankfurt-2-ad-1 { default = "uOWN:eu-frankfurt-2-ad-1" }
-variable fault_domain--FAULT-DOMAIN-2 { default = "FAULT-DOMAIN-2" }
