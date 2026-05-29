@@ -56,6 +56,24 @@ resource "oci_core_service_gateway" "rdap_chatbot_service_gateway" {
   display_name = "rdap-chatbot-service-gateway"
 }
 
+resource oci_core_subnet functions_subnet {
+  #availability_domain = <<Optional value not found in discovery>>
+  cidr_block     = "10.0.4.0/24"
+  compartment_id = local.compartment_id
+  display_name    = "functions-subnet"
+  dns_label       = "functions"
+  ipv4cidr_blocks = [
+    "10.0.4.0/24",
+  ]
+  prohibit_internet_ingress  = "true"
+  prohibit_public_ip_on_vnic = "true"
+  route_table_id             = oci_core_route_table.routetable_functions.id
+  security_list_ids = [
+    oci_core_security_list.seclist_functions.id,
+  ]
+  vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
+}
+
 resource "oci_core_subnet" "KubernetesAPIendpointSubnet" {
   compartment_id             = local.compartment_id
   vcn_id                     = oci_core_vcn.rdap_chatbot_vcn.id
@@ -99,17 +117,30 @@ resource "oci_core_subnet" "loadbalancers_subnet" {
   security_list_ids = [oci_core_security_list.seclist_loadbalancers.id]
 }
 
-# resource "oci_core_subnet" "bastion_subnet" {
-#   compartment_id             = local.compartment_id
-#   vcn_id                     = oci_core_vcn.rdap_chatbot_vcn.id
-#   cidr_block                 = "10.0.3.0/24"
-#   display_name               = "bastion-subnet"
-#   dns_label                  = "bastion"
-#   prohibit_public_ip_on_vnic = false # Allows public IPs (Public Subnet)
+resource "oci_core_subnet" "bastion_subnet" {
+  compartment_id             = local.compartment_id
+  vcn_id                     = oci_core_vcn.rdap_chatbot_vcn.id
+  cidr_block                 = "10.0.3.0/24"
+  display_name               = "bastion-subnet"
+  dns_label                  = "bastion"
+  prohibit_public_ip_on_vnic = false # Allows public IPs (Public Subnet)
 
-#   # Optional: Attach specific Route Table and Security Lists
-#   security_list_ids          = [oci_core_security_list.seclist_bastion.id]
-# }
+  # Optional: Attach specific Route Table and Security Lists
+  security_list_ids          = [oci_core_security_list.seclist_bastion.id]
+}
+
+resource oci_core_route_table routetable_functions {
+  compartment_id = local.compartment_id
+  display_name = "routetable-functions"
+  route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.rdap_chatbot_internet_gateway.id
+    route_type        = "STATIC"
+  }
+  vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
+}
 
 resource "oci_core_default_route_table" "default_route_table_rdap_chatbot_vcn" {
   #Required
@@ -183,6 +214,12 @@ resource "oci_core_route_table" "routetable_serviceloadbalancers" {
     destination      = "0.0.0.0/0"
     destination_type = "CIDR_BLOCK"
   }
+}
+
+resource oci_core_security_list seclist_functions {
+  compartment_id = local.compartment_id
+  display_name = "seclist-functions"
+  vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
 }
 
 resource "oci_core_security_list" "seclist_KubernetesAPIendpoint" {
@@ -399,28 +436,28 @@ resource "oci_core_security_list" "seclist_loadbalancers" {
   }
 }
 
-# resource "oci_core_security_list" "seclist_bastion" {
-#     compartment_id = local.compartment_id
-#     vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
-#     display_name = "seclist-Bastion"
+resource "oci_core_security_list" "seclist_bastion" {
+    compartment_id = local.compartment_id
+    vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
+    display_name = "seclist-Bastion"
 
-#     egress_security_rules {
-#         description = "Allow bastion to access the Kubernetes API endpoint"
-#         protocol = "6" # TCP protocol number
-#         destination = "10.0.0.0/30" # Kubernetes API endpoint subnet CIDR
-#         tcp_options {
-#             max = 6443
-#             min = 6443
-#         }
-#     }
+    egress_security_rules {
+        description = "Allow bastion to access the Kubernetes API endpoint"
+        protocol = "6" # TCP protocol number
+        destination = "10.0.0.0/30" # Kubernetes API endpoint subnet CIDR
+        tcp_options {
+            max = 6443
+            min = 6443
+        }
+    }
 
-#     egress_security_rules {
-#         description = "Allow SSH traffic to worker nodes from bastion host"
-#         protocol = "6" # TCP protocol number
-#         destination = "10.0.1.0/24" # Worker nodes subnet CIDR
-#         tcp_options {
-#             max = 22
-#             min = 22
-#         }
-#     }
-# }
+    egress_security_rules {
+        description = "Allow SSH traffic to worker nodes from bastion host"
+        protocol = "6" # TCP protocol number
+        destination = "10.0.1.0/24" # Worker nodes subnet CIDR
+        tcp_options {
+            max = 22
+            min = 22
+        }
+    }
+}

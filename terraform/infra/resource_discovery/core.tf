@@ -5,12 +5,12 @@ resource oci_core_nat_gateway export_rdap-chatbot-nat-gateway {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.530Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.315Z"
   }
   display_name = "rdap-chatbot-nat-gateway"
   freeform_tags = {
   }
-  public_ip_id = "ocid1.publicip.oc19.eu-frankfurt-2.aaaaaaaaykoxkpehbljrn4fakeq7vppa6aas4mffuiy6fkmaqyxgscvrioxq"
+  public_ip_id = "ocid1.publicip.oc19.eu-frankfurt-2.aaaaaaaaxkfnplugmc56zyivnuyfkge6ot2o2bd36chclxjcn433pmj57jta"
   #route_table_id = <<Optional value not found in discovery>>
   vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
 }
@@ -19,7 +19,7 @@ resource oci_core_internet_gateway export_rdap-chatbot-internet-gateway {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.599Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.396Z"
   }
   display_name = "rdap-chatbot-internet-gateway"
   enabled      = "true"
@@ -33,14 +33,13 @@ resource oci_core_default_dhcp_options export_Default-DHCP-Options-for-rdap-chat
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.236Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:08.827Z"
   }
   display_name     = "Default DHCP Options for rdap-chatbot-vcn"
   domain_name_type = "CUSTOM_DOMAIN"
   freeform_tags = {
-    "Department" = "Finance"
   }
-  manage_default_resource_id = "ocid1.dhcpoptions.oc19.eu-frankfurt-2.aaaaaaaabxqeq6rf3p2ptbgiooiugpshaeskb3invdklni3dvbkfdw4y7cna"
+  manage_default_resource_id = "ocid1.dhcpoptions.oc19.eu-frankfurt-2.aaaaaaaaqbcqrrme24xxtzbfozt6pbokoapdjfppbacfhuhydus5vmob5hta"
   options {
     custom_dns_servers = [
     ]
@@ -58,6 +57,20 @@ resource oci_core_default_dhcp_options export_Default-DHCP-Options-for-rdap-chat
   }
 }
 
+resource oci_core_public_ip export_Floating-Public-IP-for-cluster-ocid1-cluster-oc19-eu-frankfurt-2-aaaaaaaacjtgtlnbpodzvnblfl5joj3dy6hcmqavrfvidptg2cburyzxciiq {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:21.044Z"
+  }
+  display_name = "Floating Public IP for cluster ocid1.cluster.oc19.eu-frankfurt-2.aaaaaaaacjtgtlnbpodzvnblfl5joj3dy6hcmqavrfvidptg2cburyzxciiq"
+  freeform_tags = {
+  }
+  lifetime      = "RESERVED"
+  private_ip_id = oci_core_private_ip.export_Service-VNIC-for-cluster-ocid1-cluster-oc19-eu-frankfurt-2-aaaaaaaacjtgtlnbpodzvnblfl5joj3dy6hcmqavrfvidptg2cburyzxciiq.id
+  #public_ip_pool_id = <<Optional value not found in discovery>>
+}
+
 resource oci_core_vcn export_rdap-chatbot-vcn {
   #byoipv6cidr_details = <<Optional value not found in discovery>>
   #cidr_block = <<Optional value not found in discovery>>
@@ -67,12 +80,11 @@ resource oci_core_vcn export_rdap-chatbot-vcn {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.236Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:08.827Z"
   }
   display_name = "rdap-chatbot-vcn"
   dns_label    = "rdapchatbotvcn"
   freeform_tags = {
-    "Department" = "Finance"
   }
   ipv6private_cidr_blocks = [
   ]
@@ -82,100 +94,30 @@ resource oci_core_vcn export_rdap-chatbot-vcn {
   }
 }
 
-resource oci_core_public_ip export_Floating-Public-IP-for-cluster-ocid1-cluster-oc19-eu-frankfurt-2-aaaaaaaay2qwpl3pag3s6evidkffg6jc4tkx7dkz2vfgix5agcz6qcjcr2pa {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:30:33.991Z"
-  }
-  display_name = "Floating Public IP for cluster ocid1.cluster.oc19.eu-frankfurt-2.aaaaaaaay2qwpl3pag3s6evidkffg6jc4tkx7dkz2vfgix5agcz6qcjcr2pa"
-  freeform_tags = {
-  }
-  lifetime      = "RESERVED"
-  private_ip_id = oci_core_private_ip.export_Service-VNIC-for-cluster-ocid1-cluster-oc19-eu-frankfurt-2-aaaaaaaay2qwpl3pag3s6evidkffg6jc4tkx7dkz2vfgix5agcz6qcjcr2pa.id
-  #public_ip_pool_id = <<Optional value not found in discovery>>
-}
-
-resource oci_core_subnet export_worker-nodes-subnet {
+resource oci_core_subnet export_functions-subnet {
   #availability_domain = <<Optional value not found in discovery>>
-  cidr_block     = "10.0.1.0/24"
+  cidr_block     = "10.0.4.0/24"
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:04.182Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T11:10:53.806Z"
   }
   dhcp_options_id = oci_core_default_dhcp_options.export_Default-DHCP-Options-for-rdap-chatbot-vcn.id
-  display_name    = "worker-nodes-subnet"
-  dns_label       = "workernodes"
+  display_name    = "functions-subnet"
+  dns_label       = "functions"
   freeform_tags = {
   }
   ipv4cidr_blocks = [
-    "10.0.1.0/24",
+    "10.0.4.0/24",
   ]
   #ipv6cidr_block = <<Optional value not found in discovery>>
   ipv6cidr_blocks = [
   ]
   prohibit_internet_ingress  = "true"
   prohibit_public_ip_on_vnic = "true"
-  route_table_id             = oci_core_route_table.export_routetable-Workernodes.id
+  route_table_id             = oci_core_route_table.export_routetable-functions.id
   security_list_ids = [
-    oci_core_security_list.export_seclist-workernodes.id,
-  ]
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
-}
-
-resource oci_core_subnet export_load-balancers-subnet {
-  #availability_domain = <<Optional value not found in discovery>>
-  cidr_block     = "10.0.2.0/24"
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:04.182Z"
-  }
-  dhcp_options_id = oci_core_default_dhcp_options.export_Default-DHCP-Options-for-rdap-chatbot-vcn.id
-  display_name    = "load-balancers-subnet"
-  dns_label       = "loadbalancers"
-  freeform_tags = {
-  }
-  ipv4cidr_blocks = [
-    "10.0.2.0/24",
-  ]
-  #ipv6cidr_block = <<Optional value not found in discovery>>
-  ipv6cidr_blocks = [
-  ]
-  prohibit_internet_ingress  = "false"
-  prohibit_public_ip_on_vnic = "false"
-  route_table_id             = oci_core_route_table.export_routetable-Serviceloadbalancers.id
-  security_list_ids = [
-    oci_core_security_list.export_seclist-loadbalancers.id,
-  ]
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
-}
-
-resource oci_core_subnet export_Kubernetes-API-endpoint-subnet {
-  #availability_domain = <<Optional value not found in discovery>>
-  cidr_block     = "10.0.0.0/30"
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.841Z"
-  }
-  dhcp_options_id = oci_core_default_dhcp_options.export_Default-DHCP-Options-for-rdap-chatbot-vcn.id
-  display_name    = "Kubernetes-API-endpoint-subnet"
-  dns_label       = "k8sapiendpoint"
-  freeform_tags = {
-  }
-  ipv4cidr_blocks = [
-    "10.0.0.0/30",
-  ]
-  #ipv6cidr_block = <<Optional value not found in discovery>>
-  ipv6cidr_blocks = [
-  ]
-  prohibit_internet_ingress  = "false"
-  prohibit_public_ip_on_vnic = "false"
-  route_table_id             = oci_core_route_table.export_routetable-KubernetesAPIendpoint.id
-  security_list_ids = [
-    oci_core_security_list.export_seclist-KubernetesAPIendpoint.id,
+    oci_core_security_list.export_seclist-functions.id,
   ]
   vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
 }
@@ -186,7 +128,7 @@ resource oci_core_subnet export_bastion-subnet {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.841Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T11:06:10.540Z"
   }
   dhcp_options_id = oci_core_default_dhcp_options.export_Default-DHCP-Options-for-rdap-chatbot-vcn.id
   display_name    = "bastion-subnet"
@@ -208,1338 +150,227 @@ resource oci_core_subnet export_bastion-subnet {
   vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
 }
 
+resource oci_core_subnet export_worker-nodes-subnet {
+  #availability_domain = <<Optional value not found in discovery>>
+  cidr_block     = "10.0.1.0/24"
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.797Z"
+  }
+  dhcp_options_id = oci_core_default_dhcp_options.export_Default-DHCP-Options-for-rdap-chatbot-vcn.id
+  display_name    = "worker-nodes-subnet"
+  dns_label       = "workernodes"
+  freeform_tags = {
+  }
+  ipv4cidr_blocks = [
+    "10.0.1.0/24",
+  ]
+  #ipv6cidr_block = <<Optional value not found in discovery>>
+  ipv6cidr_blocks = [
+  ]
+  prohibit_internet_ingress  = "true"
+  prohibit_public_ip_on_vnic = "true"
+  route_table_id             = oci_core_route_table.export_routetable-Workernodes.id
+  security_list_ids = [
+    oci_core_security_list.export_seclist-workernodes.id,
+  ]
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+}
+
+resource oci_core_subnet export_Kubernetes-API-endpoint-subnet {
+  #availability_domain = <<Optional value not found in discovery>>
+  cidr_block     = "10.0.0.0/30"
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.818Z"
+  }
+  dhcp_options_id = oci_core_default_dhcp_options.export_Default-DHCP-Options-for-rdap-chatbot-vcn.id
+  display_name    = "Kubernetes-API-endpoint-subnet"
+  dns_label       = "k8sapiendpoint"
+  freeform_tags = {
+  }
+  ipv4cidr_blocks = [
+    "10.0.0.0/30",
+  ]
+  #ipv6cidr_block = <<Optional value not found in discovery>>
+  ipv6cidr_blocks = [
+  ]
+  prohibit_internet_ingress  = "false"
+  prohibit_public_ip_on_vnic = "false"
+  route_table_id             = oci_core_route_table.export_routetable-KubernetesAPIendpoint.id
+  security_list_ids = [
+    oci_core_security_list.export_seclist-KubernetesAPIendpoint.id,
+  ]
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+}
+
+resource oci_core_subnet export_load-balancers-subnet {
+  #availability_domain = <<Optional value not found in discovery>>
+  cidr_block     = "10.0.2.0/24"
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.797Z"
+  }
+  dhcp_options_id = oci_core_default_dhcp_options.export_Default-DHCP-Options-for-rdap-chatbot-vcn.id
+  display_name    = "load-balancers-subnet"
+  dns_label       = "loadbalancers"
+  freeform_tags = {
+  }
+  ipv4cidr_blocks = [
+    "10.0.2.0/24",
+  ]
+  #ipv6cidr_block = <<Optional value not found in discovery>>
+  ipv6cidr_blocks = [
+  ]
+  prohibit_internet_ingress  = "false"
+  prohibit_public_ip_on_vnic = "false"
+  route_table_id             = oci_core_route_table.export_routetable-Serviceloadbalancers.id
+  security_list_ids = [
+    oci_core_security_list.export_seclist-loadbalancers.id,
+  ]
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+}
+
 resource oci_core_service_gateway export_rdap-chatbot-service-gateway {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.609Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.395Z"
   }
   display_name = "rdap-chatbot-service-gateway"
   freeform_tags = {
   }
   #route_table_id = <<Optional value not found in discovery>>
   services {
-    service_id = "ocid1.service.oc19.eu-frankfurt-2.aaaaaaaacym7znzt6mbicoimfypivpdpjfebx4rnlipjvz2r76gbklabcira"
+    service_id = "ocid1.service.oc19.eu-frankfurt-2.aaaaaaaay2ztby4osvjejwqc7y5f3aq3piezbc4ameipjh6stjy7c6hfrj2q"
   }
   vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
 }
 
-resource oci_core_private_ip export_privateip20260526112443 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
+resource oci_core_route_table export_routetable-functions {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:43.768Z"
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T11:06:10.392Z"
   }
-  display_name = "privateip20260526112443"
+  display_name = "routetable-functions"
   freeform_tags = {
   }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.6"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112430 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:30.298Z"
-  }
-  display_name = "privateip20260526112430"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.7"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112418 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:18.505Z"
-  }
-  display_name = "privateip20260526112418"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.12"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112428 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:28.416Z"
-  }
-  display_name = "privateip20260526112428"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.13"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112442 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:42.522Z"
-  }
-  display_name = "privateip20260526112442"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.14"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112415 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:15.763Z"
-  }
-  display_name = "privateip20260526112415"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.17"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112434 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:34.336Z"
-  }
-  display_name = "privateip20260526112434"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.34"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112426 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:26.438Z"
-  }
-  display_name = "privateip20260526112426"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.46"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112422 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:22.559Z"
-  }
-  display_name = "privateip20260526112422"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.48"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112423 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:23.296Z"
-  }
-  display_name = "privateip20260526112423"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.51"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112437 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:37.682Z"
-  }
-  display_name = "privateip20260526112437"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.59"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112415_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:15.785Z"
-  }
-  display_name = "privateip20260526112415"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.60"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112444 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:44.196Z"
-  }
-  display_name = "privateip20260526112444"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.67"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112429 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:29.538Z"
-  }
-  display_name = "privateip20260526112429"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.70"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112439 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:39.113Z"
-  }
-  display_name = "privateip20260526112439"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.72"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112421 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:21.844Z"
-  }
-  display_name = "privateip20260526112421"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.73"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112424 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:24.477Z"
-  }
-  display_name = "privateip20260526112424"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.74"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112420 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:20.043Z"
-  }
-  display_name = "privateip20260526112420"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.75"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112433 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:33.065Z"
-  }
-  display_name = "privateip20260526112433"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.76"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112424_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:24.776Z"
-  }
-  display_name = "privateip20260526112424"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.81"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112447 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:47.190Z"
-  }
-  display_name = "privateip20260526112447"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.84"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112425 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:25.114Z"
-  }
-  display_name = "privateip20260526112425"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.86"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112421_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:21.603Z"
-  }
-  display_name = "privateip20260526112421"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.87"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_vnic20260526112412 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:09.917Z"
-  }
-  display_name = "vnic20260526112412"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.89"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_node_pool.export_pool1.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:23:38.437Z"
-  }
-  display_name = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0"
-  freeform_tags = {
-  }
-  hostname_label = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0"
-  ip_address     = "10.0.1.91"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrjrlwevdtdqrdnu3dg6s5pl7ye43ffx3r3vyhcs4jbohjnz23r77q"
-}
-
-resource oci_core_private_ip export_privateip20260526112422_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:22.914Z"
-  }
-  display_name = "privateip20260526112422"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.98"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112436 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:36.448Z"
-  }
-  display_name = "privateip20260526112436"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.99"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112444_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:44.648Z"
-  }
-  display_name = "privateip20260526112444"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.102"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112426_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:26.757Z"
-  }
-  display_name = "privateip20260526112426"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.103"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112442_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:42.113Z"
-  }
-  display_name = "privateip20260526112442"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.106"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112445 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:45.679Z"
-  }
-  display_name = "privateip20260526112445"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.110"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112427 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:27.081Z"
+  route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
+    route_type        = "STATIC"
   }
-  display_name = "privateip20260526112427"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.112"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112419 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:19.778Z"
-  }
-  display_name = "privateip20260526112419"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.115"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112421_2 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:21.903Z"
-  }
-  display_name = "privateip20260526112421"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.120"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112422_2 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:22.235Z"
-  }
-  display_name = "privateip20260526112422"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.124"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112435 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:35.777Z"
-  }
-  display_name = "privateip20260526112435"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.127"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_node_pool.export_pool1.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:23:39.129Z"
-  }
-  display_name = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1"
-  freeform_tags = {
-  }
-  hostname_label = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1"
-  ip_address     = "10.0.1.128"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr3pijk4jilsd35rafz4kszhidhwpwv3q7kyrmgtmc6aq7dy7ixmwa"
-}
-
-resource oci_core_private_ip export_privateip20260526112415_2 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:15.529Z"
-  }
-  display_name = "privateip20260526112415"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.129"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112438 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:38.161Z"
-  }
-  display_name = "privateip20260526112438"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.132"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112446 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:46.690Z"
-  }
-  display_name = "privateip20260526112446"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.133"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112436_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:36.199Z"
-  }
-  display_name = "privateip20260526112436"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.135"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112432 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:32.506Z"
-  }
-  display_name = "privateip20260526112432"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.148"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112440 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:40.274Z"
-  }
-  display_name = "privateip20260526112440"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.150"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112442_2 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:42.900Z"
-  }
-  display_name = "privateip20260526112442"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.154"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112423_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:23.153Z"
-  }
-  display_name = "privateip20260526112423"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.158"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112428_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:28.771Z"
-  }
-  display_name = "privateip20260526112428"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.160"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112441 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:41.711Z"
-  }
-  display_name = "privateip20260526112441"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.167"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112432_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:32.078Z"
-  }
-  display_name = "privateip20260526112432"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.169"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112446_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:46.169Z"
-  }
-  display_name = "privateip20260526112446"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.171"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112415_3 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:15.565Z"
-  }
-  display_name = "privateip20260526112415"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.176"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112436_2 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:36.840Z"
-  }
-  display_name = "privateip20260526112436"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.182"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112438_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:38.635Z"
-  }
-  display_name = "privateip20260526112438"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.189"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112443_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:43.324Z"
-  }
-  display_name = "privateip20260526112443"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.190"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112429_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:29.913Z"
-  }
-  display_name = "privateip20260526112429"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.194"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112433_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:33.940Z"
-  }
-  display_name = "privateip20260526112433"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.205"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112417 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:17.245Z"
-  }
-  display_name = "privateip20260526112417"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.206"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112417_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:17.017Z"
-  }
-  display_name = "privateip20260526112417"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.210"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112416 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:16.019Z"
-  }
-  display_name = "privateip20260526112416"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.213"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112429_2 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:29.132Z"
-  }
-  display_name = "privateip20260526112429"
-  freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.214"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
 }
 
-resource oci_core_private_ip export_privateip20260526112432_2 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
+resource oci_core_route_table export_routetable-Workernodes {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:32.723Z"
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.841Z"
   }
-  display_name = "privateip20260526112432"
+  display_name = "routetable-Workernodes"
   freeform_tags = {
   }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.217"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_vnic20260526112412_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:09.946Z"
+  route_rules {
+    description       = "Service Gateway Route Rule"
+    destination       = "all-str-services-in-oracle-services-network"
+    destination_type  = "SERVICE_CIDR_BLOCK"
+    network_entity_id = oci_core_service_gateway.export_rdap-chatbot-service-gateway.id
+    route_type        = "STATIC"
   }
-  display_name = "vnic20260526112412"
-  freeform_tags = {
+  route_rules {
+    description       = "NAT Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_nat_gateway.export_rdap-chatbot-nat-gateway.id
+    route_type        = "STATIC"
   }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.218"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
 }
 
-resource oci_core_private_ip export_privateip20260526112420_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
+resource oci_core_route_table export_routetable-KubernetesAPIendpoint {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:20.300Z"
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.649Z"
   }
-  display_name = "privateip20260526112420"
+  display_name = "routetable-KubernetesAPIendpoint"
   freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.223"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
-}
-
-resource oci_core_private_ip export_privateip20260526112418_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:18.551Z"
   }
-  display_name = "privateip20260526112418"
-  freeform_tags = {
+  route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
+    route_type        = "STATIC"
   }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.236"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
 }
 
-resource oci_core_private_ip export_privateip20260526112440_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
+resource oci_core_route_table export_routetable-Serviceloadbalancers {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:40.815Z"
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.620Z"
   }
-  display_name = "privateip20260526112440"
+  display_name = "routetable-Serviceloadbalancers"
   freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.241"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112431 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:31.714Z"
   }
-  display_name = "privateip20260526112431"
-  freeform_tags = {
+  route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
+    route_type        = "STATIC"
   }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.245"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
 }
 
-resource oci_core_private_ip export_privateip20260526112439_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
+resource oci_core_default_route_table export_default-route-table-rdap-chatbot-vcn {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:39.628Z"
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:08.827Z"
   }
-  display_name = "privateip20260526112439"
+  display_name = "default-route-table-rdap-chatbot-vcn"
   freeform_tags = {
-  }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.247"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
-}
-
-resource oci_core_private_ip export_privateip20260526112447_1 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:47.706Z"
   }
-  display_name = "privateip20260526112447"
-  freeform_tags = {
+  manage_default_resource_id = oci_core_vcn.export_rdap-chatbot-vcn.default_route_table_id
+  route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
+    route_type        = "STATIC"
   }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.248"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrbuk62f7sx32hzmqejpyalqocpymwhm7nzm7cpbccuu36wu2jr5wq"
 }
 
-resource oci_core_private_ip export_privateip20260526112417_2 {
-  #cidr_prefix_length = <<Optional value not found in discovery>>
+resource oci_core_security_list export_seclist-functions {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:17.288Z"
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T11:06:10.374Z"
   }
-  display_name = "privateip20260526112417"
+  display_name = "seclist-functions"
   freeform_tags = {
   }
-  #hostname_label = <<Optional value not found in discovery>>
-  ip_address = "10.0.1.250"
-  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
-  lifetime = "EPHEMERAL"
-  #route_table_id = <<Optional value not found in discovery>>
-  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
-  #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljr645bovdbi6swwud4wvnymtjwsly6pkvxgunnypaifhgpsllvpk3q"
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
 }
 
 resource oci_core_security_list export_seclist-Bastion {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.615Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T11:06:10.376Z"
   }
   display_name = "seclist-Bastion"
-  egress_security_rules {
-    description      = "Allow bastion to access the Kubernetes API endpoint"
-    destination      = "10.0.0.0/30"
-    destination_type = "CIDR_BLOCK"
-    #icmp_options = <<Optional value not found in discovery>>
-    protocol  = "6"
-    stateless = "false"
-    tcp_options {
-      #max = <<Optional value not found in discovery>>
-      #min = <<Optional value not found in discovery>>
-      source_port_range {
-        max = "6443"
-        min = "6443"
-      }
-    }
-    #udp_options = <<Optional value not found in discovery>>
-  }
   egress_security_rules {
     description      = "Allow SSH traffic to worker nodes from bastion host"
     destination      = "10.0.1.0/24"
@@ -1548,12 +379,23 @@ resource oci_core_security_list export_seclist-Bastion {
     protocol  = "6"
     stateless = "false"
     tcp_options {
-      #max = <<Optional value not found in discovery>>
-      #min = <<Optional value not found in discovery>>
-      source_port_range {
-        max = "22"
-        min = "22"
-      }
+      max = "22"
+      min = "22"
+      #source_port_range = <<Optional value not found in discovery>>
+    }
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  egress_security_rules {
+    description      = "Allow bastion to access the Kubernetes API endpoint"
+    destination      = "10.0.0.0/30"
+    destination_type = "CIDR_BLOCK"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol  = "6"
+    stateless = "false"
+    tcp_options {
+      max = "6443"
+      min = "6443"
+      #source_port_range = <<Optional value not found in discovery>>
     }
     #udp_options = <<Optional value not found in discovery>>
   }
@@ -1566,7 +408,7 @@ resource oci_core_security_list export_seclist-KubernetesAPIendpoint {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.607Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.405Z"
   }
   display_name = "seclist-KubernetesAPIendpoint"
   egress_security_rules {
@@ -1602,37 +444,7 @@ resource oci_core_security_list export_seclist-KubernetesAPIendpoint {
     #tcp_options = <<Optional value not found in discovery>>
     #udp_options = <<Optional value not found in discovery>>
   }
-  egress_security_rules {
-    description      = "Path Discovery"
-    destination      = "all-str-services-in-oracle-services-network"
-    destination_type = "SERVICE_CIDR_BLOCK"
-    icmp_options {
-      code = "4"
-      type = "3"
-    }
-    protocol  = "1"
-    stateless = "false"
-    #tcp_options = <<Optional value not found in discovery>>
-    #udp_options = <<Optional value not found in discovery>>
-  }
   freeform_tags = {
-  }
-  ingress_security_rules {
-    description = "External access to Kubernetes API endpoint"
-    #icmp_options = <<Optional value not found in discovery>>
-    protocol    = "6"
-    source      = "10.0.3.0/24"
-    source_type = "CIDR_BLOCK"
-    stateless   = "false"
-    tcp_options {
-      #max = <<Optional value not found in discovery>>
-      #min = <<Optional value not found in discovery>>
-      source_port_range {
-        max = "6443"
-        min = "6443"
-      }
-    }
-    #udp_options = <<Optional value not found in discovery>>
   }
   ingress_security_rules {
     description = "Kubernetes worker to Kubernetes API endpoint communication"
@@ -1642,12 +454,9 @@ resource oci_core_security_list export_seclist-KubernetesAPIendpoint {
     source_type = "CIDR_BLOCK"
     stateless   = "false"
     tcp_options {
-      #max = <<Optional value not found in discovery>>
-      #min = <<Optional value not found in discovery>>
-      source_port_range {
-        max = "6443"
-        min = "6443"
-      }
+      max = "6443"
+      min = "6443"
+      #source_port_range = <<Optional value not found in discovery>>
     }
     #udp_options = <<Optional value not found in discovery>>
   }
@@ -1665,6 +474,20 @@ resource oci_core_security_list export_seclist-KubernetesAPIendpoint {
     #udp_options = <<Optional value not found in discovery>>
   }
   ingress_security_rules {
+    description = "External access to Kubernetes API endpoint"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol    = "6"
+    source      = "0.0.0.0/0"
+    source_type = "CIDR_BLOCK"
+    stateless   = "false"
+    tcp_options {
+      max = "6443"
+      min = "6443"
+      #source_port_range = <<Optional value not found in discovery>>
+    }
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  ingress_security_rules {
     description = "Kubernetes worker to control plane communication"
     #icmp_options = <<Optional value not found in discovery>>
     protocol    = "6"
@@ -1672,12 +495,166 @@ resource oci_core_security_list export_seclist-KubernetesAPIendpoint {
     source_type = "CIDR_BLOCK"
     stateless   = "false"
     tcp_options {
-      #max = <<Optional value not found in discovery>>
-      #min = <<Optional value not found in discovery>>
-      source_port_range {
-        max = "12250"
-        min = "12250"
-      }
+      max = "12250"
+      min = "12250"
+      #source_port_range = <<Optional value not found in discovery>>
+    }
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+}
+
+resource oci_core_security_list export_seclist-workernodes {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.397Z"
+  }
+  display_name = "seclist-workernodes"
+  egress_security_rules {
+    description      = "Allow worker nodes to communicate with OKE control plane"
+    destination      = "all-str-services-in-oracle-services-network"
+    destination_type = "SERVICE_CIDR_BLOCK"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol  = "6"
+    stateless = "false"
+    tcp_options {
+      max = "443"
+      min = "443"
+      #source_port_range = <<Optional value not found in discovery>>
+    }
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  egress_security_rules {
+    description      = "Kubernetes worker to control plane communication"
+    destination      = "10.0.0.0/30"
+    destination_type = "CIDR_BLOCK"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol  = "6"
+    stateless = "false"
+    tcp_options {
+      max = "12250"
+      min = "12250"
+      #source_port_range = <<Optional value not found in discovery>>
+    }
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  egress_security_rules {
+    description      = "Allow worker nodes to communicate with internet"
+    destination      = "0.0.0.0/0"
+    destination_type = "CIDR_BLOCK"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol  = "all"
+    stateless = "false"
+    #tcp_options = <<Optional value not found in discovery>>
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  egress_security_rules {
+    description      = "Allow worker nodes to communicate with Kubernetes API endpoint"
+    destination      = "10.0.0.0/30"
+    destination_type = "CIDR_BLOCK"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol  = "6"
+    stateless = "false"
+    tcp_options {
+      max = "6443"
+      min = "6443"
+      #source_port_range = <<Optional value not found in discovery>>
+    }
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  egress_security_rules {
+    description      = "Path Discovery"
+    destination      = "0.0.0.0/0"
+    destination_type = "CIDR_BLOCK"
+    icmp_options {
+      code = "4"
+      type = "3"
+    }
+    protocol  = "1"
+    stateless = "false"
+    #tcp_options = <<Optional value not found in discovery>>
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  egress_security_rules {
+    description      = "Path Discovery"
+    destination      = "10.0.0.0/30"
+    destination_type = "CIDR_BLOCK"
+    icmp_options {
+      code = "4"
+      type = "3"
+    }
+    protocol  = "1"
+    stateless = "false"
+    #tcp_options = <<Optional value not found in discovery>>
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  egress_security_rules {
+    description      = "Allow pods on one worker node to communicate with pods on other worker nodes"
+    destination      = "10.0.1.0/24"
+    destination_type = "CIDR_BLOCK"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol  = "all"
+    stateless = "false"
+    #tcp_options = <<Optional value not found in discovery>>
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  freeform_tags = {
+  }
+  ingress_security_rules {
+    description = "Allow load balancer to communicate with kube-proxy on worker nodes for health checks and node port traffic"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol    = "all"
+    source      = "10.0.2.0/24"
+    source_type = "CIDR_BLOCK"
+    stateless   = "false"
+    #tcp_options = <<Optional value not found in discovery>>
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  ingress_security_rules {
+    description = "Allow Kubernetes control plane to communicate with worker nodes"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol    = "6"
+    source      = "10.0.0.0/30"
+    source_type = "CIDR_BLOCK"
+    stateless   = "false"
+    #tcp_options = <<Optional value not found in discovery>>
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  ingress_security_rules {
+    description = "Path Discovery"
+    icmp_options {
+      code = "4"
+      type = "3"
+    }
+    protocol    = "1"
+    source      = "10.0.0.0/30"
+    source_type = "CIDR_BLOCK"
+    stateless   = "false"
+    #tcp_options = <<Optional value not found in discovery>>
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  ingress_security_rules {
+    description = "Allow pods on one worker node to communicate with pods on other worker nodes"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol    = "all"
+    source      = "10.0.1.0/24"
+    source_type = "CIDR_BLOCK"
+    stateless   = "false"
+    #tcp_options = <<Optional value not found in discovery>>
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  ingress_security_rules {
+    description = "Allow inbound SSH traffic to managed nodes from Internet"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol    = "6"
+    source      = "0.0.0.0/0"
+    source_type = "CIDR_BLOCK"
+    stateless   = "false"
+    tcp_options {
+      max = "22"
+      min = "22"
+      #source_port_range = <<Optional value not found in discovery>>
     }
     #udp_options = <<Optional value not found in discovery>>
   }
@@ -1688,7 +665,7 @@ resource oci_core_security_list export_seclist-loadbalancers {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.615Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.397Z"
   }
   display_name = "seclist-loadbalancers"
   egress_security_rules {
@@ -1721,172 +698,10 @@ resource oci_core_security_list export_seclist-loadbalancers {
     source_type = "CIDR_BLOCK"
     stateless   = "false"
     tcp_options {
-      #max = <<Optional value not found in discovery>>
-      #min = <<Optional value not found in discovery>>
-      source_port_range {
-        max = "80"
-        min = "80"
-      }
+      max = "80"
+      min = "80"
+      #source_port_range = <<Optional value not found in discovery>>
     }
-    #udp_options = <<Optional value not found in discovery>>
-  }
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
-}
-
-resource oci_core_security_list export_seclist-workernodes {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.607Z"
-  }
-  display_name = "seclist-workernodes"
-  egress_security_rules {
-    description      = "Allow worker nodes to communicate with internet"
-    destination      = "0.0.0.0/0"
-    destination_type = "CIDR_BLOCK"
-    #icmp_options = <<Optional value not found in discovery>>
-    protocol  = "6"
-    stateless = "false"
-    #tcp_options = <<Optional value not found in discovery>>
-    #udp_options = <<Optional value not found in discovery>>
-  }
-  egress_security_rules {
-    description      = "Allow worker nodes to communicate with Kubernetes API endpoint"
-    destination      = "10.0.0.0/30"
-    destination_type = "CIDR_BLOCK"
-    #icmp_options = <<Optional value not found in discovery>>
-    protocol  = "6"
-    stateless = "false"
-    tcp_options {
-      #max = <<Optional value not found in discovery>>
-      #min = <<Optional value not found in discovery>>
-      source_port_range {
-        max = "6443"
-        min = "6443"
-      }
-    }
-    #udp_options = <<Optional value not found in discovery>>
-  }
-  egress_security_rules {
-    description      = "Path Discovery"
-    destination      = "0.0.0.0/0"
-    destination_type = "CIDR_BLOCK"
-    icmp_options {
-      code = "4"
-      type = "3"
-    }
-    protocol  = "1"
-    stateless = "false"
-    #tcp_options = <<Optional value not found in discovery>>
-    #udp_options = <<Optional value not found in discovery>>
-  }
-  egress_security_rules {
-    description      = "Kubernetes worker to control plane communication"
-    destination      = "10.0.0.0/30"
-    destination_type = "CIDR_BLOCK"
-    #icmp_options = <<Optional value not found in discovery>>
-    protocol  = "6"
-    stateless = "false"
-    tcp_options {
-      #max = <<Optional value not found in discovery>>
-      #min = <<Optional value not found in discovery>>
-      source_port_range {
-        max = "12250"
-        min = "12250"
-      }
-    }
-    #udp_options = <<Optional value not found in discovery>>
-  }
-  egress_security_rules {
-    description      = "Allow worker nodes to communicate with OKE control plane"
-    destination      = "all-str-services-in-oracle-services-network"
-    destination_type = "SERVICE_CIDR_BLOCK"
-    #icmp_options = <<Optional value not found in discovery>>
-    protocol  = "6"
-    stateless = "false"
-    #tcp_options = <<Optional value not found in discovery>>
-    #udp_options = <<Optional value not found in discovery>>
-  }
-  egress_security_rules {
-    description      = "Allow pods on one worker node to communicate with pods on other worker nodes"
-    destination      = "10.0.1.0/24"
-    destination_type = "CIDR_BLOCK"
-    #icmp_options = <<Optional value not found in discovery>>
-    protocol  = "all"
-    stateless = "false"
-    #tcp_options = <<Optional value not found in discovery>>
-    #udp_options = <<Optional value not found in discovery>>
-  }
-  freeform_tags = {
-  }
-  ingress_security_rules {
-    description = "Allow load balancer to communicate with kube-proxy on worker nodes for health checks and node port traffic"
-    #icmp_options = <<Optional value not found in discovery>>
-    protocol    = "all"
-    source      = "10.0.2.0/24"
-    source_type = "CIDR_BLOCK"
-    stateless   = "false"
-    #tcp_options = <<Optional value not found in discovery>>
-    #udp_options = <<Optional value not found in discovery>>
-  }
-  ingress_security_rules {
-    description = "Allow inbound SSH traffic to managed nodes from bastion host"
-    #icmp_options = <<Optional value not found in discovery>>
-    protocol    = "6"
-    source      = "10.0.3.0/24"
-    source_type = "CIDR_BLOCK"
-    stateless   = "false"
-    tcp_options {
-      #max = <<Optional value not found in discovery>>
-      #min = <<Optional value not found in discovery>>
-      source_port_range {
-        max = "22"
-        min = "22"
-      }
-    }
-    #udp_options = <<Optional value not found in discovery>>
-  }
-  ingress_security_rules {
-    description = "Load balancer to worker nodes node ports communication"
-    #icmp_options = <<Optional value not found in discovery>>
-    protocol    = "all"
-    source      = "10.0.2.0/24"
-    source_type = "CIDR_BLOCK"
-    stateless   = "false"
-    #tcp_options = <<Optional value not found in discovery>>
-    #udp_options = <<Optional value not found in discovery>>
-  }
-  ingress_security_rules {
-    description = "Allow Kubernetes control plane to communicate with worker nodes"
-    #icmp_options = <<Optional value not found in discovery>>
-    protocol    = "6"
-    source      = "10.0.0.0/30"
-    source_type = "CIDR_BLOCK"
-    stateless   = "false"
-    #tcp_options = <<Optional value not found in discovery>>
-    #udp_options = <<Optional value not found in discovery>>
-  }
-  ingress_security_rules {
-    description = "Path Discovery"
-    icmp_options {
-      code = "4"
-      type = "3"
-    }
-    protocol    = "1"
-    source      = "0.0.0.0/0"
-    source_type = "CIDR_BLOCK"
-    stateless   = "false"
-    #tcp_options = <<Optional value not found in discovery>>
-    #udp_options = <<Optional value not found in discovery>>
-  }
-  ingress_security_rules {
-    description = "Allow pods on one worker node to communicate with pods on other worker nodes"
-    #icmp_options = <<Optional value not found in discovery>>
-    protocol    = "all"
-    source      = "10.0.1.0/24"
-    source_type = "CIDR_BLOCK"
-    stateless   = "false"
-    #tcp_options = <<Optional value not found in discovery>>
     #udp_options = <<Optional value not found in discovery>>
   }
   vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
@@ -1896,7 +711,7 @@ resource oci_core_default_security_list export_Default-Security-List-for-rdap-ch
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.236Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:08.827Z"
   }
   display_name = "Default Security List for rdap-chatbot-vcn"
   egress_security_rules {
@@ -1910,7 +725,6 @@ resource oci_core_default_security_list export_Default-Security-List-for-rdap-ch
     #udp_options = <<Optional value not found in discovery>>
   }
   freeform_tags = {
-    "Department" = "Finance"
   }
   ingress_security_rules {
     #description = <<Optional value not found in discovery>>
@@ -1955,110 +769,1318 @@ resource oci_core_default_security_list export_Default-Security-List-for-rdap-ch
   manage_default_resource_id = oci_core_vcn.export_rdap-chatbot-vcn.default_security_list_id
 }
 
-resource oci_core_route_table export_routetable-Workernodes {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+resource oci_core_private_ip export_privateip20260529102619 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
   defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:04.178Z"
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:19.398Z"
   }
-  display_name = "routetable-Workernodes"
+  display_name = "privateip20260529102619"
   freeform_tags = {
   }
-  route_rules {
-    description       = "NAT Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_nat_gateway.export_rdap-chatbot-nat-gateway.id
-    route_type        = "STATIC"
-  }
-  route_rules {
-    description       = "Service Gateway Route Rule"
-    destination       = "all-str-services-in-oracle-services-network"
-    destination_type  = "SERVICE_CIDR_BLOCK"
-    network_entity_id = oci_core_service_gateway.export_rdap-chatbot-service-gateway.id
-    route_type        = "STATIC"
-  }
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.3"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
 }
 
-resource oci_core_route_table export_routetable-Serviceloadbalancers {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+resource oci_core_private_ip export_privateip20260529102627 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
   defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.895Z"
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:27.970Z"
   }
-  display_name = "routetable-Serviceloadbalancers"
+  display_name = "privateip20260529102627"
   freeform_tags = {
   }
-  route_rules {
-    description       = "Internet Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
-    route_type        = "STATIC"
-  }
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.4"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
 }
 
-resource oci_core_route_table export_routetable-KubernetesAPIendpoint {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+resource oci_core_private_ip export_privateip20260529102614 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
   defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.881Z"
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:14.308Z"
   }
-  display_name = "routetable-KubernetesAPIendpoint"
+  display_name = "privateip20260529102614"
   freeform_tags = {
   }
-  route_rules {
-    description       = "Internet Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
-    route_type        = "STATIC"
-  }
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.6"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
 }
 
-resource oci_core_default_route_table export_default-route-table-rdap-chatbot-vcn {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+resource oci_core_private_ip export_privateip20260529102633 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
   defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.236Z"
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:33.159Z"
   }
-  display_name = "default-route-table-rdap-chatbot-vcn"
+  display_name = "privateip20260529102633"
   freeform_tags = {
-    "Department" = "Finance"
   }
-  manage_default_resource_id = oci_core_vcn.export_rdap-chatbot-vcn.default_route_table_id
-  route_rules {
-    description       = "Internet Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
-    route_type        = "STATIC"
-  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.8"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
 }
 
-resource oci_core_private_ip export_Service-VNIC-for-cluster-ocid1-cluster-oc19-eu-frankfurt-2-aaaaaaaay2qwpl3pag3s6evidkffg6jc4tkx7dkz2vfgix5agcz6qcjcr2pa {
+resource oci_core_private_ip export_privateip20260529102629 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:29.819Z"
+  }
+  display_name = "privateip20260529102629"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.9"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102626 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:26.159Z"
+  }
+  display_name = "privateip20260529102626"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.11"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102624 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:24.045Z"
+  }
+  display_name = "privateip20260529102624"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.12"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102625 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:25.406Z"
+  }
+  display_name = "privateip20260529102625"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.13"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102624_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:24.379Z"
+  }
+  display_name = "privateip20260529102624"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.18"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102621 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:21.345Z"
+  }
+  display_name = "privateip20260529102621"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.21"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_node_pool.export_rdap-chatbot-oke-node-pool.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:25:28.183Z"
+  }
+  display_name = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0"
+  freeform_tags = {
+  }
+  hostname_label = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0"
+  ip_address     = "10.0.1.25"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljru3wj3jdzimj3hxk4jax6fzsxjksjl2h3ohvkpkbimm7oyvjaziiq"
+}
+
+resource oci_core_private_ip export_privateip20260529102632 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:32.648Z"
+  }
+  display_name = "privateip20260529102632"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.26"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102635 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:35.015Z"
+  }
+  display_name = "privateip20260529102635"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.28"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102624_2 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:24.763Z"
+  }
+  display_name = "privateip20260529102624"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.30"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102638 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:38.315Z"
+  }
+  display_name = "privateip20260529102638"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.31"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102627_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:27.495Z"
+  }
+  display_name = "privateip20260529102627"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.35"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102610 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:10.811Z"
+  }
+  display_name = "privateip20260529102610"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.41"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102640 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:40.355Z"
+  }
+  display_name = "privateip20260529102640"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.51"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102617 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:17.846Z"
+  }
+  display_name = "privateip20260529102617"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.63"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102612 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:12.012Z"
+  }
+  display_name = "privateip20260529102612"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.66"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_vnic20260529102604 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:25:59.709Z"
+  }
+  display_name = "vnic20260529102604"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.73"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102611 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:11.031Z"
+  }
+  display_name = "privateip20260529102611"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.75"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_node_pool.export_rdap-chatbot-oke-node-pool.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:25:28.981Z"
+  }
+  display_name = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1"
+  freeform_tags = {
+  }
+  hostname_label = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1"
+  ip_address     = "10.0.1.76"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrorsegem7lwawoljhkp6ub3ub47ff2ejclybivrbg6rdjrndfk7ga"
+}
+
+resource oci_core_private_ip export_privateip20260529102614_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:14.065Z"
+  }
+  display_name = "privateip20260529102614"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.77"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102621_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:21.682Z"
+  }
+  display_name = "privateip20260529102621"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.78"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102622 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:22.684Z"
+  }
+  display_name = "privateip20260529102622"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.81"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102639 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:39.818Z"
+  }
+  display_name = "privateip20260529102639"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.84"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102622_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:22.320Z"
+  }
+  display_name = "privateip20260529102622"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.95"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102625_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:25.038Z"
+  }
+  display_name = "privateip20260529102625"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.97"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102640_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:40.820Z"
+  }
+  display_name = "privateip20260529102640"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.107"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102619_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:19.988Z"
+  }
+  display_name = "privateip20260529102619"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.113"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102618 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:18.921Z"
+  }
+  display_name = "privateip20260529102618"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.127"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102610_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:10.535Z"
+  }
+  display_name = "privateip20260529102610"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.129"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102616 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:16.976Z"
+  }
+  display_name = "privateip20260529102616"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.134"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102615 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:15.636Z"
+  }
+  display_name = "privateip20260529102615"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.137"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102636 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:36.652Z"
+  }
+  display_name = "privateip20260529102636"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.139"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102613 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:13.532Z"
+  }
+  display_name = "privateip20260529102613"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.146"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102632_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:32.177Z"
+  }
+  display_name = "privateip20260529102632"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.148"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102636_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:36.463Z"
+  }
+  display_name = "privateip20260529102636"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.149"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102615_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:15.346Z"
+  }
+  display_name = "privateip20260529102615"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.150"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102642 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:42.384Z"
+  }
+  display_name = "privateip20260529102642"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.151"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102637 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:37.900Z"
+  }
+  display_name = "privateip20260529102637"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.153"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102627_2 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:27.562Z"
+  }
+  display_name = "privateip20260529102627"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.156"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102629_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:29.391Z"
+  }
+  display_name = "privateip20260529102629"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.165"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102619_2 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:19.693Z"
+  }
+  display_name = "privateip20260529102619"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.167"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102627_3 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:27.874Z"
+  }
+  display_name = "privateip20260529102627"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.169"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_vnic20260529102604_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:25:59.676Z"
+  }
+  display_name = "vnic20260529102604"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.172"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102638_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:38.771Z"
+  }
+  display_name = "privateip20260529102638"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.174"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102626_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:26.114Z"
+  }
+  display_name = "privateip20260529102626"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.178"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102634 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:34.588Z"
+  }
+  display_name = "privateip20260529102634"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.189"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102631 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:31.709Z"
+  }
+  display_name = "privateip20260529102631"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.192"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102611_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:11.770Z"
+  }
+  display_name = "privateip20260529102611"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.198"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102617_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:17.274Z"
+  }
+  display_name = "privateip20260529102617"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.204"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102631_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:31.086Z"
+  }
+  display_name = "privateip20260529102631"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.205"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102613_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:13.810Z"
+  }
+  display_name = "privateip20260529102613"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.207"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102610_2 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:10.578Z"
+  }
+  display_name = "privateip20260529102610"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.211"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102625_2 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:25.768Z"
+  }
+  display_name = "privateip20260529102625"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.213"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102629_2 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:29.659Z"
+  }
+  display_name = "privateip20260529102629"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.216"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102619_3 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:19.125Z"
+  }
+  display_name = "privateip20260529102619"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.219"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102610_3 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:10.349Z"
+  }
+  display_name = "privateip20260529102610"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.229"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102618_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:18.587Z"
+  }
+  display_name = "privateip20260529102618"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.231"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102629_3 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:29.254Z"
+  }
+  display_name = "privateip20260529102629"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.233"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102631_2 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:31.243Z"
+  }
+  display_name = "privateip20260529102631"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.236"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102637_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:37.880Z"
+  }
+  display_name = "privateip20260529102637"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.237"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102613_2 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:13.281Z"
+  }
+  display_name = "privateip20260529102613"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.239"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102614_2 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:14.563Z"
+  }
+  display_name = "privateip20260529102614"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.241"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
+}
+
+resource oci_core_private_ip export_privateip20260529102639_1 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:39.353Z"
+  }
+  display_name = "privateip20260529102639"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.242"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_privateip20260529102610_4 {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:26:10.298Z"
+  }
+  display_name = "privateip20260529102610"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.1.249"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrxhqexw6bo5iia3k5gyen6a2srsanfzsb6qwifdcgnyalt7yh4lxa"
+}
+
+resource oci_core_private_ip export_Service-VNIC-for-cluster-ocid1-cluster-oc19-eu-frankfurt-2-aaaaaaaacjtgtlnbpodzvnblfl5joj3dy6hcmqavrfvidptg2cburyzxciiq {
   #cidr_prefix_length = <<Optional value not found in discovery>>
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:30:33.481Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:20.622Z"
   }
-  display_name = "Service VNIC for cluster ocid1.cluster.oc19.eu-frankfurt-2.aaaaaaaay2qwpl3pag3s6evidkffg6jc4tkx7dkz2vfgix5agcz6qcjcr2pa"
+  display_name = "Service VNIC for cluster ocid1.cluster.oc19.eu-frankfurt-2.aaaaaaaacjtgtlnbpodzvnblfl5joj3dy6hcmqavrfvidptg2cburyzxciiq"
   freeform_tags = {
   }
-  hostname_label = "cz6qcjcr2pa"
+  hostname_label = "cburyzxciiq"
   ip_address     = "10.0.0.2"
   #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
   lifetime = "EPHEMERAL"
   #route_table_id = <<Optional value not found in discovery>>
   subnet_id = oci_core_subnet.export_Kubernetes-API-endpoint-subnet.id
   #vlan_id = <<Optional value not found in discovery>>
-  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrj4gqzmaazzvgbnq2zntfcb574c4dmbja7qhsvvpwk7wwzr44dqaa"
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrr67ehzrbv5exxi3o2zksirntn474cbcxtyrr6rg5t3odkaesvhuq"
 }
 
-resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0_1 {
+resource oci_core_instance export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0 {
   agent_config {
     are_all_plugins_disabled = "false"
     is_management_disabled   = "false"
@@ -2079,16 +2101,16 @@ resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0_1 {
     #assign_private_dns_record = <<Optional value not found in discovery>>
     assign_public_ip = "false"
     defined_tags = {
-      "Oracle-Tags.CreatedBy" = oci_containerengine_node_pool.export_pool1.id
-      "Oracle-Tags.CreatedOn" = "2026-05-26T11:23:38.437Z"
+      "Oracle-Tags.CreatedBy" = oci_containerengine_node_pool.export_rdap-chatbot-oke-node-pool.id
+      "Oracle-Tags.CreatedOn" = "2026-05-29T10:25:28.183Z"
     }
-    display_name = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0"
+    display_name = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0"
     freeform_tags = {
     }
-    hostname_label = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0"
+    hostname_label = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0"
     nsg_ids = [
     ]
-    private_ip = "10.0.1.91"
+    private_ip = "10.0.1.25"
     #private_ip_id = <<Optional value not found in discovery>>
     security_attributes = {
     }
@@ -2099,10 +2121,10 @@ resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0_1 {
   }
   #dedicated_vm_host_id = <<Optional value not found in discovery>>
   defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_node_pool.export_pool1.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:23:38.399Z"
+    "Oracle-Tags.CreatedBy" = oci_containerengine_node_pool.export_rdap-chatbot-oke-node-pool.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:25:28.134Z"
   }
-  display_name = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0"
+  display_name = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0"
   extended_metadata = {
   }
   fault_domain = var.fault_domain--FAULT-DOMAIN-1
@@ -2125,15 +2147,15 @@ resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0_1 {
   }
   #launch_volume_attachments = <<Optional value not found in discovery>>
   metadata = {
-    "ansible_args"                      = "eyJjbHVzdGVyX2lkIjoiY3o2cWNqY3IycGEiLCJrOHNfYXBpc2VydmVyX2FkZHIiOiIxMC4wLjAuMiIsIms4c19hcGlzZXJ2ZXJfcG9ydCI6IjY0NDMiLCJmbGFubmVsX2V0Y2RfY2FfY2VydCI6Ii0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLVxuTUlJRGlUQ0NBbkdnQXdJQkFnSVJBT0xxZGczRHR6ZGh6UklJc0pmYkJyY3dEUVlKS29aSWh2Y05BUUVMQlFBd1xuWGpFUE1BMEdBMVVFQXd3R1N6aHpJRU5CTVFzd0NRWURWUVFHRXdKVlV6RVBNQTBHQTFVRUJ3d0dRWFZ6ZEdsdVxuTVE4d0RRWURWUVFLREFaUGNtRmpiR1V4RERBS0JnTlZCQXNNQTA5amFURU9NQXdHQTFVRUNBd0ZWR1Y0WVhNd1xuSGhjTk1qWXdOVEkyTURnek1ETTFXaGNOTXpFd05USTJNRGd6TURNMVdqQmVNUTh3RFFZRFZRUUREQVpMT0hNZ1xuUTBFeEN6QUpCZ05WQkFZVEFsVlRNUTh3RFFZRFZRUUhEQVpCZFhOMGFXNHhEekFOQmdOVkJBb01Cazl5WVdOc1xuWlRFTU1Bb0dBMVVFQ3d3RFQyTnBNUTR3REFZRFZRUUlEQVZVWlhoaGN6Q0NBU0l3RFFZSktvWklodmNOQVFFQlxuQlFBRGdnRVBBRENDQVFvQ2dnRUJBS3U5bW44SXk5MGFyQU1zZHRXTTBORGhPaVA5RGQrVW5DUFB3cFd3clZyTFxuUlBJV1RveE1qcjhMbVI2U0Ezc3pNM2RvWWUxNW8yRmZoNkRzS21QUmRkQ0JFaVdhL3FKU3phNzNNVTZnemhNT1xuSFovTXlTVnJ4eGlYZ3hMTzBvaXkrSVBVU1l6ZkJPMy9peStXZUVGQmdrSnhPWmY0TjJnSDdzNnFxREQ0aHpjT1xuZ2dGWXJGTFZGcHBiN2RBbjE0WmFyQndLTzlCRnowSzFwT1g3dzZPbjlDd01OdE4ySzNJbk5tWDV4S0g1dnJuK1xuQ3A1Wlk1SjlqTlNTdVNDT3MxazdTL2pVdWZjME5FRTJOa0k3TTdjWG9XZWtZbXlySStaU1B4NW1nbkJKeG9seVxuSXJLNDN0SjZ5SVI4R25Xd2VGckVJS1FHN3F2aCtiQTlIV2VDTXJwS2VPOENBd0VBQWFOQ01FQXdEd1lEVlIwVFxuQVFIL0JBVXdBd0VCL3pBT0JnTlZIUThCQWY4RUJBTUNBUVl3SFFZRFZSME9CQllFRkZoVEhiem83TG1BRHRYalxuTk1aRWV0aVRpQkl0TUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFBci91WnpLRGdmMDhzTDVOQk5nN0UvS24valxuYkthQW5BblpuY0pHSjY0djVVcFdrK2lIRjhERGk5VmF5UHVnOUNFV0xTNW9mT05ZUERGbVhubUlWYUwyM08rRVxuUUpiQnJRWDdzK2Irek5SYzBoMzV6dlhVTFkvMXV2YWJjUDN0bjVkRWVkREIwZTlzeUo3eFFZbForVEt0M2lWbFxubUZwbDZMMDZ0ZHNLVDcySmxNeHUxa3JjVnUrV29nN09LRldLTzJIUWlUeVF5djgrZEQ2L24xY3dVL1RxT1pCWFxuUlVJb1E2RTVhYXE1b3dqMis5K29yT3ZzZFkreitxcW1MYzZER2Jibld0Qm1va0xLM3draUVmUzkreklhWjFoWVxuZFhJc0U0Vm12cGZyQ1BNS0lFa0lwbkdSTUFNb2tHMmRwZklqSkZSNDNVR2NuOFliL3BwUFNFbWZycFROXG4tLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tXG5cbiIsImt1YmVkbnNfc3ZjX2lwIjoiMTAuOTYuNS41IiwidG1faWQiOiJva2UiLCJrdWJlbGV0X2NsaWVudF9jYSI6Ii0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLVxuTUlJRGlUQ0NBbkdnQXdJQkFnSVJBT0xxZGczRHR6ZGh6UklJc0pmYkJyY3dEUVlKS29aSWh2Y05BUUVMQlFBd1xuWGpFUE1BMEdBMVVFQXd3R1N6aHpJRU5CTVFzd0NRWURWUVFHRXdKVlV6RVBNQTBHQTFVRUJ3d0dRWFZ6ZEdsdVxuTVE4d0RRWURWUVFLREFaUGNtRmpiR1V4RERBS0JnTlZCQXNNQTA5amFURU9NQXdHQTFVRUNBd0ZWR1Y0WVhNd1xuSGhjTk1qWXdOVEkyTURnek1ETTFXaGNOTXpFd05USTJNRGd6TURNMVdqQmVNUTh3RFFZRFZRUUREQVpMT0hNZ1xuUTBFeEN6QUpCZ05WQkFZVEFsVlRNUTh3RFFZRFZRUUhEQVpCZFhOMGFXNHhEekFOQmdOVkJBb01Cazl5WVdOc1xuWlRFTU1Bb0dBMVVFQ3d3RFQyTnBNUTR3REFZRFZRUUlEQVZVWlhoaGN6Q0NBU0l3RFFZSktvWklodmNOQVFFQlxuQlFBRGdnRVBBRENDQVFvQ2dnRUJBS3U5bW44SXk5MGFyQU1zZHRXTTBORGhPaVA5RGQrVW5DUFB3cFd3clZyTFxuUlBJV1RveE1qcjhMbVI2U0Ezc3pNM2RvWWUxNW8yRmZoNkRzS21QUmRkQ0JFaVdhL3FKU3phNzNNVTZnemhNT1xuSFovTXlTVnJ4eGlYZ3hMTzBvaXkrSVBVU1l6ZkJPMy9peStXZUVGQmdrSnhPWmY0TjJnSDdzNnFxREQ0aHpjT1xuZ2dGWXJGTFZGcHBiN2RBbjE0WmFyQndLTzlCRnowSzFwT1g3dzZPbjlDd01OdE4ySzNJbk5tWDV4S0g1dnJuK1xuQ3A1Wlk1SjlqTlNTdVNDT3MxazdTL2pVdWZjME5FRTJOa0k3TTdjWG9XZWtZbXlySStaU1B4NW1nbkJKeG9seVxuSXJLNDN0SjZ5SVI4R25Xd2VGckVJS1FHN3F2aCtiQTlIV2VDTXJwS2VPOENBd0VBQWFOQ01FQXdEd1lEVlIwVFxuQVFIL0JBVXdBd0VCL3pBT0JnTlZIUThCQWY4RUJBTUNBUVl3SFFZRFZSME9CQllFRkZoVEhiem83TG1BRHRYalxuTk1aRWV0aVRpQkl0TUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFBci91WnpLRGdmMDhzTDVOQk5nN0UvS24valxuYkthQW5BblpuY0pHSjY0djVVcFdrK2lIRjhERGk5VmF5UHVnOUNFV0xTNW9mT05ZUERGbVhubUlWYUwyM08rRVxuUUpiQnJRWDdzK2Irek5SYzBoMzV6dlhVTFkvMXV2YWJjUDN0bjVkRWVkREIwZTlzeUo3eFFZbForVEt0M2lWbFxubUZwbDZMMDZ0ZHNLVDcySmxNeHUxa3JjVnUrV29nN09LRldLTzJIUWlUeVF5djgrZEQ2L24xY3dVL1RxT1pCWFxuUlVJb1E2RTVhYXE1b3dqMis5K29yT3ZzZFkreitxcW1MYzZER2Jibld0Qm1va0xLM3draUVmUzkreklhWjFoWVxuZFhJc0U0Vm12cGZyQ1BNS0lFa0lwbkdSTUFNb2tHMmRwZklqSkZSNDNVR2NuOFliL3BwUFNFbWZycFROXG4tLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tXG5cbiIsInByb3h5bXV4X3NlcnZlcl9wb3J0IjoiMTIyNTAifQ=="
-    "bootstrap-kubelet-conf"            = "YXBpVmVyc2lvbjogdjEKY2x1c3RlcnM6Ci0gY2x1c3RlcjoKICAgIGNlcnRpZmljYXRlLWF1dGhvcml0eS1kYXRhOiBMUzB0TFMxQ1JVZEpUaUJEUlZKVVNVWkpRMEZVUlMwdExTMHRDazFKU1VScFZFTkRRVzVIWjBGM1NVSkJaMGxTUVU5TWNXUm5NMFIwZW1Sb2VsSkpTWE5LWm1KQ2NtTjNSRkZaU2t0dldrbG9kbU5PUVZGRlRFSlJRWGNLV0dwRlVFMUJNRWRCTVZWRlFYZDNSMU42YUhwSlJVNUNUVkZ6ZDBOUldVUldVVkZIUlhkS1ZsVjZSVkJOUVRCSFFURlZSVUozZDBkUldGWjZaRWRzZFFwTlVUaDNSRkZaUkZaUlVVdEVRVnBRWTIxR2FtSkhWWGhFUkVGTFFtZE9Wa0pCYzAxQk1EbHFZVlJGVDAxQmQwZEJNVlZGUTBGM1JsWkhWalJaV0UxM0NraG9ZMDVOYWxsM1RsUkpNazFFWjNwTlJFMHhWMmhqVGsxNlJYZE9WRWt5VFVSbmVrMUVUVEZYYWtKbFRWRTRkMFJSV1VSV1VWRkVSRUZhVEU5SVRXY0tVVEJGZUVONlFVcENaMDVXUWtGWlZFRnNWbFJOVVRoM1JGRlpSRlpSVVVoRVFWcENaRmhPTUdGWE5IaEVla0ZPUW1kT1ZrSkJiMDFDYXpsNVdWZE9jd3BhVkVWTlRVRnZSMEV4VlVWRGQzZEVWREpPY0UxUk5IZEVRVmxFVmxGUlNVUkJWbFZhV0dob1kzcERRMEZUU1hkRVVWbEtTMjlhU1doMlkwNUJVVVZDQ2tKUlFVUm5aMFZRUVVSRFEwRlJiME5uWjBWQ1FVdDFPVzF1T0VsNU9UQmhja0ZOYzJSMFYwMHdUa1JvVDJsUU9VUmtLMVZ1UTFCUWQzQlhkM0pXY2t3S1VsQkpWMVJ2ZUUxcWNqaE1iVkkyVTBFemMzcE5NMlJ2V1dVeE5XOHlSbVpvTmtSelMyMVFVbVJrUTBKRmFWZGhMM0ZLVTNwaE56Tk5WVFpuZW1oTlR3cElXaTlOZVZOV2NuaDRhVmhuZUV4UE1HOXBlU3RKVUZWVFdYcG1Razh6TDJsNUsxZGxSVVpDWjJ0S2VFOWFaalJPTW1kSU4zTTJjWEZFUkRSb2VtTlBDbWRuUmxseVJreFdSbkJ3WWpka1FXNHhORnBoY2tKM1MwODVRa1o2TUVzeGNFOVlOM2MyVDI0NVEzZE5UblJPTWtzelNXNU9iVmcxZUV0SU5YWnliaXNLUTNBMVdsazFTamxxVGxOVGRWTkRUM014YXpkVEwycFZkV1pqTUU1RlJUSk9hMGszVFRkaldHOVhaV3RaYlhseVNTdGFVMUI0TlcxbmJrSktlRzlzZVFwSmNrczBNM1JLTm5sSlVqaEhibGQzWlVaeVJVbExVVWMzY1hab0sySkJPVWhYWlVOTmNuQkxaVTg0UTBGM1JVRkJZVTVEVFVWQmQwUjNXVVJXVWpCVUNrRlJTQzlDUVZWM1FYZEZRaTk2UVU5Q1owNVdTRkU0UWtGbU9FVkNRVTFEUVZGWmQwaFJXVVJXVWpCUFFrSlpSVVpHYUZSSVlucHZOMHh0UVVSMFdHb0tUazFhUldWMGFWUnBRa2wwVFVFd1IwTlRjVWRUU1dJelJGRkZRa04zVlVGQk5FbENRVkZCY2k5MVducExSR2RtTURoelREVk9RazVuTjBVdlMyNHZhZ3BpUzJGQmJrRnVXbTVqU2tkS05qUjJOVlZ3VjJzcmFVaEdPRVJFYVRsV1lYbFFkV2M1UTBWWFRGTTFiMlpQVGxsUVJFWnRXRzV0U1ZaaFRESXpUeXRGQ2xGS1lrSnlVVmczY3l0aUszcE9VbU13YURNMWVuWllWVXhaTHpGMWRtRmlZMUF6ZEc0MVpFVmxaRVJDTUdVNWMzbEtOM2hSV1d4YUsxUkxkRE5wVm13S2JVWndiRFpNTURaMFpITkxWRGN5U214TmVIVXhhM0pqVm5VclYyOW5OMDlMUmxkTFR6SklVV2xVZVZGNWRqZ3JaRVEyTDI0eFkzZFZMMVJ4VDFwQ1dBcFNWVWx2VVRaRk5XRmhjVFZ2ZDJveUt6a3JiM0pQZG5Oa1dTdDZLM0Z4YlV4ak5rUkhZbUp1VjNSQ2JXOXJURXN6ZDJ0cFJXWlRPU3Q2U1dGYU1XaFpDbVJZU1hORk5GWnRkbkJtY2tOUVRVdEpSV3RKY0c1SFVrMUJUVzlyUnpKa2NHWkpha3BHVWpRelZVZGpiamhaWWk5d2NGQlRSVzFtY25CVVRnb3RMUzB0TFVWT1JDQkRSVkpVU1VaSlEwRlVSUzB0TFMwdENnbz0KICAgIHNlcnZlcjogaHR0cHM6Ly8xMC4wLjAuMjo2NDQzCiAgbmFtZTogYm9vdHN0cmFwCmNvbnRleHRzOgotIGNvbnRleHQ6CiAgICBjbHVzdGVyOiBib290c3RyYXAKICAgIHVzZXI6IGJvb3RzdHJhcAogIG5hbWU6IGJvb3RzdHJhcApjdXJyZW50LWNvbnRleHQ6IGJvb3RzdHJhcApraW5kOiBDb25maWcKcHJlZmVyZW5jZXM6IHt9CnVzZXJzOgotIG5hbWU6IGJvb3RzdHJhcAogIHVzZXI6CiAgICB0b2tlbjogcmd1OWx5Lnhzd3Vycjh1ajNpeGJvZDkK"
-    "inventory_tmpl"                    = "[tkm-minions]\nlocalhost initial_node_labels=name=pool1,oci.oraclecloud.com/node.info.managed=true node_is_on_private_subnet={NODE_IS_ON_PRIVATE_SUBNET} nodeid_suffix={NODE_SUFFIX} shape=VM.Standard3.Flex ansible_user=opc tenancyid=ocid1.tenancy.oc19..aaaaaaaadu4nynpyltw2mbzb7qhmimjldhzpasq5vzffcv7mkw67vy5fnd3a compartmentid_prefix=ocid1.compartment.oc19 k8s_kubelet_hostname={K8S_KUBELET_HOSTNAME} region_key=STR ansible_connection=local public_ipaddress={PUBLIC_IP} zone=uOWN:eu-frankfurt-2-ad-1 k8s_version=v1.34.2 displayname=oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0 compartmentname=rdap-chatbot-cmp nodeid_prefix={NODE_PREFIX} region_name=eu-frankfurt-2 ta_version={TA_VERSION} region=eu-frankfurt-2 compartmentid_suffix=aaaaaaaaw7nfek7szdgjrdidzqhkjzx7bw4txy2y3kdydjryavxmei52t5xq private_ipaddress={PRIVATE_IP}\n"
+    "ansible_args"                      = "eyJjbHVzdGVyX2lkIjoiY2J1cnl6eGNpaXEiLCJrOHNfYXBpc2VydmVyX2FkZHIiOiIxMC4wLjAuMiIsIms4c19hcGlzZXJ2ZXJfcG9ydCI6IjY0NDMiLCJmbGFubmVsX2V0Y2RfY2FfY2VydCI6Ii0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLVxuTUlJRGlUQ0NBbkdnQXdJQkFnSVJBTkFGbC9XT25SK3diL0FoRGt6NDFFWXdEUVlKS29aSWh2Y05BUUVMQlFBd1xuWGpFUE1BMEdBMVVFQXd3R1N6aHpJRU5CTVFzd0NRWURWUVFHRXdKVlV6RVBNQTBHQTFVRUJ3d0dRWFZ6ZEdsdVxuTVE4d0RRWURWUVFLREFaUGNtRmpiR1V4RERBS0JnTlZCQXNNQTA5amFURU9NQXdHQTFVRUNBd0ZWR1Y0WVhNd1xuSGhjTk1qWXdOVEk1TVRBeE9USXlXaGNOTXpFd05USTVNVEF4T1RJeVdqQmVNUTh3RFFZRFZRUUREQVpMT0hNZ1xuUTBFeEN6QUpCZ05WQkFZVEFsVlRNUTh3RFFZRFZRUUhEQVpCZFhOMGFXNHhEekFOQmdOVkJBb01Cazl5WVdOc1xuWlRFTU1Bb0dBMVVFQ3d3RFQyTnBNUTR3REFZRFZRUUlEQVZVWlhoaGN6Q0NBU0l3RFFZSktvWklodmNOQVFFQlxuQlFBRGdnRVBBRENDQVFvQ2dnRUJBTEpYVmpSaUVwVlcrUjh2dzRoNkZuZ3lweVRpa0NjRW9yMm81NndsMjJxelxuS284SXhOcHIzb1p3UnROTXFhRk1hZjRpRVB5eDVEd2pyTURhK3RNSGRNVnNLckRrU2FsNWhTZHV1SS9PUnpNOVxuL3I4ZVZUV3pHUzRQbWxvWEhOZEdEYVpaUHJsTGhwVHZhZXMycmFxVTlyaVRybUZSQ0t5OUVkZ0J2R1drdEtkL1xuK2xJZHpKOVpxckhpdHhxUWRhNnpMbFVmZmMvbDhwQ3BEWktMVmpnRXJqak13bmREZUtueTA1VzB2Sk9YSktJL1xuQitsTEJRYm8ySk91dnVOY282UmVYMWR0VEFuNnRZYWdxSDNFelo4NEhFdVdqb3ppUUFFT3BpSk5zMGNKeEo1WlxuUDJDbXRaZzBwdVVJTW9MT2lXK1F2VS8wenBmRFo3RTZsSmE4QVNVbmVMOENBd0VBQWFOQ01FQXdEd1lEVlIwVFxuQVFIL0JBVXdBd0VCL3pBT0JnTlZIUThCQWY4RUJBTUNBUVl3SFFZRFZSME9CQllFRk9tblRGT0FCYWVJK05RZFxuNWw1eXN3QksvZEYrTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFDUi9uUGp4Y1JSOGdvUjZjb2kxRUFVaTl3YlxuSjBlb0JjUkdGODlHWFlCa0NQUTliTG9PeWh6MHdveUV6N2RobGFlTk1jeGVNSGQxS2s5Q2dCdmt1bU5paVRKTVxuTTQ0RmNrRWFGWUhCcXg2U3JZTlZhZlk3Qk52Rk9LSm5Sc2pTNFdLQUpqUExJUkRJRGJ1MEJrUkJqTkh4K29MTlxucEpjb1NwTDRRZko4VUJ0c2FzMXhTRUJrUzVuYkZaMHRxNmtWR2hwMFFZVzBHNTFoNkd1U2Y0cnpvTktiSnRERFxuMVU3S1J3bS9pckU4VUhMWTNWTFN4dThYWGVDZ3paNVJwYTRBZjhQSjdZOTRSbmZxMEM3VU9tSkhVR3Y0ZUdTZVxuM0QvdXhPOWxHZ0RUcUo0eGdDR09STDZZc1BVZndES05mNlJBT2dUVkQxd1NFYk9BL005YUZnRTFycFRJXG4tLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tXG5cbiIsImt1YmVkbnNfc3ZjX2lwIjoiMTAuOTYuNS41IiwidG1faWQiOiJva2UiLCJrdWJlbGV0X2NsaWVudF9jYSI6Ii0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLVxuTUlJRGlUQ0NBbkdnQXdJQkFnSVJBTkFGbC9XT25SK3diL0FoRGt6NDFFWXdEUVlKS29aSWh2Y05BUUVMQlFBd1xuWGpFUE1BMEdBMVVFQXd3R1N6aHpJRU5CTVFzd0NRWURWUVFHRXdKVlV6RVBNQTBHQTFVRUJ3d0dRWFZ6ZEdsdVxuTVE4d0RRWURWUVFLREFaUGNtRmpiR1V4RERBS0JnTlZCQXNNQTA5amFURU9NQXdHQTFVRUNBd0ZWR1Y0WVhNd1xuSGhjTk1qWXdOVEk1TVRBeE9USXlXaGNOTXpFd05USTVNVEF4T1RJeVdqQmVNUTh3RFFZRFZRUUREQVpMT0hNZ1xuUTBFeEN6QUpCZ05WQkFZVEFsVlRNUTh3RFFZRFZRUUhEQVpCZFhOMGFXNHhEekFOQmdOVkJBb01Cazl5WVdOc1xuWlRFTU1Bb0dBMVVFQ3d3RFQyTnBNUTR3REFZRFZRUUlEQVZVWlhoaGN6Q0NBU0l3RFFZSktvWklodmNOQVFFQlxuQlFBRGdnRVBBRENDQVFvQ2dnRUJBTEpYVmpSaUVwVlcrUjh2dzRoNkZuZ3lweVRpa0NjRW9yMm81NndsMjJxelxuS284SXhOcHIzb1p3UnROTXFhRk1hZjRpRVB5eDVEd2pyTURhK3RNSGRNVnNLckRrU2FsNWhTZHV1SS9PUnpNOVxuL3I4ZVZUV3pHUzRQbWxvWEhOZEdEYVpaUHJsTGhwVHZhZXMycmFxVTlyaVRybUZSQ0t5OUVkZ0J2R1drdEtkL1xuK2xJZHpKOVpxckhpdHhxUWRhNnpMbFVmZmMvbDhwQ3BEWktMVmpnRXJqak13bmREZUtueTA1VzB2Sk9YSktJL1xuQitsTEJRYm8ySk91dnVOY282UmVYMWR0VEFuNnRZYWdxSDNFelo4NEhFdVdqb3ppUUFFT3BpSk5zMGNKeEo1WlxuUDJDbXRaZzBwdVVJTW9MT2lXK1F2VS8wenBmRFo3RTZsSmE4QVNVbmVMOENBd0VBQWFOQ01FQXdEd1lEVlIwVFxuQVFIL0JBVXdBd0VCL3pBT0JnTlZIUThCQWY4RUJBTUNBUVl3SFFZRFZSME9CQllFRk9tblRGT0FCYWVJK05RZFxuNWw1eXN3QksvZEYrTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFDUi9uUGp4Y1JSOGdvUjZjb2kxRUFVaTl3YlxuSjBlb0JjUkdGODlHWFlCa0NQUTliTG9PeWh6MHdveUV6N2RobGFlTk1jeGVNSGQxS2s5Q2dCdmt1bU5paVRKTVxuTTQ0RmNrRWFGWUhCcXg2U3JZTlZhZlk3Qk52Rk9LSm5Sc2pTNFdLQUpqUExJUkRJRGJ1MEJrUkJqTkh4K29MTlxucEpjb1NwTDRRZko4VUJ0c2FzMXhTRUJrUzVuYkZaMHRxNmtWR2hwMFFZVzBHNTFoNkd1U2Y0cnpvTktiSnRERFxuMVU3S1J3bS9pckU4VUhMWTNWTFN4dThYWGVDZ3paNVJwYTRBZjhQSjdZOTRSbmZxMEM3VU9tSkhVR3Y0ZUdTZVxuM0QvdXhPOWxHZ0RUcUo0eGdDR09STDZZc1BVZndES05mNlJBT2dUVkQxd1NFYk9BL005YUZnRTFycFRJXG4tLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tXG5cbiIsInByb3h5bXV4X3NlcnZlcl9wb3J0IjoiMTIyNTAifQ=="
+    "bootstrap-kubelet-conf"            = "YXBpVmVyc2lvbjogdjEKY2x1c3RlcnM6Ci0gY2x1c3RlcjoKICAgIGNlcnRpZmljYXRlLWF1dGhvcml0eS1kYXRhOiBMUzB0TFMxQ1JVZEpUaUJEUlZKVVNVWkpRMEZVUlMwdExTMHRDazFKU1VScFZFTkRRVzVIWjBGM1NVSkJaMGxTUVU1QlJtd3ZWMDl1VWl0M1lpOUJhRVJyZWpReFJWbDNSRkZaU2t0dldrbG9kbU5PUVZGRlRFSlJRWGNLV0dwRlVFMUJNRWRCTVZWRlFYZDNSMU42YUhwSlJVNUNUVkZ6ZDBOUldVUldVVkZIUlhkS1ZsVjZSVkJOUVRCSFFURlZSVUozZDBkUldGWjZaRWRzZFFwTlVUaDNSRkZaUkZaUlVVdEVRVnBRWTIxR2FtSkhWWGhFUkVGTFFtZE9Wa0pCYzAxQk1EbHFZVlJGVDAxQmQwZEJNVlZGUTBGM1JsWkhWalJaV0UxM0NraG9ZMDVOYWxsM1RsUkpOVTFVUVhoUFZFbDVWMmhqVGsxNlJYZE9WRWsxVFZSQmVFOVVTWGxYYWtKbFRWRTRkMFJSV1VSV1VWRkVSRUZhVEU5SVRXY0tVVEJGZUVONlFVcENaMDVXUWtGWlZFRnNWbFJOVVRoM1JGRlpSRlpSVVVoRVFWcENaRmhPTUdGWE5IaEVla0ZPUW1kT1ZrSkJiMDFDYXpsNVdWZE9jd3BhVkVWTlRVRnZSMEV4VlVWRGQzZEVWREpPY0UxUk5IZEVRVmxFVmxGUlNVUkJWbFZhV0dob1kzcERRMEZUU1hkRVVWbEtTMjlhU1doMlkwNUJVVVZDQ2tKUlFVUm5aMFZRUVVSRFEwRlJiME5uWjBWQ1FVeEtXRlpxVW1sRmNGWlhLMUk0ZG5jMGFEWkdibWQ1Y0hsVWFXdERZMFZ2Y2pKdk5UWjNiREl5Y1hvS1MyODRTWGhPY0hJemIxcDNVblJPVFhGaFJrMWhaalJwUlZCNWVEVkVkMnB5VFVSaEszUk5TR1JOVm5OTGNrUnJVMkZzTldoVFpIVjFTUzlQVW5wTk9Rb3ZjamhsVmxSWGVrZFRORkJ0Ykc5WVNFNWtSMFJoV2xwUWNteE1hSEJVZG1GbGN6SnlZWEZWT1hKcFZISnRSbEpEUzNrNVJXUm5RblpIVjJ0MFMyUXZDaXRzU1dSNlNqbGFjWEpJYVhSNGNWRmtZVFo2VEd4VlptWmpMMnc0Y0VOd1JGcExURlpxWjBWeWFtcE5kMjVrUkdWTGJua3dOVmN3ZGtwUFdFcExTUzhLUWl0c1RFSlJZbTh5U2s5MWRuVk9ZMjgyVW1WWU1XUjBWRUZ1Tm5SWllXZHhTRE5GZWxvNE5FaEZkVmRxYjNwcFVVRkZUM0JwU2s1ek1HTktlRW8xV2dwUU1rTnRkRnBuTUhCMVZVbE5iMHhQYVZjclVYWlZMekI2Y0daRVdqZEZObXhLWVRoQlUxVnVaVXc0UTBGM1JVRkJZVTVEVFVWQmQwUjNXVVJXVWpCVUNrRlJTQzlDUVZWM1FYZEZRaTk2UVU5Q1owNVdTRkU0UWtGbU9FVkNRVTFEUVZGWmQwaFJXVVJXVWpCUFFrSlpSVVpQYlc1VVJrOUJRbUZsU1N0T1VXUUtOV3cxZVhOM1Frc3ZaRVlyVFVFd1IwTlRjVWRUU1dJelJGRkZRa04zVlVGQk5FbENRVkZEVWk5dVVHcDRZMUpTT0dkdlVqWmpiMmt4UlVGVmFUbDNZZ3BLTUdWdlFtTlNSMFk0T1VkWVdVSnJRMUJST1dKTWIwOTVhSG93ZDI5NVJYbzNaR2hzWVdWT1RXTjRaVTFJWkRGTGF6bERaMEoyYTNWdFRtbHBWRXBOQ2swME5FWmphMFZoUmxsSVFuRjRObE55V1U1V1lXWlpOMEpPZGtaUFMwcHVVbk5xVXpSWFMwRkthbEJNU1ZKRVNVUmlkVEJDYTFKQ2FrNUllQ3R2VEU0S2NFcGpiMU53VERSUlprbzRWVUowYzJGek1YaFRSVUpyVXpWdVlrWmFNSFJ4Tm10V1IyaHdNRkZaVnpCSE5URm9Oa2QxVTJZMGNucHZUa3RpU25SRVJBb3hWVGRMVW5kdEwybHlSVGhWU0V4Wk0xWk1VM2gxT0ZoWVpVTm5lbG8xVW5CaE5FRm1PRkJLTjFrNU5GSnVabkV3UXpkVlQyMUtTRlZIZGpSbFIxTmxDak5FTDNWNFR6bHNSMmRFVkhGS05IaG5RMGRQVWt3MldYTlFWV1ozUkV0T1pqWlNRVTluVkZaRU1YZFRSV0pQUVM5Tk9XRkdaMFV4Y25CVVNRb3RMUzB0TFVWT1JDQkRSVkpVU1VaSlEwRlVSUzB0TFMwdENnbz0KICAgIHNlcnZlcjogaHR0cHM6Ly8xMC4wLjAuMjo2NDQzCiAgbmFtZTogYm9vdHN0cmFwCmNvbnRleHRzOgotIGNvbnRleHQ6CiAgICBjbHVzdGVyOiBib290c3RyYXAKICAgIHVzZXI6IGJvb3RzdHJhcAogIG5hbWU6IGJvb3RzdHJhcApjdXJyZW50LWNvbnRleHQ6IGJvb3RzdHJhcApraW5kOiBDb25maWcKcHJlZmVyZW5jZXM6IHt9CnVzZXJzOgotIG5hbWU6IGJvb3RzdHJhcAogIHVzZXI6CiAgICB0b2tlbjogZjlwdWZ6LnpjbjBrM2lvN253c2hub2QK"
+    "inventory_tmpl"                    = "[tkm-minions]\nlocalhost initial_node_labels=name=pool1,oci.oraclecloud.com/node.info.managed=true node_is_on_private_subnet={NODE_IS_ON_PRIVATE_SUBNET} nodeid_suffix={NODE_SUFFIX} shape=VM.Standard3.Flex ansible_user=opc tenancyid=ocid1.tenancy.oc19..aaaaaaaadu4nynpyltw2mbzb7qhmimjldhzpasq5vzffcv7mkw67vy5fnd3a compartmentid_prefix=ocid1.compartment.oc19 k8s_kubelet_hostname={K8S_KUBELET_HOSTNAME} region_key=STR ansible_connection=local public_ipaddress={PUBLIC_IP} zone=uOWN:eu-frankfurt-2-ad-1 k8s_version=v1.34.2 displayname=oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0 compartmentname=rdap-chatbot-cmp nodeid_prefix={NODE_PREFIX} region_name=eu-frankfurt-2 ta_version={TA_VERSION} region=eu-frankfurt-2 compartmentid_suffix=aaaaaaaaw7nfek7szdgjrdidzqhkjzx7bw4txy2y3kdydjryavxmei52t5xq private_ipaddress={PRIVATE_IP}\n"
     "ip-families"                       = "IPv4"
     "oci_tld"                           = "oraclecloud.eu"
     "oke-ad"                            = var.availability_domain--uOWN-eu-frankfurt-2-ad-1
     "oke-cluster-display-name"          = "rdap-chatbot-oke-cluster"
     "oke-cluster-id"                    = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "oke-cluster-label"                 = "cz6qcjcr2pa"
+    "oke-cluster-label"                 = "cburyzxciiq"
     "oke-compartment-name"              = "rdap-chatbot-cmp"
     "oke-image-name"                    = "Oracle-Linux-8.10-2026.02.28-0-OKE-1.34.2-1402"
     "oke-initial-node-labels"           = "name=pool1,oci.oraclecloud.com/node.info.managed=true"
@@ -2146,11 +2168,11 @@ resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0_1 {
     "oke-max-pods"                      = "31"
     "oke-native-pod-networking"         = "true"
     "oke-node-package-node-all-version" = "oci-oke-node-all-1.34.2*"
-    "oke-pool-id"                       = oci_containerengine_node_pool.export_pool1.id
-    "oke-pool-label"                    = "n4hhutserzq"
+    "oke-pool-id"                       = oci_containerengine_node_pool.export_rdap-chatbot-oke-node-pool.id
+    "oke-pool-label"                    = "nbwc7loxi5q"
     "oke-preconfigured-vnics"           = "false"
     "oke-slot"                          = "0"
-    "oke-subnet-label"                  = "sbg3pqfmi6a"
+    "oke-subnet-label"                  = "s7icahamozq"
     "oke-tenancy-id"                    = "ocid1.tenancy.oc19..aaaaaaaadu4nynpyltw2mbzb7qhmimjldhzpasq5vzffcv7mkw67vy5fnd3a"
     "oke-tm"                            = "oke"
     "oke_artifact_signing_key"          = "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAskI/lzqeOVqDZj4I8IpM\nub+mJJN5xHnLaf3oJUAdJFz93lic0YLsh9CzU0DG1JF+0BKyVw5Jsmt0M6sQ2S9Z\n3WB57KT78yEMDHHFB1Uwv7A0C142v7TVvL/5opp+0LqtFIiCdW8fOHh/9hAIoIf+\n8iFPF5OwuaLoDIsU6ynXSA4k8GVXBthvUpMb4OrZ5VdTHIMIlOpvAAfKc6USIAxq\n39o6HN/E3ivBLG11pMIeOpZhyim5eBFfo5tZLcQw5xFpGvvQ6L/hOyOscMrxrMmr\n8Jh9XfaeeQzDAOmMOyd4qlFdhJC4g9QWLlHdxJpXVPQdTxh9kI/p7MqM6iaf3LOx\noO/RIoQ2E3VhrnGKpINJYCfe2rbeTZSvhYktZcmucDMNwliAGQPEa4Z4RGsUGkQq\nGGDb6bUFDy6e0oXiBkWcNmT7eWAt4b05zDioUUdEGf7jeaU0RGP7M1ushK7YQ1lY\nS/viB1N1LaT1RqgRMA97nsqUIM+BW3KEx7hPB5sddoYbBqfocuXnsuCmpylClESx\nX7IKcZtQqR8OHRuOBpI6qm6GvBd18bS4QOOTosPJtcgzXPMki3i4O6we9KM3pUhx\nbH683tLmq1HQpCxWHrRp9yqMrAOFz2mmEotE27Y8G8uKnqb2YRXsvTs8KpSCxIBc\ne6nnrSMUwVLlU6R4JtcGzc0CAwEAAQ==\n-----END PUBLIC KEY-----\n"
@@ -2170,9 +2192,9 @@ resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0_1 {
     baseline_ocpu_utilization = ""
     memory_in_gbs             = "16"
     nvmes                     = "0"
-    ocpus                     = "1"
+    ocpus                     = "2"
     resource_management       = ""
-    vcpus                     = "2"
+    vcpus                     = "4"
   }
   source_details {
     #boot_volume_size_in_gbs = <<Optional value not found in discovery>>
@@ -2180,14 +2202,14 @@ resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0_1 {
     #instance_source_image_filter_details = <<Optional value not found in discovery>>
     #is_preserve_boot_volume_enabled = <<Optional value not found in discovery>>
     #kms_key_id = <<Optional value not found in discovery>>
-    source_id   = var.oci_core_instance--source_details-source_id--export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1_1
+    source_id   = var.oci_core_instance--source_details-source_id--export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1_1
     source_type = "image"
   }
   state = "RUNNING"
   #update_operation_constraint = <<Optional value not found in discovery>>
 }
 
-resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1_1 {
+resource oci_core_instance export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1_1 {
   agent_config {
     are_all_plugins_disabled = "false"
     is_management_disabled   = "false"
@@ -2208,16 +2230,16 @@ resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1_1 {
     #assign_private_dns_record = <<Optional value not found in discovery>>
     assign_public_ip = "false"
     defined_tags = {
-      "Oracle-Tags.CreatedBy" = oci_containerengine_node_pool.export_pool1.id
-      "Oracle-Tags.CreatedOn" = "2026-05-26T11:23:39.129Z"
+      "Oracle-Tags.CreatedBy" = oci_containerengine_node_pool.export_rdap-chatbot-oke-node-pool.id
+      "Oracle-Tags.CreatedOn" = "2026-05-29T10:25:28.981Z"
     }
-    display_name = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1"
+    display_name = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1"
     freeform_tags = {
     }
-    hostname_label = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1"
+    hostname_label = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1"
     nsg_ids = [
     ]
-    private_ip = "10.0.1.128"
+    private_ip = "10.0.1.76"
     #private_ip_id = <<Optional value not found in discovery>>
     security_attributes = {
     }
@@ -2228,10 +2250,10 @@ resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1_1 {
   }
   #dedicated_vm_host_id = <<Optional value not found in discovery>>
   defined_tags = {
-    "Oracle-Tags.CreatedBy" = oci_containerengine_node_pool.export_pool1.id
-    "Oracle-Tags.CreatedOn" = "2026-05-26T11:23:39.071Z"
+    "Oracle-Tags.CreatedBy" = oci_containerengine_node_pool.export_rdap-chatbot-oke-node-pool.id
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:25:28.933Z"
   }
-  display_name = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1"
+  display_name = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1"
   extended_metadata = {
   }
   fault_domain = var.fault_domain--FAULT-DOMAIN-1
@@ -2254,15 +2276,15 @@ resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1_1 {
   }
   #launch_volume_attachments = <<Optional value not found in discovery>>
   metadata = {
-    "ansible_args"                      = "eyJjbHVzdGVyX2lkIjoiY3o2cWNqY3IycGEiLCJrOHNfYXBpc2VydmVyX2FkZHIiOiIxMC4wLjAuMiIsIms4c19hcGlzZXJ2ZXJfcG9ydCI6IjY0NDMiLCJmbGFubmVsX2V0Y2RfY2FfY2VydCI6Ii0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLVxuTUlJRGlUQ0NBbkdnQXdJQkFnSVJBT0xxZGczRHR6ZGh6UklJc0pmYkJyY3dEUVlKS29aSWh2Y05BUUVMQlFBd1xuWGpFUE1BMEdBMVVFQXd3R1N6aHpJRU5CTVFzd0NRWURWUVFHRXdKVlV6RVBNQTBHQTFVRUJ3d0dRWFZ6ZEdsdVxuTVE4d0RRWURWUVFLREFaUGNtRmpiR1V4RERBS0JnTlZCQXNNQTA5amFURU9NQXdHQTFVRUNBd0ZWR1Y0WVhNd1xuSGhjTk1qWXdOVEkyTURnek1ETTFXaGNOTXpFd05USTJNRGd6TURNMVdqQmVNUTh3RFFZRFZRUUREQVpMT0hNZ1xuUTBFeEN6QUpCZ05WQkFZVEFsVlRNUTh3RFFZRFZRUUhEQVpCZFhOMGFXNHhEekFOQmdOVkJBb01Cazl5WVdOc1xuWlRFTU1Bb0dBMVVFQ3d3RFQyTnBNUTR3REFZRFZRUUlEQVZVWlhoaGN6Q0NBU0l3RFFZSktvWklodmNOQVFFQlxuQlFBRGdnRVBBRENDQVFvQ2dnRUJBS3U5bW44SXk5MGFyQU1zZHRXTTBORGhPaVA5RGQrVW5DUFB3cFd3clZyTFxuUlBJV1RveE1qcjhMbVI2U0Ezc3pNM2RvWWUxNW8yRmZoNkRzS21QUmRkQ0JFaVdhL3FKU3phNzNNVTZnemhNT1xuSFovTXlTVnJ4eGlYZ3hMTzBvaXkrSVBVU1l6ZkJPMy9peStXZUVGQmdrSnhPWmY0TjJnSDdzNnFxREQ0aHpjT1xuZ2dGWXJGTFZGcHBiN2RBbjE0WmFyQndLTzlCRnowSzFwT1g3dzZPbjlDd01OdE4ySzNJbk5tWDV4S0g1dnJuK1xuQ3A1Wlk1SjlqTlNTdVNDT3MxazdTL2pVdWZjME5FRTJOa0k3TTdjWG9XZWtZbXlySStaU1B4NW1nbkJKeG9seVxuSXJLNDN0SjZ5SVI4R25Xd2VGckVJS1FHN3F2aCtiQTlIV2VDTXJwS2VPOENBd0VBQWFOQ01FQXdEd1lEVlIwVFxuQVFIL0JBVXdBd0VCL3pBT0JnTlZIUThCQWY4RUJBTUNBUVl3SFFZRFZSME9CQllFRkZoVEhiem83TG1BRHRYalxuTk1aRWV0aVRpQkl0TUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFBci91WnpLRGdmMDhzTDVOQk5nN0UvS24valxuYkthQW5BblpuY0pHSjY0djVVcFdrK2lIRjhERGk5VmF5UHVnOUNFV0xTNW9mT05ZUERGbVhubUlWYUwyM08rRVxuUUpiQnJRWDdzK2Irek5SYzBoMzV6dlhVTFkvMXV2YWJjUDN0bjVkRWVkREIwZTlzeUo3eFFZbForVEt0M2lWbFxubUZwbDZMMDZ0ZHNLVDcySmxNeHUxa3JjVnUrV29nN09LRldLTzJIUWlUeVF5djgrZEQ2L24xY3dVL1RxT1pCWFxuUlVJb1E2RTVhYXE1b3dqMis5K29yT3ZzZFkreitxcW1MYzZER2Jibld0Qm1va0xLM3draUVmUzkreklhWjFoWVxuZFhJc0U0Vm12cGZyQ1BNS0lFa0lwbkdSTUFNb2tHMmRwZklqSkZSNDNVR2NuOFliL3BwUFNFbWZycFROXG4tLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tXG5cbiIsImt1YmVkbnNfc3ZjX2lwIjoiMTAuOTYuNS41IiwidG1faWQiOiJva2UiLCJrdWJlbGV0X2NsaWVudF9jYSI6Ii0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLVxuTUlJRGlUQ0NBbkdnQXdJQkFnSVJBT0xxZGczRHR6ZGh6UklJc0pmYkJyY3dEUVlKS29aSWh2Y05BUUVMQlFBd1xuWGpFUE1BMEdBMVVFQXd3R1N6aHpJRU5CTVFzd0NRWURWUVFHRXdKVlV6RVBNQTBHQTFVRUJ3d0dRWFZ6ZEdsdVxuTVE4d0RRWURWUVFLREFaUGNtRmpiR1V4RERBS0JnTlZCQXNNQTA5amFURU9NQXdHQTFVRUNBd0ZWR1Y0WVhNd1xuSGhjTk1qWXdOVEkyTURnek1ETTFXaGNOTXpFd05USTJNRGd6TURNMVdqQmVNUTh3RFFZRFZRUUREQVpMT0hNZ1xuUTBFeEN6QUpCZ05WQkFZVEFsVlRNUTh3RFFZRFZRUUhEQVpCZFhOMGFXNHhEekFOQmdOVkJBb01Cazl5WVdOc1xuWlRFTU1Bb0dBMVVFQ3d3RFQyTnBNUTR3REFZRFZRUUlEQVZVWlhoaGN6Q0NBU0l3RFFZSktvWklodmNOQVFFQlxuQlFBRGdnRVBBRENDQVFvQ2dnRUJBS3U5bW44SXk5MGFyQU1zZHRXTTBORGhPaVA5RGQrVW5DUFB3cFd3clZyTFxuUlBJV1RveE1qcjhMbVI2U0Ezc3pNM2RvWWUxNW8yRmZoNkRzS21QUmRkQ0JFaVdhL3FKU3phNzNNVTZnemhNT1xuSFovTXlTVnJ4eGlYZ3hMTzBvaXkrSVBVU1l6ZkJPMy9peStXZUVGQmdrSnhPWmY0TjJnSDdzNnFxREQ0aHpjT1xuZ2dGWXJGTFZGcHBiN2RBbjE0WmFyQndLTzlCRnowSzFwT1g3dzZPbjlDd01OdE4ySzNJbk5tWDV4S0g1dnJuK1xuQ3A1Wlk1SjlqTlNTdVNDT3MxazdTL2pVdWZjME5FRTJOa0k3TTdjWG9XZWtZbXlySStaU1B4NW1nbkJKeG9seVxuSXJLNDN0SjZ5SVI4R25Xd2VGckVJS1FHN3F2aCtiQTlIV2VDTXJwS2VPOENBd0VBQWFOQ01FQXdEd1lEVlIwVFxuQVFIL0JBVXdBd0VCL3pBT0JnTlZIUThCQWY4RUJBTUNBUVl3SFFZRFZSME9CQllFRkZoVEhiem83TG1BRHRYalxuTk1aRWV0aVRpQkl0TUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFBci91WnpLRGdmMDhzTDVOQk5nN0UvS24valxuYkthQW5BblpuY0pHSjY0djVVcFdrK2lIRjhERGk5VmF5UHVnOUNFV0xTNW9mT05ZUERGbVhubUlWYUwyM08rRVxuUUpiQnJRWDdzK2Irek5SYzBoMzV6dlhVTFkvMXV2YWJjUDN0bjVkRWVkREIwZTlzeUo3eFFZbForVEt0M2lWbFxubUZwbDZMMDZ0ZHNLVDcySmxNeHUxa3JjVnUrV29nN09LRldLTzJIUWlUeVF5djgrZEQ2L24xY3dVL1RxT1pCWFxuUlVJb1E2RTVhYXE1b3dqMis5K29yT3ZzZFkreitxcW1MYzZER2Jibld0Qm1va0xLM3draUVmUzkreklhWjFoWVxuZFhJc0U0Vm12cGZyQ1BNS0lFa0lwbkdSTUFNb2tHMmRwZklqSkZSNDNVR2NuOFliL3BwUFNFbWZycFROXG4tLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tXG5cbiIsInByb3h5bXV4X3NlcnZlcl9wb3J0IjoiMTIyNTAifQ=="
-    "bootstrap-kubelet-conf"            = "YXBpVmVyc2lvbjogdjEKY2x1c3RlcnM6Ci0gY2x1c3RlcjoKICAgIGNlcnRpZmljYXRlLWF1dGhvcml0eS1kYXRhOiBMUzB0TFMxQ1JVZEpUaUJEUlZKVVNVWkpRMEZVUlMwdExTMHRDazFKU1VScFZFTkRRVzVIWjBGM1NVSkJaMGxTUVU5TWNXUm5NMFIwZW1Sb2VsSkpTWE5LWm1KQ2NtTjNSRkZaU2t0dldrbG9kbU5PUVZGRlRFSlJRWGNLV0dwRlVFMUJNRWRCTVZWRlFYZDNSMU42YUhwSlJVNUNUVkZ6ZDBOUldVUldVVkZIUlhkS1ZsVjZSVkJOUVRCSFFURlZSVUozZDBkUldGWjZaRWRzZFFwTlVUaDNSRkZaUkZaUlVVdEVRVnBRWTIxR2FtSkhWWGhFUkVGTFFtZE9Wa0pCYzAxQk1EbHFZVlJGVDAxQmQwZEJNVlZGUTBGM1JsWkhWalJaV0UxM0NraG9ZMDVOYWxsM1RsUkpNazFFWjNwTlJFMHhWMmhqVGsxNlJYZE9WRWt5VFVSbmVrMUVUVEZYYWtKbFRWRTRkMFJSV1VSV1VWRkVSRUZhVEU5SVRXY0tVVEJGZUVONlFVcENaMDVXUWtGWlZFRnNWbFJOVVRoM1JGRlpSRlpSVVVoRVFWcENaRmhPTUdGWE5IaEVla0ZPUW1kT1ZrSkJiMDFDYXpsNVdWZE9jd3BhVkVWTlRVRnZSMEV4VlVWRGQzZEVWREpPY0UxUk5IZEVRVmxFVmxGUlNVUkJWbFZhV0dob1kzcERRMEZUU1hkRVVWbEtTMjlhU1doMlkwNUJVVVZDQ2tKUlFVUm5aMFZRUVVSRFEwRlJiME5uWjBWQ1FVdDFPVzF1T0VsNU9UQmhja0ZOYzJSMFYwMHdUa1JvVDJsUU9VUmtLMVZ1UTFCUWQzQlhkM0pXY2t3S1VsQkpWMVJ2ZUUxcWNqaE1iVkkyVTBFemMzcE5NMlJ2V1dVeE5XOHlSbVpvTmtSelMyMVFVbVJrUTBKRmFWZGhMM0ZLVTNwaE56Tk5WVFpuZW1oTlR3cElXaTlOZVZOV2NuaDRhVmhuZUV4UE1HOXBlU3RKVUZWVFdYcG1Razh6TDJsNUsxZGxSVVpDWjJ0S2VFOWFaalJPTW1kSU4zTTJjWEZFUkRSb2VtTlBDbWRuUmxseVJreFdSbkJ3WWpka1FXNHhORnBoY2tKM1MwODVRa1o2TUVzeGNFOVlOM2MyVDI0NVEzZE5UblJPTWtzelNXNU9iVmcxZUV0SU5YWnliaXNLUTNBMVdsazFTamxxVGxOVGRWTkRUM014YXpkVEwycFZkV1pqTUU1RlJUSk9hMGszVFRkaldHOVhaV3RaYlhseVNTdGFVMUI0TlcxbmJrSktlRzlzZVFwSmNrczBNM1JLTm5sSlVqaEhibGQzWlVaeVJVbExVVWMzY1hab0sySkJPVWhYWlVOTmNuQkxaVTg0UTBGM1JVRkJZVTVEVFVWQmQwUjNXVVJXVWpCVUNrRlJTQzlDUVZWM1FYZEZRaTk2UVU5Q1owNVdTRkU0UWtGbU9FVkNRVTFEUVZGWmQwaFJXVVJXVWpCUFFrSlpSVVpHYUZSSVlucHZOMHh0UVVSMFdHb0tUazFhUldWMGFWUnBRa2wwVFVFd1IwTlRjVWRUU1dJelJGRkZRa04zVlVGQk5FbENRVkZCY2k5MVducExSR2RtTURoelREVk9RazVuTjBVdlMyNHZhZ3BpUzJGQmJrRnVXbTVqU2tkS05qUjJOVlZ3VjJzcmFVaEdPRVJFYVRsV1lYbFFkV2M1UTBWWFRGTTFiMlpQVGxsUVJFWnRXRzV0U1ZaaFRESXpUeXRGQ2xGS1lrSnlVVmczY3l0aUszcE9VbU13YURNMWVuWllWVXhaTHpGMWRtRmlZMUF6ZEc0MVpFVmxaRVJDTUdVNWMzbEtOM2hSV1d4YUsxUkxkRE5wVm13S2JVWndiRFpNTURaMFpITkxWRGN5U214TmVIVXhhM0pqVm5VclYyOW5OMDlMUmxkTFR6SklVV2xVZVZGNWRqZ3JaRVEyTDI0eFkzZFZMMVJ4VDFwQ1dBcFNWVWx2VVRaRk5XRmhjVFZ2ZDJveUt6a3JiM0pQZG5Oa1dTdDZLM0Z4YlV4ak5rUkhZbUp1VjNSQ2JXOXJURXN6ZDJ0cFJXWlRPU3Q2U1dGYU1XaFpDbVJZU1hORk5GWnRkbkJtY2tOUVRVdEpSV3RKY0c1SFVrMUJUVzlyUnpKa2NHWkpha3BHVWpRelZVZGpiamhaWWk5d2NGQlRSVzFtY25CVVRnb3RMUzB0TFVWT1JDQkRSVkpVU1VaSlEwRlVSUzB0TFMwdENnbz0KICAgIHNlcnZlcjogaHR0cHM6Ly8xMC4wLjAuMjo2NDQzCiAgbmFtZTogYm9vdHN0cmFwCmNvbnRleHRzOgotIGNvbnRleHQ6CiAgICBjbHVzdGVyOiBib290c3RyYXAKICAgIHVzZXI6IGJvb3RzdHJhcAogIG5hbWU6IGJvb3RzdHJhcApjdXJyZW50LWNvbnRleHQ6IGJvb3RzdHJhcApraW5kOiBDb25maWcKcHJlZmVyZW5jZXM6IHt9CnVzZXJzOgotIG5hbWU6IGJvb3RzdHJhcAogIHVzZXI6CiAgICB0b2tlbjogd20wOXc4LnV6ZnRxYWd6MHVjd29tZzcK"
-    "inventory_tmpl"                    = "[tkm-minions]\nlocalhost initial_node_labels=name=pool1,oci.oraclecloud.com/node.info.managed=true node_is_on_private_subnet={NODE_IS_ON_PRIVATE_SUBNET} nodeid_suffix={NODE_SUFFIX} shape=VM.Standard3.Flex ansible_user=opc tenancyid=ocid1.tenancy.oc19..aaaaaaaadu4nynpyltw2mbzb7qhmimjldhzpasq5vzffcv7mkw67vy5fnd3a compartmentid_prefix=ocid1.compartment.oc19 k8s_kubelet_hostname={K8S_KUBELET_HOSTNAME} region_key=STR ansible_connection=local public_ipaddress={PUBLIC_IP} zone=uOWN:eu-frankfurt-2-ad-1 k8s_version=v1.34.2 displayname=oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1 compartmentname=rdap-chatbot-cmp nodeid_prefix={NODE_PREFIX} region_name=eu-frankfurt-2 ta_version={TA_VERSION} region=eu-frankfurt-2 compartmentid_suffix=aaaaaaaaw7nfek7szdgjrdidzqhkjzx7bw4txy2y3kdydjryavxmei52t5xq private_ipaddress={PRIVATE_IP}\n"
+    "ansible_args"                      = "eyJjbHVzdGVyX2lkIjoiY2J1cnl6eGNpaXEiLCJrOHNfYXBpc2VydmVyX2FkZHIiOiIxMC4wLjAuMiIsIms4c19hcGlzZXJ2ZXJfcG9ydCI6IjY0NDMiLCJmbGFubmVsX2V0Y2RfY2FfY2VydCI6Ii0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLVxuTUlJRGlUQ0NBbkdnQXdJQkFnSVJBTkFGbC9XT25SK3diL0FoRGt6NDFFWXdEUVlKS29aSWh2Y05BUUVMQlFBd1xuWGpFUE1BMEdBMVVFQXd3R1N6aHpJRU5CTVFzd0NRWURWUVFHRXdKVlV6RVBNQTBHQTFVRUJ3d0dRWFZ6ZEdsdVxuTVE4d0RRWURWUVFLREFaUGNtRmpiR1V4RERBS0JnTlZCQXNNQTA5amFURU9NQXdHQTFVRUNBd0ZWR1Y0WVhNd1xuSGhjTk1qWXdOVEk1TVRBeE9USXlXaGNOTXpFd05USTVNVEF4T1RJeVdqQmVNUTh3RFFZRFZRUUREQVpMT0hNZ1xuUTBFeEN6QUpCZ05WQkFZVEFsVlRNUTh3RFFZRFZRUUhEQVpCZFhOMGFXNHhEekFOQmdOVkJBb01Cazl5WVdOc1xuWlRFTU1Bb0dBMVVFQ3d3RFQyTnBNUTR3REFZRFZRUUlEQVZVWlhoaGN6Q0NBU0l3RFFZSktvWklodmNOQVFFQlxuQlFBRGdnRVBBRENDQVFvQ2dnRUJBTEpYVmpSaUVwVlcrUjh2dzRoNkZuZ3lweVRpa0NjRW9yMm81NndsMjJxelxuS284SXhOcHIzb1p3UnROTXFhRk1hZjRpRVB5eDVEd2pyTURhK3RNSGRNVnNLckRrU2FsNWhTZHV1SS9PUnpNOVxuL3I4ZVZUV3pHUzRQbWxvWEhOZEdEYVpaUHJsTGhwVHZhZXMycmFxVTlyaVRybUZSQ0t5OUVkZ0J2R1drdEtkL1xuK2xJZHpKOVpxckhpdHhxUWRhNnpMbFVmZmMvbDhwQ3BEWktMVmpnRXJqak13bmREZUtueTA1VzB2Sk9YSktJL1xuQitsTEJRYm8ySk91dnVOY282UmVYMWR0VEFuNnRZYWdxSDNFelo4NEhFdVdqb3ppUUFFT3BpSk5zMGNKeEo1WlxuUDJDbXRaZzBwdVVJTW9MT2lXK1F2VS8wenBmRFo3RTZsSmE4QVNVbmVMOENBd0VBQWFOQ01FQXdEd1lEVlIwVFxuQVFIL0JBVXdBd0VCL3pBT0JnTlZIUThCQWY4RUJBTUNBUVl3SFFZRFZSME9CQllFRk9tblRGT0FCYWVJK05RZFxuNWw1eXN3QksvZEYrTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFDUi9uUGp4Y1JSOGdvUjZjb2kxRUFVaTl3YlxuSjBlb0JjUkdGODlHWFlCa0NQUTliTG9PeWh6MHdveUV6N2RobGFlTk1jeGVNSGQxS2s5Q2dCdmt1bU5paVRKTVxuTTQ0RmNrRWFGWUhCcXg2U3JZTlZhZlk3Qk52Rk9LSm5Sc2pTNFdLQUpqUExJUkRJRGJ1MEJrUkJqTkh4K29MTlxucEpjb1NwTDRRZko4VUJ0c2FzMXhTRUJrUzVuYkZaMHRxNmtWR2hwMFFZVzBHNTFoNkd1U2Y0cnpvTktiSnRERFxuMVU3S1J3bS9pckU4VUhMWTNWTFN4dThYWGVDZ3paNVJwYTRBZjhQSjdZOTRSbmZxMEM3VU9tSkhVR3Y0ZUdTZVxuM0QvdXhPOWxHZ0RUcUo0eGdDR09STDZZc1BVZndES05mNlJBT2dUVkQxd1NFYk9BL005YUZnRTFycFRJXG4tLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tXG5cbiIsImt1YmVkbnNfc3ZjX2lwIjoiMTAuOTYuNS41IiwidG1faWQiOiJva2UiLCJrdWJlbGV0X2NsaWVudF9jYSI6Ii0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLVxuTUlJRGlUQ0NBbkdnQXdJQkFnSVJBTkFGbC9XT25SK3diL0FoRGt6NDFFWXdEUVlKS29aSWh2Y05BUUVMQlFBd1xuWGpFUE1BMEdBMVVFQXd3R1N6aHpJRU5CTVFzd0NRWURWUVFHRXdKVlV6RVBNQTBHQTFVRUJ3d0dRWFZ6ZEdsdVxuTVE4d0RRWURWUVFLREFaUGNtRmpiR1V4RERBS0JnTlZCQXNNQTA5amFURU9NQXdHQTFVRUNBd0ZWR1Y0WVhNd1xuSGhjTk1qWXdOVEk1TVRBeE9USXlXaGNOTXpFd05USTVNVEF4T1RJeVdqQmVNUTh3RFFZRFZRUUREQVpMT0hNZ1xuUTBFeEN6QUpCZ05WQkFZVEFsVlRNUTh3RFFZRFZRUUhEQVpCZFhOMGFXNHhEekFOQmdOVkJBb01Cazl5WVdOc1xuWlRFTU1Bb0dBMVVFQ3d3RFQyTnBNUTR3REFZRFZRUUlEQVZVWlhoaGN6Q0NBU0l3RFFZSktvWklodmNOQVFFQlxuQlFBRGdnRVBBRENDQVFvQ2dnRUJBTEpYVmpSaUVwVlcrUjh2dzRoNkZuZ3lweVRpa0NjRW9yMm81NndsMjJxelxuS284SXhOcHIzb1p3UnROTXFhRk1hZjRpRVB5eDVEd2pyTURhK3RNSGRNVnNLckRrU2FsNWhTZHV1SS9PUnpNOVxuL3I4ZVZUV3pHUzRQbWxvWEhOZEdEYVpaUHJsTGhwVHZhZXMycmFxVTlyaVRybUZSQ0t5OUVkZ0J2R1drdEtkL1xuK2xJZHpKOVpxckhpdHhxUWRhNnpMbFVmZmMvbDhwQ3BEWktMVmpnRXJqak13bmREZUtueTA1VzB2Sk9YSktJL1xuQitsTEJRYm8ySk91dnVOY282UmVYMWR0VEFuNnRZYWdxSDNFelo4NEhFdVdqb3ppUUFFT3BpSk5zMGNKeEo1WlxuUDJDbXRaZzBwdVVJTW9MT2lXK1F2VS8wenBmRFo3RTZsSmE4QVNVbmVMOENBd0VBQWFOQ01FQXdEd1lEVlIwVFxuQVFIL0JBVXdBd0VCL3pBT0JnTlZIUThCQWY4RUJBTUNBUVl3SFFZRFZSME9CQllFRk9tblRGT0FCYWVJK05RZFxuNWw1eXN3QksvZEYrTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFDUi9uUGp4Y1JSOGdvUjZjb2kxRUFVaTl3YlxuSjBlb0JjUkdGODlHWFlCa0NQUTliTG9PeWh6MHdveUV6N2RobGFlTk1jeGVNSGQxS2s5Q2dCdmt1bU5paVRKTVxuTTQ0RmNrRWFGWUhCcXg2U3JZTlZhZlk3Qk52Rk9LSm5Sc2pTNFdLQUpqUExJUkRJRGJ1MEJrUkJqTkh4K29MTlxucEpjb1NwTDRRZko4VUJ0c2FzMXhTRUJrUzVuYkZaMHRxNmtWR2hwMFFZVzBHNTFoNkd1U2Y0cnpvTktiSnRERFxuMVU3S1J3bS9pckU4VUhMWTNWTFN4dThYWGVDZ3paNVJwYTRBZjhQSjdZOTRSbmZxMEM3VU9tSkhVR3Y0ZUdTZVxuM0QvdXhPOWxHZ0RUcUo0eGdDR09STDZZc1BVZndES05mNlJBT2dUVkQxd1NFYk9BL005YUZnRTFycFRJXG4tLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tXG5cbiIsInByb3h5bXV4X3NlcnZlcl9wb3J0IjoiMTIyNTAifQ=="
+    "bootstrap-kubelet-conf"            = "YXBpVmVyc2lvbjogdjEKY2x1c3RlcnM6Ci0gY2x1c3RlcjoKICAgIGNlcnRpZmljYXRlLWF1dGhvcml0eS1kYXRhOiBMUzB0TFMxQ1JVZEpUaUJEUlZKVVNVWkpRMEZVUlMwdExTMHRDazFKU1VScFZFTkRRVzVIWjBGM1NVSkJaMGxTUVU1QlJtd3ZWMDl1VWl0M1lpOUJhRVJyZWpReFJWbDNSRkZaU2t0dldrbG9kbU5PUVZGRlRFSlJRWGNLV0dwRlVFMUJNRWRCTVZWRlFYZDNSMU42YUhwSlJVNUNUVkZ6ZDBOUldVUldVVkZIUlhkS1ZsVjZSVkJOUVRCSFFURlZSVUozZDBkUldGWjZaRWRzZFFwTlVUaDNSRkZaUkZaUlVVdEVRVnBRWTIxR2FtSkhWWGhFUkVGTFFtZE9Wa0pCYzAxQk1EbHFZVlJGVDAxQmQwZEJNVlZGUTBGM1JsWkhWalJaV0UxM0NraG9ZMDVOYWxsM1RsUkpOVTFVUVhoUFZFbDVWMmhqVGsxNlJYZE9WRWsxVFZSQmVFOVVTWGxYYWtKbFRWRTRkMFJSV1VSV1VWRkVSRUZhVEU5SVRXY0tVVEJGZUVONlFVcENaMDVXUWtGWlZFRnNWbFJOVVRoM1JGRlpSRlpSVVVoRVFWcENaRmhPTUdGWE5IaEVla0ZPUW1kT1ZrSkJiMDFDYXpsNVdWZE9jd3BhVkVWTlRVRnZSMEV4VlVWRGQzZEVWREpPY0UxUk5IZEVRVmxFVmxGUlNVUkJWbFZhV0dob1kzcERRMEZUU1hkRVVWbEtTMjlhU1doMlkwNUJVVVZDQ2tKUlFVUm5aMFZRUVVSRFEwRlJiME5uWjBWQ1FVeEtXRlpxVW1sRmNGWlhLMUk0ZG5jMGFEWkdibWQ1Y0hsVWFXdERZMFZ2Y2pKdk5UWjNiREl5Y1hvS1MyODRTWGhPY0hJemIxcDNVblJPVFhGaFJrMWhaalJwUlZCNWVEVkVkMnB5VFVSaEszUk5TR1JOVm5OTGNrUnJVMkZzTldoVFpIVjFTUzlQVW5wTk9Rb3ZjamhsVmxSWGVrZFRORkJ0Ykc5WVNFNWtSMFJoV2xwUWNteE1hSEJVZG1GbGN6SnlZWEZWT1hKcFZISnRSbEpEUzNrNVJXUm5RblpIVjJ0MFMyUXZDaXRzU1dSNlNqbGFjWEpJYVhSNGNWRmtZVFo2VEd4VlptWmpMMnc0Y0VOd1JGcExURlpxWjBWeWFtcE5kMjVrUkdWTGJua3dOVmN3ZGtwUFdFcExTUzhLUWl0c1RFSlJZbTh5U2s5MWRuVk9ZMjgyVW1WWU1XUjBWRUZ1Tm5SWllXZHhTRE5GZWxvNE5FaEZkVmRxYjNwcFVVRkZUM0JwU2s1ek1HTktlRW8xV2dwUU1rTnRkRnBuTUhCMVZVbE5iMHhQYVZjclVYWlZMekI2Y0daRVdqZEZObXhLWVRoQlUxVnVaVXc0UTBGM1JVRkJZVTVEVFVWQmQwUjNXVVJXVWpCVUNrRlJTQzlDUVZWM1FYZEZRaTk2UVU5Q1owNVdTRkU0UWtGbU9FVkNRVTFEUVZGWmQwaFJXVVJXVWpCUFFrSlpSVVpQYlc1VVJrOUJRbUZsU1N0T1VXUUtOV3cxZVhOM1Frc3ZaRVlyVFVFd1IwTlRjVWRUU1dJelJGRkZRa04zVlVGQk5FbENRVkZEVWk5dVVHcDRZMUpTT0dkdlVqWmpiMmt4UlVGVmFUbDNZZ3BLTUdWdlFtTlNSMFk0T1VkWVdVSnJRMUJST1dKTWIwOTVhSG93ZDI5NVJYbzNaR2hzWVdWT1RXTjRaVTFJWkRGTGF6bERaMEoyYTNWdFRtbHBWRXBOQ2swME5FWmphMFZoUmxsSVFuRjRObE55V1U1V1lXWlpOMEpPZGtaUFMwcHVVbk5xVXpSWFMwRkthbEJNU1ZKRVNVUmlkVEJDYTFKQ2FrNUllQ3R2VEU0S2NFcGpiMU53VERSUlprbzRWVUowYzJGek1YaFRSVUpyVXpWdVlrWmFNSFJ4Tm10V1IyaHdNRkZaVnpCSE5URm9Oa2QxVTJZMGNucHZUa3RpU25SRVJBb3hWVGRMVW5kdEwybHlSVGhWU0V4Wk0xWk1VM2gxT0ZoWVpVTm5lbG8xVW5CaE5FRm1PRkJLTjFrNU5GSnVabkV3UXpkVlQyMUtTRlZIZGpSbFIxTmxDak5FTDNWNFR6bHNSMmRFVkhGS05IaG5RMGRQVWt3MldYTlFWV1ozUkV0T1pqWlNRVTluVkZaRU1YZFRSV0pQUVM5Tk9XRkdaMFV4Y25CVVNRb3RMUzB0TFVWT1JDQkRSVkpVU1VaSlEwRlVSUzB0TFMwdENnbz0KICAgIHNlcnZlcjogaHR0cHM6Ly8xMC4wLjAuMjo2NDQzCiAgbmFtZTogYm9vdHN0cmFwCmNvbnRleHRzOgotIGNvbnRleHQ6CiAgICBjbHVzdGVyOiBib290c3RyYXAKICAgIHVzZXI6IGJvb3RzdHJhcAogIG5hbWU6IGJvb3RzdHJhcApjdXJyZW50LWNvbnRleHQ6IGJvb3RzdHJhcApraW5kOiBDb25maWcKcHJlZmVyZW5jZXM6IHt9CnVzZXJzOgotIG5hbWU6IGJvb3RzdHJhcAogIHVzZXI6CiAgICB0b2tlbjogYzdsbnNkLnJ2NWYxMWozemJ4eGhuYmMK"
+    "inventory_tmpl"                    = "[tkm-minions]\nlocalhost initial_node_labels=name=pool1,oci.oraclecloud.com/node.info.managed=true node_is_on_private_subnet={NODE_IS_ON_PRIVATE_SUBNET} nodeid_suffix={NODE_SUFFIX} shape=VM.Standard3.Flex ansible_user=opc tenancyid=ocid1.tenancy.oc19..aaaaaaaadu4nynpyltw2mbzb7qhmimjldhzpasq5vzffcv7mkw67vy5fnd3a compartmentid_prefix=ocid1.compartment.oc19 k8s_kubelet_hostname={K8S_KUBELET_HOSTNAME} region_key=STR ansible_connection=local public_ipaddress={PUBLIC_IP} zone=uOWN:eu-frankfurt-2-ad-1 k8s_version=v1.34.2 displayname=oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1 compartmentname=rdap-chatbot-cmp nodeid_prefix={NODE_PREFIX} region_name=eu-frankfurt-2 ta_version={TA_VERSION} region=eu-frankfurt-2 compartmentid_suffix=aaaaaaaaw7nfek7szdgjrdidzqhkjzx7bw4txy2y3kdydjryavxmei52t5xq private_ipaddress={PRIVATE_IP}\n"
     "ip-families"                       = "IPv4"
     "oci_tld"                           = "oraclecloud.eu"
     "oke-ad"                            = var.availability_domain--uOWN-eu-frankfurt-2-ad-1
     "oke-cluster-display-name"          = "rdap-chatbot-oke-cluster"
     "oke-cluster-id"                    = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-    "oke-cluster-label"                 = "cz6qcjcr2pa"
+    "oke-cluster-label"                 = "cburyzxciiq"
     "oke-compartment-name"              = "rdap-chatbot-cmp"
     "oke-image-name"                    = "Oracle-Linux-8.10-2026.02.28-0-OKE-1.34.2-1402"
     "oke-initial-node-labels"           = "name=pool1,oci.oraclecloud.com/node.info.managed=true"
@@ -2275,11 +2297,11 @@ resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1_1 {
     "oke-max-pods"                      = "31"
     "oke-native-pod-networking"         = "true"
     "oke-node-package-node-all-version" = "oci-oke-node-all-1.34.2*"
-    "oke-pool-id"                       = oci_containerengine_node_pool.export_pool1.id
-    "oke-pool-label"                    = "n4hhutserzq"
+    "oke-pool-id"                       = oci_containerengine_node_pool.export_rdap-chatbot-oke-node-pool.id
+    "oke-pool-label"                    = "nbwc7loxi5q"
     "oke-preconfigured-vnics"           = "false"
     "oke-slot"                          = "1"
-    "oke-subnet-label"                  = "sbg3pqfmi6a"
+    "oke-subnet-label"                  = "s7icahamozq"
     "oke-tenancy-id"                    = "ocid1.tenancy.oc19..aaaaaaaadu4nynpyltw2mbzb7qhmimjldhzpasq5vzffcv7mkw67vy5fnd3a"
     "oke-tm"                            = "oke"
     "oke_artifact_signing_key"          = "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAskI/lzqeOVqDZj4I8IpM\nub+mJJN5xHnLaf3oJUAdJFz93lic0YLsh9CzU0DG1JF+0BKyVw5Jsmt0M6sQ2S9Z\n3WB57KT78yEMDHHFB1Uwv7A0C142v7TVvL/5opp+0LqtFIiCdW8fOHh/9hAIoIf+\n8iFPF5OwuaLoDIsU6ynXSA4k8GVXBthvUpMb4OrZ5VdTHIMIlOpvAAfKc6USIAxq\n39o6HN/E3ivBLG11pMIeOpZhyim5eBFfo5tZLcQw5xFpGvvQ6L/hOyOscMrxrMmr\n8Jh9XfaeeQzDAOmMOyd4qlFdhJC4g9QWLlHdxJpXVPQdTxh9kI/p7MqM6iaf3LOx\noO/RIoQ2E3VhrnGKpINJYCfe2rbeTZSvhYktZcmucDMNwliAGQPEa4Z4RGsUGkQq\nGGDb6bUFDy6e0oXiBkWcNmT7eWAt4b05zDioUUdEGf7jeaU0RGP7M1ushK7YQ1lY\nS/viB1N1LaT1RqgRMA97nsqUIM+BW3KEx7hPB5sddoYbBqfocuXnsuCmpylClESx\nX7IKcZtQqR8OHRuOBpI6qm6GvBd18bS4QOOTosPJtcgzXPMki3i4O6we9KM3pUhx\nbH683tLmq1HQpCxWHrRp9yqMrAOFz2mmEotE27Y8G8uKnqb2YRXsvTs8KpSCxIBc\ne6nnrSMUwVLlU6R4JtcGzc0CAwEAAQ==\n-----END PUBLIC KEY-----\n"
@@ -2299,9 +2321,9 @@ resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1_1 {
     baseline_ocpu_utilization = ""
     memory_in_gbs             = "16"
     nvmes                     = "0"
-    ocpus                     = "1"
+    ocpus                     = "2"
     resource_management       = ""
-    vcpus                     = "2"
+    vcpus                     = "4"
   }
   source_details {
     #boot_volume_size_in_gbs = <<Optional value not found in discovery>>
@@ -2309,29 +2331,29 @@ resource oci_core_instance export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1_1 {
     #instance_source_image_filter_details = <<Optional value not found in discovery>>
     #is_preserve_boot_volume_enabled = <<Optional value not found in discovery>>
     #kms_key_id = <<Optional value not found in discovery>>
-    source_id   = var.oci_core_instance--source_details-source_id--export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1_1
+    source_id   = var.oci_core_instance--source_details-source_id--export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1_1
     source_type = "image"
   }
   state = "RUNNING"
   #update_operation_constraint = <<Optional value not found in discovery>>
 }
 
-resource oci_core_vnic_attachment export_vnicattachment20260526112409 {
+resource oci_core_vnic_attachment export_vnicattachment20260529102559 {
   create_vnic_details {
     #assign_ipv6ip = <<Optional value not found in discovery>>
     #assign_private_dns_record = <<Optional value not found in discovery>>
     assign_public_ip = "false"
     defined_tags = {
       "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-      "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:09.917Z"
+      "Oracle-Tags.CreatedOn" = "2026-05-29T10:25:59.676Z"
     }
-    display_name = "vnic20260526112412"
+    display_name = "vnic20260529102604"
     freeform_tags = {
     }
     #hostname_label = <<Optional value not found in discovery>>
     nsg_ids = [
     ]
-    private_ip = "10.0.1.89"
+    private_ip = "10.0.1.172"
     #private_ip_id = <<Optional value not found in discovery>>
     #route_table_id = <<Optional value not found in discovery>>
     security_attributes = {
@@ -2341,27 +2363,27 @@ resource oci_core_vnic_attachment export_vnicattachment20260526112409 {
     subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
     #vlan_id = <<Optional value not found in discovery>>
   }
-  display_name = "vnicattachment20260526112409"
-  instance_id  = oci_core_instance.export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0_1.id
+  display_name = "vnicattachment20260529102559"
+  instance_id  = oci_core_instance.export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0.id
   nic_index    = "0"
 }
 
-resource oci_core_vnic_attachment export_vnicattachment20260526112409_1 {
+resource oci_core_vnic_attachment export_vnicattachment20260529102559_1 {
   create_vnic_details {
     #assign_ipv6ip = <<Optional value not found in discovery>>
     #assign_private_dns_record = <<Optional value not found in discovery>>
     assign_public_ip = "false"
     defined_tags = {
       "Oracle-Tags.CreatedBy" = oci_containerengine_cluster.export_rdap-chatbot-oke-cluster.id
-      "Oracle-Tags.CreatedOn" = "2026-05-26T11:24:09.946Z"
+      "Oracle-Tags.CreatedOn" = "2026-05-29T10:25:59.709Z"
     }
-    display_name = "vnic20260526112412"
+    display_name = "vnic20260529102604"
     freeform_tags = {
     }
     #hostname_label = <<Optional value not found in discovery>>
     nsg_ids = [
     ]
-    private_ip = "10.0.1.218"
+    private_ip = "10.0.1.73"
     #private_ip_id = <<Optional value not found in discovery>>
     #route_table_id = <<Optional value not found in discovery>>
     security_attributes = {
@@ -2371,8 +2393,8 @@ resource oci_core_vnic_attachment export_vnicattachment20260526112409_1 {
     subnet_id = oci_core_subnet.export_worker-nodes-subnet.id
     #vlan_id = <<Optional value not found in discovery>>
   }
-  display_name = "vnicattachment20260526112409"
-  instance_id  = oci_core_instance.export_oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1_1.id
+  display_name = "vnicattachment20260529102559"
+  instance_id  = oci_core_instance.export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1_1.id
   nic_index    = "0"
 }
 

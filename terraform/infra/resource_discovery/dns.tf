@@ -4,11 +4,10 @@ resource oci_dns_view export_rdap-chatbot-vcn_1 {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.236Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:08.827Z"
   }
   display_name = "rdap-chatbot-vcn"
   freeform_tags = {
-    "Department" = "Finance"
   }
   #scope = <<Optional value not found in discovery>>
 }
@@ -17,58 +16,25 @@ resource oci_dns_resolver export_rdap-chatbot-vcn_2 {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.236Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:08.827Z"
   }
   display_name = "rdap-chatbot-vcn"
   freeform_tags = {
-    "Department" = "Finance"
   }
-  resolver_id = "ocid1.dnsresolver.oc19.eu-frankfurt-2.amaaaaaalgam66yacdvd4f2kqfvrxtbnmqmosga7es3olpixfebzxerpauxa"
+  resolver_id = "ocid1.dnsresolver.oc19.eu-frankfurt-2.amaaaaaalgam66yanvrjw4yjdubesxgmga3vgkth72pfrg4ahpk4ete4n5va"
   #scope = <<Optional value not found in discovery>>
 }
 
-resource oci_dns_zone export_workernodes-rdapchatbotvcn-oraclevcn-com {
+resource oci_dns_zone export_functions-rdapchatbotvcn-oraclevcn-com {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:04.182Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T11:10:53.806Z"
   }
   dnssec_state = "DISABLED"
   freeform_tags = {
   }
-  name            = "workernodes.rdapchatbotvcn.oraclevcn.com"
-  resolution_mode = "STATIC"
-  scope           = "PRIVATE"
-  view_id         = oci_dns_view.export_rdap-chatbot-vcn_1.id
-  zone_type       = "PRIMARY"
-}
-
-resource oci_dns_zone export_loadbalancers-rdapchatbotvcn-oraclevcn-com {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:04.182Z"
-  }
-  dnssec_state = "DISABLED"
-  freeform_tags = {
-  }
-  name            = "loadbalancers.rdapchatbotvcn.oraclevcn.com"
-  resolution_mode = "STATIC"
-  scope           = "PRIVATE"
-  view_id         = oci_dns_view.export_rdap-chatbot-vcn_1.id
-  zone_type       = "PRIMARY"
-}
-
-resource oci_dns_zone export_k8sapiendpoint-rdapchatbotvcn-oraclevcn-com {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.841Z"
-  }
-  dnssec_state = "DISABLED"
-  freeform_tags = {
-  }
-  name            = "k8sapiendpoint.rdapchatbotvcn.oraclevcn.com"
+  name            = "functions.rdapchatbotvcn.oraclevcn.com"
   resolution_mode = "STATIC"
   scope           = "PRIVATE"
   view_id         = oci_dns_view.export_rdap-chatbot-vcn_1.id
@@ -79,7 +45,7 @@ resource oci_dns_zone export_bastion-rdapchatbotvcn-oraclevcn-com {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.841Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T11:06:10.540Z"
   }
   dnssec_state = "DISABLED"
   freeform_tags = {
@@ -91,15 +57,62 @@ resource oci_dns_zone export_bastion-rdapchatbotvcn-oraclevcn-com {
   zone_type       = "PRIMARY"
 }
 
+resource oci_dns_zone export_workernodes-rdapchatbotvcn-oraclevcn-com {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.797Z"
+  }
+  dnssec_state = "DISABLED"
+  freeform_tags = {
+  }
+  name            = "workernodes.rdapchatbotvcn.oraclevcn.com"
+  resolution_mode = "STATIC"
+  scope           = "PRIVATE"
+  view_id         = oci_dns_view.export_rdap-chatbot-vcn_1.id
+  zone_type       = "PRIMARY"
+}
+
+resource oci_dns_zone export_k8sapiendpoint-rdapchatbotvcn-oraclevcn-com {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.818Z"
+  }
+  dnssec_state = "DISABLED"
+  freeform_tags = {
+  }
+  name            = "k8sapiendpoint.rdapchatbotvcn.oraclevcn.com"
+  resolution_mode = "STATIC"
+  scope           = "PRIVATE"
+  view_id         = oci_dns_view.export_rdap-chatbot-vcn_1.id
+  zone_type       = "PRIMARY"
+}
+
+resource oci_dns_zone export_loadbalancers-rdapchatbotvcn-oraclevcn-com {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.797Z"
+  }
+  dnssec_state = "DISABLED"
+  freeform_tags = {
+  }
+  name            = "loadbalancers.rdapchatbotvcn.oraclevcn.com"
+  resolution_mode = "STATIC"
+  scope           = "PRIVATE"
+  view_id         = oci_dns_view.export_rdap-chatbot-vcn_1.id
+  zone_type       = "PRIMARY"
+}
+
 resource oci_dns_zone export_0-10-in-addr-arpa {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-26T08:06:03.236Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:08.827Z"
   }
   dnssec_state = "DISABLED"
   freeform_tags = {
-    "Department" = "Finance"
   }
   name            = "0.10.in-addr.arpa"
   resolution_mode = "STATIC"
@@ -108,11 +121,63 @@ resource oci_dns_zone export_0-10-in-addr-arpa {
   zone_type       = "PRIMARY"
 }
 
-resource oci_dns_rrset export_workernodes-rdapchatbotvcn-oraclevcn-com_oke--cz6qcjcr2pa--n4hhutserzq--sbg3pqfmi6a--0-workernodes-rdapchatbotvcn-oraclevcn-com_A {
-  domain = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0.workernodes.rdapchatbotvcn.oraclevcn.com"
+resource oci_dns_rrset export_functions-rdapchatbotvcn-oraclevcn-com_functions-rdapchatbotvcn-oraclevcn-com_NS {
+  domain = "functions.rdapchatbotvcn.oraclevcn.com"
   items {
-    domain = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0.workernodes.rdapchatbotvcn.oraclevcn.com"
-    rdata  = "10.0.1.91"
+    domain = "functions.rdapchatbotvcn.oraclevcn.com"
+    rdata  = "vcn-dns.oraclevcn.com."
+    rtype  = "NS"
+    ttl    = "86400"
+  }
+  rtype = "NS"
+  #view_id = <<Optional value not found in discovery>>
+  zone_name_or_id = oci_dns_zone.export_functions-rdapchatbotvcn-oraclevcn-com.id
+}
+
+resource oci_dns_rrset export_functions-rdapchatbotvcn-oraclevcn-com_functions-rdapchatbotvcn-oraclevcn-com_SOA {
+  domain = "functions.rdapchatbotvcn.oraclevcn.com"
+  items {
+    domain = "functions.rdapchatbotvcn.oraclevcn.com"
+    rdata  = "vcn-dns.oraclevcn.com. hostmaster.oracle.com. 1 3600 3600 3600 10"
+    rtype  = "SOA"
+    ttl    = "86400"
+  }
+  rtype = "SOA"
+  #view_id = <<Optional value not found in discovery>>
+  zone_name_or_id = oci_dns_zone.export_functions-rdapchatbotvcn-oraclevcn-com.id
+}
+
+resource oci_dns_rrset export_bastion-rdapchatbotvcn-oraclevcn-com_bastion-rdapchatbotvcn-oraclevcn-com_SOA {
+  domain = "bastion.rdapchatbotvcn.oraclevcn.com"
+  items {
+    domain = "bastion.rdapchatbotvcn.oraclevcn.com"
+    rdata  = "vcn-dns.oraclevcn.com. hostmaster.oracle.com. 1 3600 3600 3600 10"
+    rtype  = "SOA"
+    ttl    = "86400"
+  }
+  rtype = "SOA"
+  #view_id = <<Optional value not found in discovery>>
+  zone_name_or_id = oci_dns_zone.export_bastion-rdapchatbotvcn-oraclevcn-com.id
+}
+
+resource oci_dns_rrset export_bastion-rdapchatbotvcn-oraclevcn-com_bastion-rdapchatbotvcn-oraclevcn-com_NS {
+  domain = "bastion.rdapchatbotvcn.oraclevcn.com"
+  items {
+    domain = "bastion.rdapchatbotvcn.oraclevcn.com"
+    rdata  = "vcn-dns.oraclevcn.com."
+    rtype  = "NS"
+    ttl    = "86400"
+  }
+  rtype = "NS"
+  #view_id = <<Optional value not found in discovery>>
+  zone_name_or_id = oci_dns_zone.export_bastion-rdapchatbotvcn-oraclevcn-com.id
+}
+
+resource oci_dns_rrset export_workernodes-rdapchatbotvcn-oraclevcn-com_oke--cburyzxciiq--nbwc7loxi5q--s7icahamozq--0-workernodes-rdapchatbotvcn-oraclevcn-com_A {
+  domain = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0.workernodes.rdapchatbotvcn.oraclevcn.com"
+  items {
+    domain = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0.workernodes.rdapchatbotvcn.oraclevcn.com"
+    rdata  = "10.0.1.25"
     rtype  = "A"
     ttl    = "300"
   }
@@ -121,11 +186,11 @@ resource oci_dns_rrset export_workernodes-rdapchatbotvcn-oraclevcn-com_oke--cz6q
   zone_name_or_id = oci_dns_zone.export_workernodes-rdapchatbotvcn-oraclevcn-com.id
 }
 
-resource oci_dns_rrset export_workernodes-rdapchatbotvcn-oraclevcn-com_oke--cz6qcjcr2pa--n4hhutserzq--sbg3pqfmi6a--1-workernodes-rdapchatbotvcn-oraclevcn-com_A {
-  domain = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1.workernodes.rdapchatbotvcn.oraclevcn.com"
+resource oci_dns_rrset export_workernodes-rdapchatbotvcn-oraclevcn-com_oke--cburyzxciiq--nbwc7loxi5q--s7icahamozq--1-workernodes-rdapchatbotvcn-oraclevcn-com_A {
+  domain = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1.workernodes.rdapchatbotvcn.oraclevcn.com"
   items {
-    domain = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1.workernodes.rdapchatbotvcn.oraclevcn.com"
-    rdata  = "10.0.1.128"
+    domain = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1.workernodes.rdapchatbotvcn.oraclevcn.com"
+    rdata  = "10.0.1.76"
     rtype  = "A"
     ttl    = "300"
   }
@@ -151,7 +216,7 @@ resource oci_dns_rrset export_workernodes-rdapchatbotvcn-oraclevcn-com_workernod
   domain = "workernodes.rdapchatbotvcn.oraclevcn.com"
   items {
     domain = "workernodes.rdapchatbotvcn.oraclevcn.com"
-    rdata  = "vcn-dns.oraclevcn.com. hostmaster.oracle.com. 4 3600 3600 3600 10"
+    rdata  = "vcn-dns.oraclevcn.com. hostmaster.oracle.com. 2 3600 3600 3600 10"
     rtype  = "SOA"
     ttl    = "86400"
   }
@@ -160,36 +225,10 @@ resource oci_dns_rrset export_workernodes-rdapchatbotvcn-oraclevcn-com_workernod
   zone_name_or_id = oci_dns_zone.export_workernodes-rdapchatbotvcn-oraclevcn-com.id
 }
 
-resource oci_dns_rrset export_loadbalancers-rdapchatbotvcn-oraclevcn-com_loadbalancers-rdapchatbotvcn-oraclevcn-com_NS {
-  domain = "loadbalancers.rdapchatbotvcn.oraclevcn.com"
+resource oci_dns_rrset export_k8sapiendpoint-rdapchatbotvcn-oraclevcn-com_cburyzxciiq-k8sapiendpoint-rdapchatbotvcn-oraclevcn-com_A {
+  domain = "cburyzxciiq.k8sapiendpoint.rdapchatbotvcn.oraclevcn.com"
   items {
-    domain = "loadbalancers.rdapchatbotvcn.oraclevcn.com"
-    rdata  = "vcn-dns.oraclevcn.com."
-    rtype  = "NS"
-    ttl    = "86400"
-  }
-  rtype = "NS"
-  #view_id = <<Optional value not found in discovery>>
-  zone_name_or_id = oci_dns_zone.export_loadbalancers-rdapchatbotvcn-oraclevcn-com.id
-}
-
-resource oci_dns_rrset export_loadbalancers-rdapchatbotvcn-oraclevcn-com_loadbalancers-rdapchatbotvcn-oraclevcn-com_SOA {
-  domain = "loadbalancers.rdapchatbotvcn.oraclevcn.com"
-  items {
-    domain = "loadbalancers.rdapchatbotvcn.oraclevcn.com"
-    rdata  = "vcn-dns.oraclevcn.com. hostmaster.oracle.com. 1 3600 3600 3600 10"
-    rtype  = "SOA"
-    ttl    = "86400"
-  }
-  rtype = "SOA"
-  #view_id = <<Optional value not found in discovery>>
-  zone_name_or_id = oci_dns_zone.export_loadbalancers-rdapchatbotvcn-oraclevcn-com.id
-}
-
-resource oci_dns_rrset export_k8sapiendpoint-rdapchatbotvcn-oraclevcn-com_cz6qcjcr2pa-k8sapiendpoint-rdapchatbotvcn-oraclevcn-com_A {
-  domain = "cz6qcjcr2pa.k8sapiendpoint.rdapchatbotvcn.oraclevcn.com"
-  items {
-    domain = "cz6qcjcr2pa.k8sapiendpoint.rdapchatbotvcn.oraclevcn.com"
+    domain = "cburyzxciiq.k8sapiendpoint.rdapchatbotvcn.oraclevcn.com"
     rdata  = "10.0.0.2"
     rtype  = "A"
     ttl    = "300"
@@ -225,30 +264,69 @@ resource oci_dns_rrset export_k8sapiendpoint-rdapchatbotvcn-oraclevcn-com_k8sapi
   zone_name_or_id = oci_dns_zone.export_k8sapiendpoint-rdapchatbotvcn-oraclevcn-com.id
 }
 
-resource oci_dns_rrset export_bastion-rdapchatbotvcn-oraclevcn-com_bastion-rdapchatbotvcn-oraclevcn-com_NS {
-  domain = "bastion.rdapchatbotvcn.oraclevcn.com"
+resource oci_dns_rrset export_loadbalancers-rdapchatbotvcn-oraclevcn-com_loadbalancers-rdapchatbotvcn-oraclevcn-com_NS {
+  domain = "loadbalancers.rdapchatbotvcn.oraclevcn.com"
   items {
-    domain = "bastion.rdapchatbotvcn.oraclevcn.com"
+    domain = "loadbalancers.rdapchatbotvcn.oraclevcn.com"
     rdata  = "vcn-dns.oraclevcn.com."
     rtype  = "NS"
     ttl    = "86400"
   }
   rtype = "NS"
   #view_id = <<Optional value not found in discovery>>
-  zone_name_or_id = oci_dns_zone.export_bastion-rdapchatbotvcn-oraclevcn-com.id
+  zone_name_or_id = oci_dns_zone.export_loadbalancers-rdapchatbotvcn-oraclevcn-com.id
 }
 
-resource oci_dns_rrset export_bastion-rdapchatbotvcn-oraclevcn-com_bastion-rdapchatbotvcn-oraclevcn-com_SOA {
-  domain = "bastion.rdapchatbotvcn.oraclevcn.com"
+resource oci_dns_rrset export_loadbalancers-rdapchatbotvcn-oraclevcn-com_loadbalancers-rdapchatbotvcn-oraclevcn-com_SOA {
+  domain = "loadbalancers.rdapchatbotvcn.oraclevcn.com"
   items {
-    domain = "bastion.rdapchatbotvcn.oraclevcn.com"
+    domain = "loadbalancers.rdapchatbotvcn.oraclevcn.com"
     rdata  = "vcn-dns.oraclevcn.com. hostmaster.oracle.com. 1 3600 3600 3600 10"
     rtype  = "SOA"
     ttl    = "86400"
   }
   rtype = "SOA"
   #view_id = <<Optional value not found in discovery>>
-  zone_name_or_id = oci_dns_zone.export_bastion-rdapchatbotvcn-oraclevcn-com.id
+  zone_name_or_id = oci_dns_zone.export_loadbalancers-rdapchatbotvcn-oraclevcn-com.id
+}
+
+resource oci_dns_rrset export_0-10-in-addr-arpa_2-0-0-10-in--addr-arpa_PTR {
+  domain = "2.0.0.10.in-addr.arpa"
+  items {
+    domain = "2.0.0.10.in-addr.arpa"
+    rdata  = "cburyzxciiq.k8sapiendpoint.rdapchatbotvcn.oraclevcn.com."
+    rtype  = "PTR"
+    ttl    = "300"
+  }
+  rtype = "PTR"
+  #view_id = <<Optional value not found in discovery>>
+  zone_name_or_id = oci_dns_zone.export_0-10-in-addr-arpa.id
+}
+
+resource oci_dns_rrset export_0-10-in-addr-arpa_25-1-0-10-in--addr-arpa_PTR {
+  domain = "25.1.0.10.in-addr.arpa"
+  items {
+    domain = "25.1.0.10.in-addr.arpa"
+    rdata  = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0.workernodes.rdapchatbotvcn.oraclevcn.com."
+    rtype  = "PTR"
+    ttl    = "300"
+  }
+  rtype = "PTR"
+  #view_id = <<Optional value not found in discovery>>
+  zone_name_or_id = oci_dns_zone.export_0-10-in-addr-arpa.id
+}
+
+resource oci_dns_rrset export_0-10-in-addr-arpa_76-1-0-10-in--addr-arpa_PTR {
+  domain = "76.1.0.10.in-addr.arpa"
+  items {
+    domain = "76.1.0.10.in-addr.arpa"
+    rdata  = "oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-1.workernodes.rdapchatbotvcn.oraclevcn.com."
+    rtype  = "PTR"
+    ttl    = "300"
+  }
+  rtype = "PTR"
+  #view_id = <<Optional value not found in discovery>>
+  zone_name_or_id = oci_dns_zone.export_0-10-in-addr-arpa.id
 }
 
 resource oci_dns_rrset export_0-10-in-addr-arpa_0-10-in--addr-arpa_NS {
@@ -268,50 +346,11 @@ resource oci_dns_rrset export_0-10-in-addr-arpa_0-10-in--addr-arpa_SOA {
   domain = "0.10.in-addr.arpa"
   items {
     domain = "0.10.in-addr.arpa"
-    rdata  = "vcn-dns.oraclevcn.com. hostmaster.oracle.com. 5 3600 3600 3600 10"
+    rdata  = "vcn-dns.oraclevcn.com. hostmaster.oracle.com. 3 3600 3600 3600 10"
     rtype  = "SOA"
     ttl    = "86400"
   }
   rtype = "SOA"
-  #view_id = <<Optional value not found in discovery>>
-  zone_name_or_id = oci_dns_zone.export_0-10-in-addr-arpa.id
-}
-
-resource oci_dns_rrset export_0-10-in-addr-arpa_128-1-0-10-in--addr-arpa_PTR {
-  domain = "128.1.0.10.in-addr.arpa"
-  items {
-    domain = "128.1.0.10.in-addr.arpa"
-    rdata  = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-1.workernodes.rdapchatbotvcn.oraclevcn.com."
-    rtype  = "PTR"
-    ttl    = "300"
-  }
-  rtype = "PTR"
-  #view_id = <<Optional value not found in discovery>>
-  zone_name_or_id = oci_dns_zone.export_0-10-in-addr-arpa.id
-}
-
-resource oci_dns_rrset export_0-10-in-addr-arpa_2-0-0-10-in--addr-arpa_PTR {
-  domain = "2.0.0.10.in-addr.arpa"
-  items {
-    domain = "2.0.0.10.in-addr.arpa"
-    rdata  = "cz6qcjcr2pa.k8sapiendpoint.rdapchatbotvcn.oraclevcn.com."
-    rtype  = "PTR"
-    ttl    = "300"
-  }
-  rtype = "PTR"
-  #view_id = <<Optional value not found in discovery>>
-  zone_name_or_id = oci_dns_zone.export_0-10-in-addr-arpa.id
-}
-
-resource oci_dns_rrset export_0-10-in-addr-arpa_91-1-0-10-in--addr-arpa_PTR {
-  domain = "91.1.0.10.in-addr.arpa"
-  items {
-    domain = "91.1.0.10.in-addr.arpa"
-    rdata  = "oke-cz6qcjcr2pa-n4hhutserzq-sbg3pqfmi6a-0.workernodes.rdapchatbotvcn.oraclevcn.com."
-    rtype  = "PTR"
-    ttl    = "300"
-  }
-  rtype = "PTR"
   #view_id = <<Optional value not found in discovery>>
   zone_name_or_id = oci_dns_zone.export_0-10-in-addr-arpa.id
 }
