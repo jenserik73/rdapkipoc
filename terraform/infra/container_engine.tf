@@ -61,7 +61,6 @@ resource "oci_containerengine_node_pool" "rdap_chatbot_oke_node_pool" {
   }
   kubernetes_version = "v1.34.2"
   name               = "rdap-chatbot-oke-node-pool"
-  network_launch_type = ""
 
   node_config_details {
     is_pv_encryption_in_transit_enabled = "false"
