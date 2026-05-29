@@ -35,12 +35,7 @@
 			    "terminal.integrated.showOnLaunch": "never"
         	}
     	}
-	},
-  "secrets": {
-    "TF_VAR_RDAPKIPOCDB_PASSWORD": {
-      "description": "RDAPKIPOCDB_PASSWORD"
-    }
-  }
+	}
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }
