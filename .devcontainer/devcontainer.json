@@ -12,7 +12,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "mkdir /home/vscode/oracle_wallet && echo \"$WALLET_RDAPKIPOCDB\" | base64 -d > /home/vscode/oracle_wallet/wallet_rdapkipocdb.zip && unzip -o /home/vscode/oracle_wallet/wallet_rdapkipocdb.zip -d /home/vscode/oracle_wallet && rm -f /home/vscode/oracle_wallet/wallet_rdapkipocdb.zip",
+	"postCreateCommand": "mkdir /home/vscode/oracle_wallet && echo \"$RDAPKIPOCDB_WALLET\" | base64 -d > /home/vscode/oracle_wallet/wallet_rdapkipocdb.zip && unzip -o /home/vscode/oracle_wallet/wallet_rdapkipocdb.zip -d /home/vscode/oracle_wallet && rm -f /home/vscode/oracle_wallet/wallet_rdapkipocdb.zip",
 
 	// Configure tool-specific properties.
 	"customizations": {
