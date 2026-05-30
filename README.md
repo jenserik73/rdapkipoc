@@ -12,3 +12,6 @@ curl -LSs https://raw.githubusercontent.com/fnproject/cli/master/install | sh
 
 ## Verifiser fn CLI
 fn version
+
+## Verifiser HELM
+helm version
