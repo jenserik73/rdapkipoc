@@ -17,15 +17,15 @@ resource oci_kms_vault export_rdap-chatbot-vault {
   vault_type = "DEFAULT"
 }
 
-resource oci_kms_key export_rdap-chatbot-vault-master-encryption-key {
+resource oci_kms_key export_rdap-chatbot-master-encryption-key {
   #auto_key_rotation_details = <<Optional value not found in discovery>>
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-29T12:55:24.246Z"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T18:59:56.077Z"
   }
   desired_state = "ENABLED"
-  display_name  = "rdap-chatbot-vault-master-encryption-key"
+  display_name  = "rdap-chatbot-master-encryption-key"
   #external_key_reference = <<Optional value not found in discovery>>
   freeform_tags = {
   }
@@ -43,9 +43,9 @@ resource oci_kms_key export_rdap-chatbot-vault-master-encryption-key {
   #time_of_deletion = <<Optional value not found in discovery>>
 }
 
-resource oci_kms_key_version export_rdap-chatbot-vault-master-encryption-key_key_version {
+resource oci_kms_key_version export_rdap-chatbot-master-encryption-key_key_version {
   #external_key_version_id = <<Optional value not found in discovery>>
-  key_id              = "ocid1.key.oc19.eu-frankfurt-2.onvbtcxbaage6.abzxiljrylsjzfqr34f26h6v72klz5r25nzpdasq6citjwzsipetnocfnssa"
+  key_id              = "ocid1.key.oc19.eu-frankfurt-2.onvbtcxbaage6.abzxiljri3k2lgzfqdn7oytv6mrdir7gd6ug6sovvg2opvifoydgrywlku5a"
   management_endpoint = "https://onvbtcxbaage6-management.kms.eu-frankfurt-2.oci.oraclecloud.eu"
   #time_of_deletion = <<Optional value not found in discovery>>
 }

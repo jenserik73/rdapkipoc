@@ -53,7 +53,7 @@ resource oci_objectstorage_object export_rdap-chatbot-terraform-state_object_1 {
   #content_disposition = <<Optional value not found in discovery>>
   #content_encoding = <<Optional value not found in discovery>>
   #content_language = <<Optional value not found in discovery>>
-  content_md5  = "KI9j1WobDOmyZIqcNuX1dw=="
+  content_md5  = "mgjBBBLGdMgq38hSAIV9zg=="
   content_type = "application/json"
   #delete_all_object_versions = <<Optional value not found in discovery>>
   metadata = {

@@ -15,20 +15,6 @@ resource oci_core_nat_gateway export_rdap-chatbot-nat-gateway {
   vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
 }
 
-resource oci_core_internet_gateway export_rdap-chatbot-internet-gateway {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.396Z"
-  }
-  display_name = "rdap-chatbot-internet-gateway"
-  enabled      = "true"
-  freeform_tags = {
-  }
-  #route_table_id = <<Optional value not found in discovery>>
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
-}
-
 resource oci_core_default_dhcp_options export_Default-DHCP-Options-for-rdap-chatbot-vcn {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
@@ -55,6 +41,20 @@ resource oci_core_default_dhcp_options export_Default-DHCP-Options-for-rdap-chat
     #server_type = <<Optional value not found in discovery>>
     type = "SearchDomain"
   }
+}
+
+resource oci_core_internet_gateway export_rdap-chatbot-internet-gateway {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.396Z"
+  }
+  display_name = "rdap-chatbot-internet-gateway"
+  enabled      = "true"
+  freeform_tags = {
+  }
+  #route_table_id = <<Optional value not found in discovery>>
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
 }
 
 resource oci_core_public_ip export_Floating-Public-IP-for-cluster-ocid1-cluster-oc19-eu-frankfurt-2-aaaaaaaacjtgtlnbpodzvnblfl5joj3dy6hcmqavrfvidptg2cburyzxciiq {
@@ -248,108 +248,6 @@ resource oci_core_service_gateway export_rdap-chatbot-service-gateway {
     service_id = "ocid1.service.oc19.eu-frankfurt-2.aaaaaaaay2ztby4osvjejwqc7y5f3aq3piezbc4ameipjh6stjy7c6hfrj2q"
   }
   vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
-}
-
-resource oci_core_route_table export_routetable-functions {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-29T11:06:10.392Z"
-  }
-  display_name = "routetable-functions"
-  freeform_tags = {
-  }
-  route_rules {
-    description       = "Internet Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
-    route_type        = "STATIC"
-  }
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
-}
-
-resource oci_core_route_table export_routetable-Workernodes {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.841Z"
-  }
-  display_name = "routetable-Workernodes"
-  freeform_tags = {
-  }
-  route_rules {
-    description       = "Service Gateway Route Rule"
-    destination       = "all-str-services-in-oracle-services-network"
-    destination_type  = "SERVICE_CIDR_BLOCK"
-    network_entity_id = oci_core_service_gateway.export_rdap-chatbot-service-gateway.id
-    route_type        = "STATIC"
-  }
-  route_rules {
-    description       = "NAT Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_nat_gateway.export_rdap-chatbot-nat-gateway.id
-    route_type        = "STATIC"
-  }
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
-}
-
-resource oci_core_route_table export_routetable-KubernetesAPIendpoint {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.649Z"
-  }
-  display_name = "routetable-KubernetesAPIendpoint"
-  freeform_tags = {
-  }
-  route_rules {
-    description       = "Internet Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
-    route_type        = "STATIC"
-  }
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
-}
-
-resource oci_core_route_table export_routetable-Serviceloadbalancers {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.620Z"
-  }
-  display_name = "routetable-Serviceloadbalancers"
-  freeform_tags = {
-  }
-  route_rules {
-    description       = "Internet Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
-    route_type        = "STATIC"
-  }
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
-}
-
-resource oci_core_default_route_table export_default-route-table-rdap-chatbot-vcn {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:08.827Z"
-  }
-  display_name = "default-route-table-rdap-chatbot-vcn"
-  freeform_tags = {
-  }
-  manage_default_resource_id = oci_core_vcn.export_rdap-chatbot-vcn.default_route_table_id
-  route_rules {
-    description       = "Internet Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
-    route_type        = "STATIC"
-  }
 }
 
 resource oci_core_security_list export_seclist-functions {
@@ -767,6 +665,108 @@ resource oci_core_default_security_list export_Default-Security-List-for-rdap-ch
     #udp_options = <<Optional value not found in discovery>>
   }
   manage_default_resource_id = oci_core_vcn.export_rdap-chatbot-vcn.default_security_list_id
+}
+
+resource oci_core_route_table export_routetable-functions {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T11:06:10.392Z"
+  }
+  display_name = "routetable-functions"
+  freeform_tags = {
+  }
+  route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
+    route_type        = "STATIC"
+  }
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+}
+
+resource oci_core_route_table export_routetable-Workernodes {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.841Z"
+  }
+  display_name = "routetable-Workernodes"
+  freeform_tags = {
+  }
+  route_rules {
+    description       = "Service Gateway Route Rule"
+    destination       = "all-str-services-in-oracle-services-network"
+    destination_type  = "SERVICE_CIDR_BLOCK"
+    network_entity_id = oci_core_service_gateway.export_rdap-chatbot-service-gateway.id
+    route_type        = "STATIC"
+  }
+  route_rules {
+    description       = "NAT Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_nat_gateway.export_rdap-chatbot-nat-gateway.id
+    route_type        = "STATIC"
+  }
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+}
+
+resource oci_core_route_table export_routetable-KubernetesAPIendpoint {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.649Z"
+  }
+  display_name = "routetable-KubernetesAPIendpoint"
+  freeform_tags = {
+  }
+  route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
+    route_type        = "STATIC"
+  }
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+}
+
+resource oci_core_route_table export_routetable-Serviceloadbalancers {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.620Z"
+  }
+  display_name = "routetable-Serviceloadbalancers"
+  freeform_tags = {
+  }
+  route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
+    route_type        = "STATIC"
+  }
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+}
+
+resource oci_core_default_route_table export_default-route-table-rdap-chatbot-vcn {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:08.827Z"
+  }
+  display_name = "default-route-table-rdap-chatbot-vcn"
+  freeform_tags = {
+  }
+  manage_default_resource_id = oci_core_vcn.export_rdap-chatbot-vcn.default_route_table_id
+  route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
+    route_type        = "STATIC"
+  }
 }
 
 resource oci_core_private_ip export_privateip20260529102619 {
