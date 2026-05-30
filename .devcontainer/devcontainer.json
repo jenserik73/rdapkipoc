@@ -30,7 +30,8 @@
 		"extensions": [
                 "hashicorp.terraform",
 			    "4ops.terraform",
-			    "oracle.sql-developer"
+			    "oracle.sql-developer",
+			    "ms-python.python"
             	],
         "settings": {
             "terminal.integrated.profiles.linux": {
