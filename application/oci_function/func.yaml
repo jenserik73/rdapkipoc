@@ -1,0 +1,16 @@
+schema_version: 20180708
+name: sql-executor
+version: 0.0.25
+runtime: python
+build_image: fnproject/python:3.12-dev
+run_image: fnproject/python:3.12
+entrypoint: /python/bin/fdk /function/func.py handler
+memory: 256
+timeout: 300
+config:
+  AI_PROFILE: QUERYCHAT_PROFILE
+  DB_DSN: rdapkipoccdb_high
+  DB_USER: QUERYCHAT
+  DBPASS_SECRET_OCID: ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yauk7ukm6zwo65vuygwr6pay4ajv3cyg3vbvixygqzfovq
+  MAX_ROWS: "500"
+  WALLET_SECRET_OCID: ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yaxjtwi247netyi2vuamlrspftpykh2t37miwi2m4yll2q
