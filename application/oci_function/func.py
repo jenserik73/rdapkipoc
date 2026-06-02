@@ -30,10 +30,10 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 # ── konfigurasjon ──────────────────────────────────────────────
-DB_USER            = "querychat"
+DB_USER            = "rdap_chatbot_app_user"
 DB_DSN             = "rdapkipocdb_high"
-WALLET_SECRET_OCID = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yauqbpvvezritxjh5gf22mryqympbatzrf2zzieaoayf4q"
-DBPASS_SECRET_OCID = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66ya2pbt5cn3ypvoagdk6lborlhglh4dvmkeoh3lnforbemq"
+WALLET_SECRET_OCID = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yaxjtwi247netyi2vuamlrspftpykh2t37miwi2m4yll2q"
+DBPASS_SECRET_OCID = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yauk7ukm6zwo65vuygwr6pay4ajv3cyg3vbvixygqzfovq"
 AI_PROFILE         = "QUERYCHAT_PROFILE"
 MAX_ROWS           = "500"
 
@@ -62,6 +62,13 @@ def _init_pool():
     _wallet_dir = tempfile.mkdtemp(prefix="wallet_")
     with zipfile.ZipFile(io.BytesIO(wallet_zip)) as zf:
         zf.extractall(_wallet_dir)
+
+    filnavn = "tnsnames.ora"
+    filsti = os.path.join(_wallet_dir, filnavn)
+
+    with open(filsti, "r", encoding="utf-8") as f:
+        innhold = f.read()
+        logger.info(innhold)  
 
     pool = oracledb.create_pool(
         user=DB_USER,

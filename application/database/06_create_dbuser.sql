@@ -1,4 +1,4 @@
-create user rdap_chatbot_app_user identified by Ud96odh01jkd4uq_e;
+create user rdap_chatbot_app_user identified by RFeqv7PWe73sxT7_mXx9kn_vj34yAh;
 grant create session to rdap_chatbot_app_user;
 grant execute on dbms_cloud_ai to rdap_chatbot_app_user;
 grant execute on dbms_cloud to rdap_chatbot_app_user;
@@ -16,3 +16,4 @@ select grantee, table_name, grantor, table_schema from all_tab_privs
         and table_name = 'OCI$RESOURCE_PRINCIPAL' 
         and table_schema = 'ADMIN';
 
+alter user rdap_chatbot_app_user identified by RFeqv7PWe73sxT7_mXx9kn_vj34yAh;
