@@ -32,8 +32,9 @@ logging.basicConfig(level=logging.INFO)
 # ── konfigurasjon ──────────────────────────────────────────────
 DB_USER            = "rdap_chatbot_app_user"
 DB_DSN             = "rdapkipocdb_high"
-WALLET_SECRET_OCID = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yaxjtwi247netyi2vuamlrspftpykh2t37miwi2m4yll2q"
-DBPASS_SECRET_OCID = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yauk7ukm6zwo65vuygwr6pay4ajv3cyg3vbvixygqzfovq"
+WALLET_SECRET_OCID = os.getenv("WALLET_SECRET_OCID")
+DBPASS_SECRET_OCID = os.getenv("DBPASS_SECRET_OCID")
+WALLETPASS_SECRET_OCID = os.getenv("WALLETPASS_SECRET_OCID")
 AI_PROFILE         = "QUERYCHAT_PROFILE"
 MAX_ROWS           = "500"
 
@@ -56,13 +57,18 @@ def _init_pool():
     global _wallet_dir
     logger.info("Henter wallet …")
     db_password = _get_secret(DBPASS_SECRET_OCID).decode().strip()
+    wallet_password = _get_secret(WALLETPASS_SECRET_OCID).decode().strip()
+    logger.info("DB passord lengde: %d", len(db_password))
+    logger.info("Wallet passord lengde: %d", len(wallet_password))
     wallet_zip = _get_secret(WALLET_SECRET_OCID)
-  
+    logger.info("Wallet zip størrelse: %d bytes", len(wallet_zip))
 
     _wallet_dir = tempfile.mkdtemp(prefix="wallet_")
     with zipfile.ZipFile(io.BytesIO(wallet_zip)) as zf:
         zf.extractall(_wallet_dir)
-
+    logger.info("Wallet filer: %s", os.listdir(_wallet_dir))
+    logger.info("DSN: %s", DB_DSN)
+    logger.info("config_dir: %s", _wallet_dir)
     filnavn = "tnsnames.ora"
     filsti = os.path.join(_wallet_dir, filnavn)
 
@@ -77,7 +83,7 @@ def _init_pool():
         min=1, max=5, increment=1,
         config_dir=_wallet_dir,
         wallet_location=_wallet_dir,
-        wallet_password=db_password
+        wallet_password=wallet_password
     )
     logger.info("Pool klar")
     return pool
