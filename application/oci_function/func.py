@@ -18,7 +18,6 @@ import io
 import json
 import logging
 import os
-import tempfile
 import zipfile
 import base64
 
@@ -30,51 +29,65 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 # ── konfigurasjon ──────────────────────────────────────────────
-DB_USER            = "rdap_chatbot_app_user"
-DB_DSN             = "rdapkipocdb_high"
-WALLET_SECRET_OCID = os.getenv("WALLET_SECRET_OCID")
-DBPASS_SECRET_OCID = os.getenv("DBPASS_SECRET_OCID")
-WALLETPASS_SECRET_OCID = os.getenv("WALLETPASS_SECRET_OCID")
-AI_PROFILE         = "QUERYCHAT_PROFILE"
-MAX_ROWS           = "500"
+def _require_env(name: str) -> str:
+    val = os.getenv(name)
+    if not val:
+        raise EnvironmentError(f"Mangler påkrevd miljøvariabel: {name}")
+    return val
 
-_pool = None
-_wallet_dir = None
+DB_USER                = _require_env("DB_USER")
+DB_DSN                 = _require_env("DB_DSN")
+AI_PROFILE             = _require_env("AI_PROFILE")
+MAX_ROWS               = _require_env("MAX_ROWS")
+WALLET_SECRET_OCID     = _require_env("WALLET_SECRET_OCID")
+DBPASS_SECRET_OCID     = _require_env("DBPASS_SECRET_OCID")
+WALLETPASS_SECRET_OCID = _require_env("WALLETPASS_SECRET_OCID")
+
+_pool           = None
+_secrets_client = None
+_wallet_dir     = "/tmp/wallet"
 
 
-# ── hent secret fra Vault via Instance Principal ───────────────
+# ── hent secret fra Vault via Resource Principal ───────────────
+
+def _get_secrets_client() -> oci.secrets.SecretsClient:
+    """Lager SecretsClient én gang og gjenbruker den (per container)."""
+    global _secrets_client
+    if _secrets_client is None:
+        signer = oci.auth.signers.get_resource_principals_signer()
+        _secrets_client = oci.secrets.SecretsClient({}, signer=signer)
+    return _secrets_client
+
 
 def _get_secret(ocid: str) -> bytes:
-    signer = oci.auth.signers.get_resource_principals_signer()
-    client = oci.secrets.SecretsClient({}, signer=signer)
-    bundle = client.get_secret_bundle(secret_id=ocid).data
+    """Henter og base64-dekoder et secret fra OCI Vault."""
+    bundle = _get_secrets_client().get_secret_bundle(secret_id=ocid).data
     return base64.b64decode(bundle.secret_bundle_content.content)
 
 
 # ── connection pool (initialiseres én gang per container) ──────
 
-def _init_pool():
-    global _wallet_dir
-    logger.info("Henter wallet …")
-    db_password = _get_secret(DBPASS_SECRET_OCID).decode().strip()
+def _init_pool() -> oracledb.ConnectionPool:
+    logger.info("Henter secrets fra Vault …")
+
+    db_password     = _get_secret(DBPASS_SECRET_OCID).decode().strip()
     wallet_password = _get_secret(WALLETPASS_SECRET_OCID).decode().strip()
-    logger.info("DB passord lengde: %d", len(db_password))
-    logger.info("Wallet passord lengde: %d", len(wallet_password))
-    wallet_zip = _get_secret(WALLET_SECRET_OCID)
+    wallet_zip      = _get_secret(WALLET_SECRET_OCID)
+
+    logger.info("DB-passord lengde: %d", len(db_password))
+    logger.info("Wallet-passord lengde: %d", len(wallet_password))
     logger.info("Wallet zip størrelse: %d bytes", len(wallet_zip))
 
-    _wallet_dir = tempfile.mkdtemp(prefix="wallet_")
+    os.makedirs(_wallet_dir, exist_ok=True)
     with zipfile.ZipFile(io.BytesIO(wallet_zip)) as zf:
         zf.extractall(_wallet_dir)
+
     logger.info("Wallet filer: %s", os.listdir(_wallet_dir))
     logger.info("DSN: %s", DB_DSN)
-    logger.info("config_dir: %s", _wallet_dir)
-    filnavn = "tnsnames.ora"
-    filsti = os.path.join(_wallet_dir, filnavn)
 
-    with open(filsti, "r", encoding="utf-8") as f:
-        innhold = f.read()
-        logger.info(innhold)  
+    tns_path = os.path.join(_wallet_dir, "tnsnames.ora")
+    with open(tns_path, "r", encoding="utf-8") as f:
+        logger.info("tnsnames.ora:\n%s", f.read())
 
     pool = oracledb.create_pool(
         user=DB_USER,
@@ -83,13 +96,13 @@ def _init_pool():
         min=1, max=5, increment=1,
         config_dir=_wallet_dir,
         wallet_location=_wallet_dir,
-        wallet_password=wallet_password
+        wallet_password=wallet_password,
     )
-    logger.info("Pool klar")
+    logger.info("Connection pool klar")
     return pool
 
 
-def _get_pool():
+def _get_pool() -> oracledb.ConnectionPool:
     global _pool
     if _pool is None:
         _pool = _init_pool()
@@ -100,16 +113,14 @@ def _get_pool():
 
 def _ask_nl(question: str) -> dict:
     """
-    Kaller myschema.querychat_pkg.ask_nl() i ADB.
+    Kaller querychat.querychat_pkg.ask_nl() i ADB.
     Returnerer JSON-respons fra pakken som Python-dict.
     """
     pool = _get_pool()
-    logger.info("Pool aquire")
+    logger.info("Henter tilkobling fra pool …")
     with pool.acquire() as conn:
-        logger.info("open cursor")
         with conn.cursor() as cur:
-            # Kall PL/SQL-funksjonen og hent CLOB-resultatet
-            logger.info("Kall PL/SQL-funksjonen og hent CLOB-resultatet")
+            logger.info("Kaller PL/SQL-funksjonen …")
             result_clob = cur.var(oracledb.DB_TYPE_CLOB)
             cur.execute(
                 """
@@ -127,9 +138,10 @@ def _ask_nl(question: str) -> dict:
                 max_rows=MAX_ROWS,
             )
             clob_val = result_clob.getvalue()
-            logger.info("end get _ask_nl")
-            logger.info(clob_val.read(1,clob_val.size()))
-            return json.loads(clob_val.read(1,clob_val.size()) if clob_val else '{"ok":false,"error":"Tom respons"}')
+            # Les CLOB én gang og gjenbruk verdien
+            clob_content = clob_val.read(1, clob_val.size()) if clob_val else None
+            logger.info("CLOB innhold: %s", clob_content)
+            return json.loads(clob_content or '{"ok":false,"error":"Tom respons"}')
 
 
 def _save_feedback(question: str, sql: str, vote: int, corrected: str = None):
@@ -140,7 +152,7 @@ def _save_feedback(question: str, sql: str, vote: int, corrected: str = None):
             cur.execute(
                 """
                 BEGIN
-                  myschema.querychat_pkg.save_feedback(
+                  querychat.querychat_pkg.save_feedback(
                     p_question  => :question,
                     p_sql       => :sql,
                     p_vote      => :vote,
@@ -172,7 +184,6 @@ def handler(ctx, data: io.BytesIO = None):
     except Exception:
         return _resp(ctx, {"ok": False, "error": "Ugyldig JSON"}, 400)
 
-    # Rute basert på action-felt (API Gateway kan også rute på path)
     action = body.get("action", "ask")
 
     if action == "feedback":
@@ -196,14 +207,14 @@ def handler(ctx, data: io.BytesIO = None):
     logger.info("Spørsmål: %s", question)
     try:
         result = _ask_nl(question)
-        logger.info("ask_nl result")
+        logger.info("ask_nl fullført")
         return _resp(ctx, result)
     except Exception as e:
         logger.exception("Feil i ask_nl")
         return _resp(ctx, {"ok": False, "error": str(e), "code": "UNKNOWN"}, 500)
 
 
-def _resp(ctx, data: dict, status: int = 200):
+def _resp(ctx, data: dict, status: int = 200) -> fdk.response.Response:
     return fdk.response.Response(
         ctx,
         response_data=json.dumps(data, ensure_ascii=False),
