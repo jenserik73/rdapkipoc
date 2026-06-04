@@ -40,7 +40,7 @@ resource "oci_vault_secret" "rdapkipocdb_wallet_password" {
 
   secret_content {
     content_type = "BASE64"
-    content      = base64encode(var.rdapkipocdb_wallet_password)
+    content      = base64encode(var.RDAPKIPOCDB_WALLET_PASSWORD)
   }
 }
 
@@ -53,6 +53,6 @@ resource "oci_vault_secret" "rdapkipocdb_password" {
 
   secret_content {
     content_type = "BASE64"
-    content      = base64encode(var.rdapkipocdb_password)
+    content      = base64encode(var.RDAPKIPOCDB_PASSWORD)
   }
 }

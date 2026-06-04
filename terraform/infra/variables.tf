@@ -44,7 +44,7 @@ variable "vcn_security_attributes" {
 
 # ── Secrets ───────────────────────────────────────────────────────────────────
 
-variable "rdapkipocdb_password" {
+variable "RDAPKIPOCDB_PASSWORD" {
   description = "Password for the RDAP Chatbot Autonomous Database user"
   type        = string
   sensitive   = true
@@ -56,7 +56,7 @@ variable "wallet_file_path" {
   default     = "/home/vscode/oracle_wallet/wallet_rdapkipocdb_slim.zip"
 }
 
-variable "rdapkipocdb_wallet_password" {
+variable "RDAPKIPOCDB_WALLET_PASSWORD" {
   description = "Password for the RDAP Chatbot Autonomous Database wallet"
   type        = string
   sensitive   = true
