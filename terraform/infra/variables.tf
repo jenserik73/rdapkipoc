@@ -7,6 +7,7 @@ locals {
   container_repository_readme_content = "Readme content"
   container_repository_readme_format = "text/markdown"
   kubernetes_version                 = "v1.34.2"
+  admin_instance_ssh_public_key      = file(pathexpand("~/.ssh/ssh-key.key.pub"))
 }
 
 # ── VCN ──────────────────────────────────────────────────────────────────────
@@ -55,13 +56,13 @@ variable "wallet_file_path" {
   default     = "/home/vscode/oracle_wallet/wallet_rdapkipocdb_slim.zip"
 }
 
-# ── Compute ───────────────────────────────────────────────────────────────────
-
-variable "admin_instance_ssh_public_key" {
-  description = "SSH public key for the admin instance"
+variable "rdapkipocdb_wallet_password" {
+  description = "Password for the RDAP Chatbot Autonomous Database wallet"
   type        = string
   sensitive   = true
 }
+
+# ── Compute ───────────────────────────────────────────────────────────────────
 
 # ── Outputs ───────────────────────────────────────────────────────────────────
 
