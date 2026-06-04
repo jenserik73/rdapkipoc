@@ -1,77 +1,55 @@
-data "oci_core_services" "all_services" {
-  filter {
-    name   = "name"
-    values = ["All .* Services In Oracle Services Network"]
-    regex  = true
-  }
-}
+# ── VCN ──────────────────────────────────────────────────────────────────────
 
 resource "oci_core_vcn" "rdap_chatbot_vcn" {
-  #Required
   compartment_id = local.compartment_id
-
-  #Optional
-  cidr_blocks             = var.vcn_cidr_blocks
-  display_name            = var.vcn_display_name
-  dns_label               = var.vcn_dns_label
-  ipv6private_cidr_blocks = var.vcn_ipv6private_cidr_blocks
-  is_ipv6enabled          = var.vcn_is_ipv6enabled
-  security_attributes     = var.vcn_security_attributes
+  cidr_blocks    = var.vcn_cidr_blocks
+  display_name   = var.vcn_display_name
+  dns_label      = var.vcn_dns_label
+  is_ipv6enabled = var.vcn_is_ipv6enabled
 }
 
 output "vcn_id" {
   value = oci_core_vcn.rdap_chatbot_vcn.id
 }
 
+# ── Gateways ──────────────────────────────────────────────────────────────────
+
 resource "oci_core_internet_gateway" "rdap_chatbot_internet_gateway" {
-  #Required
   compartment_id = local.compartment_id
   vcn_id         = oci_core_vcn.rdap_chatbot_vcn.id
-
-  #Optional
-  enabled      = true
-  display_name = "rdap-chatbot-internet-gateway"
+  enabled        = true
+  display_name   = "rdap-chatbot-internet-gateway"
 }
 
 resource "oci_core_nat_gateway" "rdap_chatbot_nat_gateway" {
-  #Required
   compartment_id = local.compartment_id
   vcn_id         = oci_core_vcn.rdap_chatbot_vcn.id
-
-  #Optional
-  block_traffic = false
-  display_name  = "rdap-chatbot-nat-gateway"
+  block_traffic  = false
+  display_name   = "rdap-chatbot-nat-gateway"
 }
 
 resource "oci_core_service_gateway" "rdap_chatbot_service_gateway" {
-  #Required
   compartment_id = local.compartment_id
+  vcn_id         = oci_core_vcn.rdap_chatbot_vcn.id
+  display_name   = "rdap-chatbot-service-gateway"
+
   services {
-    #Required
     service_id = data.oci_core_services.all_services.services[0].id
   }
-  vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
-
-  #Optional
-  display_name = "rdap-chatbot-service-gateway"
 }
 
-resource oci_core_subnet functions_subnet {
-  #availability_domain = <<Optional value not found in discovery>>
-  cidr_block     = "10.0.4.0/24"
-  compartment_id = local.compartment_id
-  display_name    = "functions-subnet"
-  dns_label       = "functions"
-  ipv4cidr_blocks = [
-    "10.0.4.0/24",
-  ]
-  prohibit_internet_ingress  = "true"
-  prohibit_public_ip_on_vnic = "true"
+# ── Subnets ───────────────────────────────────────────────────────────────────
+
+resource "oci_core_subnet" "functions_subnet" {
+  compartment_id             = local.compartment_id
+  vcn_id                     = oci_core_vcn.rdap_chatbot_vcn.id
+  cidr_block                 = "10.0.4.0/24"
+  display_name               = "functions-subnet"
+  dns_label                  = "functions"
+  prohibit_internet_ingress  = true
+  prohibit_public_ip_on_vnic = true
   route_table_id             = oci_core_route_table.routetable_functions.id
-  security_list_ids = [
-    oci_core_security_list.seclist_functions.id,
-  ]
-  vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
+  security_list_ids          = [oci_core_security_list.seclist_functions.id]
 }
 
 resource "oci_core_subnet" "KubernetesAPIendpointSubnet" {
@@ -80,28 +58,22 @@ resource "oci_core_subnet" "KubernetesAPIendpointSubnet" {
   cidr_block                 = "10.0.0.0/30"
   display_name               = "Kubernetes-API-endpoint-subnet"
   dns_label                  = "k8sapiendpoint"
-  prohibit_public_ip_on_vnic = false # Allows public IPs (Public Subnet)
-  prohibit_internet_ingress  = "false"
-
-  # Optional: Attach specific Route Table and Security Lists
-  route_table_id    = oci_core_route_table.routetable_KubernetesAPIendpoint.id
-  security_list_ids = [oci_core_security_list.seclist_KubernetesAPIendpoint.id]
+  prohibit_public_ip_on_vnic = false # Public subnet
+  prohibit_internet_ingress  = false
+  route_table_id             = oci_core_route_table.routetable_KubernetesAPIendpoint.id
+  security_list_ids          = [oci_core_security_list.seclist_KubernetesAPIendpoint.id]
 }
 
 resource "oci_core_subnet" "workernodes_subnet" {
-  cidr_block                 = "10.0.1.0/24"
   compartment_id             = local.compartment_id
+  vcn_id                     = oci_core_vcn.rdap_chatbot_vcn.id
+  cidr_block                 = "10.0.1.0/24"
   display_name               = "worker-nodes-subnet"
   dns_label                  = "workernodes"
-  prohibit_internet_ingress  = "true"
-  prohibit_public_ip_on_vnic = "true" # Prohibits public IPs (Private Subnet)
-
-  # Optional: Attach specific Route Table and Security Lists
-  route_table_id = oci_core_route_table.routetable_workernodes.id
-  security_list_ids = [
-    oci_core_security_list.seclist_workernodes.id
-  ]
-  vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
+  prohibit_internet_ingress  = true
+  prohibit_public_ip_on_vnic = true # Private subnet
+  route_table_id             = oci_core_route_table.routetable_workernodes.id
+  security_list_ids          = [oci_core_security_list.seclist_workernodes.id]
 }
 
 resource "oci_core_subnet" "loadbalancers_subnet" {
@@ -110,11 +82,10 @@ resource "oci_core_subnet" "loadbalancers_subnet" {
   cidr_block                 = "10.0.2.0/24"
   display_name               = "load-balancers-subnet"
   dns_label                  = "loadbalancers"
-  prohibit_public_ip_on_vnic = false # Allows public IPs (Public Subnet)
-  prohibit_internet_ingress  = "false"
-  # Optional: Attach specific Route Table and Security Lists
-  route_table_id    = oci_core_route_table.routetable_serviceloadbalancers.id
-  security_list_ids = [oci_core_security_list.seclist_loadbalancers.id]
+  prohibit_public_ip_on_vnic = false # Public subnet
+  prohibit_internet_ingress  = false
+  route_table_id             = oci_core_route_table.routetable_serviceloadbalancers.id
+  security_list_ids          = [oci_core_security_list.seclist_loadbalancers.id]
 }
 
 resource "oci_core_subnet" "bastion_subnet" {
@@ -123,30 +94,44 @@ resource "oci_core_subnet" "bastion_subnet" {
   cidr_block                 = "10.0.3.0/24"
   display_name               = "bastion-subnet"
   dns_label                  = "bastion"
-  prohibit_public_ip_on_vnic = false # Allows public IPs (Public Subnet)
-
-  # Optional: Attach specific Route Table and Security Lists
-  route_table_id    = oci_core_route_table.routetable_bastion.id
+  prohibit_public_ip_on_vnic = false # Public subnet
+  route_table_id             = oci_core_route_table.routetable_bastion.id
   security_list_ids          = [oci_core_security_list.seclist_bastion.id]
 }
 
-resource oci_core_route_table routetable_bastion {
-  compartment_id = local.compartment_id
-  display_name = "routetable-bastion"
+# ── Route tables ──────────────────────────────────────────────────────────────
+
+resource "oci_core_default_route_table" "default_route_table_rdap_chatbot_vcn" {
+  compartment_id             = local.compartment_id
+  manage_default_resource_id = oci_core_vcn.rdap_chatbot_vcn.default_route_table_id
+  display_name               = "default-route-table-rdap-chatbot-vcn"
 
   route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.rdap_chatbot_internet_gateway.id
+  }
+}
+
+resource "oci_core_route_table" "routetable_bastion" {
+  compartment_id = local.compartment_id
+  vcn_id         = oci_core_vcn.rdap_chatbot_vcn.id
+  display_name   = "routetable-bastion"
+
+  route_rules {
+    description       = "Internet Gateway Route Rule"
     destination       = "0.0.0.0/0"
     destination_type  = "CIDR_BLOCK"
     network_entity_id = oci_core_internet_gateway.rdap_chatbot_internet_gateway.id
     route_type        = "STATIC"
   }
-
-  vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
 }
 
-resource oci_core_route_table routetable_functions {
+resource "oci_core_route_table" "routetable_functions" {
   compartment_id = local.compartment_id
-  display_name = "routetable-functions"
+  vcn_id         = oci_core_vcn.rdap_chatbot_vcn.id
+  display_name   = "routetable-functions"
 
   route_rules {
     description       = "Service Gateway Route Rule"
@@ -155,6 +140,7 @@ resource oci_core_route_table routetable_functions {
     network_entity_id = oci_core_service_gateway.rdap_chatbot_service_gateway.id
     route_type        = "STATIC"
   }
+
   route_rules {
     description       = "NAT Gateway Route Rule"
     destination       = "0.0.0.0/0"
@@ -162,48 +148,26 @@ resource oci_core_route_table routetable_functions {
     network_entity_id = oci_core_nat_gateway.rdap_chatbot_nat_gateway.id
     route_type        = "STATIC"
   }
-  vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
-}
-
-resource "oci_core_default_route_table" "default_route_table_rdap_chatbot_vcn" {
-  #Required
-  compartment_id             = local.compartment_id
-  manage_default_resource_id = oci_core_vcn.rdap_chatbot_vcn.default_route_table_id
-
-  #Optional
-  display_name = "default-route-table-rdap-chatbot-vcn"
-  route_rules {
-    #Required
-    network_entity_id = oci_core_internet_gateway.rdap_chatbot_internet_gateway.id
-
-    #Optional
-    description      = "Internet Gateway Route Rule"
-    destination      = "0.0.0.0/0"
-    destination_type = "CIDR_BLOCK"
-  }
 }
 
 resource "oci_core_route_table" "routetable_KubernetesAPIendpoint" {
-  #Required
   compartment_id = local.compartment_id
   vcn_id         = oci_core_vcn.rdap_chatbot_vcn.id
+  display_name   = "routetable-KubernetesAPIendpoint"
 
-  #Optional
-  display_name = "routetable-KubernetesAPIendpoint"
   route_rules {
-    #Required
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
     network_entity_id = oci_core_internet_gateway.rdap_chatbot_internet_gateway.id
-
-    #Optional
-    description      = "Internet Gateway Route Rule"
-    destination      = "0.0.0.0/0"
-    destination_type = "CIDR_BLOCK"
   }
 }
 
 resource "oci_core_route_table" "routetable_workernodes" {
   compartment_id = local.compartment_id
+  vcn_id         = oci_core_vcn.rdap_chatbot_vcn.id
   display_name   = "routetable-Workernodes"
+
   route_rules {
     description       = "NAT Gateway Route Rule"
     destination       = "0.0.0.0/0"
@@ -211,6 +175,7 @@ resource "oci_core_route_table" "routetable_workernodes" {
     network_entity_id = oci_core_nat_gateway.rdap_chatbot_nat_gateway.id
     route_type        = "STATIC"
   }
+
   route_rules {
     description       = "Service Gateway Route Rule"
     destination       = "all-str-services-in-oracle-services-network"
@@ -218,74 +183,71 @@ resource "oci_core_route_table" "routetable_workernodes" {
     network_entity_id = oci_core_service_gateway.rdap_chatbot_service_gateway.id
     route_type        = "STATIC"
   }
-  vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
 }
 
 resource "oci_core_route_table" "routetable_serviceloadbalancers" {
-  #Required
   compartment_id = local.compartment_id
   vcn_id         = oci_core_vcn.rdap_chatbot_vcn.id
+  display_name   = "routetable-Serviceloadbalancers"
 
-  #Optional
-  display_name = "routetable-Serviceloadbalancers"
   route_rules {
-    #Required
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
     network_entity_id = oci_core_internet_gateway.rdap_chatbot_internet_gateway.id
-
-    #Optional
-    description      = "Internet Gateway Route Rule"
-    destination      = "0.0.0.0/0"
-    destination_type = "CIDR_BLOCK"
   }
 }
 
-resource oci_core_security_list seclist_functions {
+# ── Security lists ────────────────────────────────────────────────────────────
+
+resource "oci_core_security_list" "seclist_functions" {
   compartment_id = local.compartment_id
-  display_name = "seclist-functions"
-  vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
+  vcn_id         = oci_core_vcn.rdap_chatbot_vcn.id
+  display_name   = "seclist-functions"
 
   ingress_security_rules {
     description = "Allow SSH traffic from Bastion subnet"
     source      = "10.0.3.0/24"
     source_type = "CIDR_BLOCK"
-    protocol  = "6"
-    stateless = "false"
+    protocol    = "6"
+    stateless   = false
     tcp_options {
-      max = "22"
-      min = "22"
+      min = 22
+      max = 22
     }
   }
+
   egress_security_rules {
-    #description = "Allow traffic to all Oracle services in the network"
+    description      = "Allow traffic to all Oracle services in the network"
     destination      = "all-str-services-in-oracle-services-network"
     destination_type = "SERVICE_CIDR_BLOCK"
-    #icmp_options = <<Optional value not found in discovery>>
-    protocol  = "6"
-    stateless = "false"
-    #tcp_options = <<Optional value not found in discovery>>
-    #udp_options = <<Optional value not found in discovery>>
+    protocol         = "6"
+    stateless        = false
   }
+
   egress_security_rules {
-    #description = "Allow traffic to on port 1522 to Oracle Autonomous Database for RDAP Chatbot"
+    description      = "Allow outbound traffic on port 1522 to Oracle Autonomous Database"
     destination      = "0.0.0.0/0"
     destination_type = "CIDR_BLOCK"
-    protocol  = "6"
-    stateless = "false"
+    protocol         = "6"
+    stateless        = false
     tcp_options {
-      max = "1522"
-      min = "1522"
+      min = 1522
+      max = 1522
     }
   }
+
   egress_security_rules {
-  description      = "Allow HTTPS outbound via NAT"
-  destination      = "0.0.0.0/0"
-  destination_type = "CIDR_BLOCK"
-  protocol         = "6"
-  tcp_options {
-    min = 443
-    max = 443
+    description      = "Allow HTTPS outbound via NAT"
+    destination      = "0.0.0.0/0"
+    destination_type = "CIDR_BLOCK"
+    protocol         = "6"
+    stateless        = false
+    tcp_options {
+      min = 443
+      max = 443
+    }
   }
-}
 }
 
 resource "oci_core_security_list" "seclist_KubernetesAPIendpoint" {
@@ -296,60 +258,65 @@ resource "oci_core_security_list" "seclist_KubernetesAPIendpoint" {
   ingress_security_rules {
     description = "Kubernetes worker to Kubernetes API endpoint communication"
     protocol    = "6"
-    source      = "10.0.1.0/24" # Worker nodes subnet CIDR
+    source      = "10.0.1.0/24"
     tcp_options {
-      max = 6443
       min = 6443
+      max = 6443
     }
   }
+
   ingress_security_rules {
     description = "Kubernetes worker to control plane communication"
-    protocol    = "6"           # TCP protocol number
-    source      = "10.0.1.0/24" # Worker nodes subnet CIDR
+    protocol    = "6"
+    source      = "10.0.1.0/24"
     tcp_options {
-      max = 12250
       min = 12250
+      max = 12250
     }
   }
+
   ingress_security_rules {
     description = "Path Discovery"
-    protocol    = "1"           # ICMP protocol number
-    source      = "10.0.1.0/24" # Worker nodes subnet CIDR
-    icmp_options {
-      type = 3
-      code = 4
-    }
-  }
-  ingress_security_rules {
-    description = "External access to Kubernetes API endpoint"
-    protocol    = "6"         # TCP protocol number
-    source      = "0.0.0.0/0" # Bastion host subnet CIDR
-    tcp_options {
-      max = 6443
-      min = 6443
-    }
-  }
-  egress_security_rules {
-    description      = "Allow Kubernetes control plane to communicate with OKE"
-    destination_type = "SERVICE_CIDR_BLOCK"
-    destination      = "all-str-services-in-oracle-services-network"
-    protocol         = "6" # TCP protocol number
-  }
-  egress_security_rules {
-    description = "Allow Kubernetes control plane to communicate with worker nodes"
-    destination = "10.0.1.0/24" # Worker nodes subnet CIDR
-    protocol    = "6"           # TCP protocol number
-  }
-  egress_security_rules {
-    description = "Path Discovery"
-    destination = "10.0.1.0/24" # Worker nodes subnet CIDR
-    protocol    = "1"           # ICMP protocol number
+    protocol    = "1"
+    source      = "10.0.1.0/24"
     icmp_options {
       type = 3
       code = 4
     }
   }
 
+  ingress_security_rules {
+    description = "External access to Kubernetes API endpoint"
+    protocol    = "6"
+    source      = "0.0.0.0/0"
+    tcp_options {
+      min = 6443
+      max = 6443
+    }
+  }
+
+  egress_security_rules {
+    description      = "Allow Kubernetes control plane to communicate with OKE"
+    destination_type = "SERVICE_CIDR_BLOCK"
+    destination      = "all-str-services-in-oracle-services-network"
+    protocol         = "6"
+  }
+
+  egress_security_rules {
+    description = "Allow Kubernetes control plane to communicate with worker nodes"
+    destination = "10.0.1.0/24"
+    protocol    = "6"
+  }
+
+  egress_security_rules {
+    description = "Path Discovery"
+    destination = "10.0.1.0/24"
+    protocol    = "1"
+    icmp_options {
+      type = 3
+      code = 4
+    }
+  }
 }
 
 resource "oci_core_security_list" "seclist_workernodes" {
@@ -358,98 +325,106 @@ resource "oci_core_security_list" "seclist_workernodes" {
   display_name   = "seclist-workernodes"
 
   ingress_security_rules {
-    description = "Allow load balancer to communicate with kube-proxy on worker nodes for health checks and node port traffic"
-    protocol    = "all"         # TCP protocol number
-    source      = "10.0.2.0/24" # Load balancer subnet CIDR
+    description = "Allow load balancer to communicate with kube-proxy on worker nodes"
+    protocol    = "all"
+    source      = "10.0.2.0/24"
     source_type = "CIDR_BLOCK"
-    stateless   = "false"
+    stateless   = false
   }
+
   ingress_security_rules {
     description = "Allow inbound SSH traffic to managed nodes from Internet"
-    protocol    = "6"         # TCP protocol number
-    source      = "0.0.0.0/0" # Internet
+    protocol    = "6"
+    source      = "0.0.0.0/0"
     source_type = "CIDR_BLOCK"
-    stateless   = "false"
+    stateless   = false
     tcp_options {
-      max = "22"
-      min = "22"
+      min = 22
+      max = 22
     }
   }
+
   ingress_security_rules {
     description = "Allow Kubernetes control plane to communicate with worker nodes"
-    protocol    = "6"           # TCP protocol number
-    source      = "10.0.0.0/30" # Kubernetes API endpoint subnet CIDR
+    protocol    = "6"
+    source      = "10.0.0.0/30"
     source_type = "CIDR_BLOCK"
-    stateless   = "false"
+    stateless   = false
   }
+
   ingress_security_rules {
     description = "Path Discovery"
-    protocol    = "1"           # ICMP protocol number
-    source      = "10.0.0.0/30" # Kubernetes API endpoint subnet CIDR
+    protocol    = "1"
+    source      = "10.0.0.0/30"
     source_type = "CIDR_BLOCK"
-    stateless   = "false"
+    stateless   = false
     icmp_options {
       type = 3
       code = 4
     }
   }
+
   ingress_security_rules {
     description = "Allow pods on one worker node to communicate with pods on other worker nodes"
     protocol    = "all"
-    source      = "10.0.1.0/24" # Worker nodes subnet CIDR
+    source      = "10.0.1.0/24"
     source_type = "CIDR_BLOCK"
-    stateless   = "false"
+    stateless   = false
   }
+
   egress_security_rules {
     description      = "Allow worker nodes to communicate with internet"
-    destination      = "0.0.0.0/0" # Allow all destinations for outbound traffic from worker nodes
+    destination      = "0.0.0.0/0"
     destination_type = "CIDR_BLOCK"
-    protocol         = "all" # TCP protocol number
-    stateless        = "false"
+    protocol         = "all"
+    stateless        = false
   }
 
   egress_security_rules {
     description      = "Allow worker nodes to communicate with Kubernetes API endpoint"
-    destination      = "10.0.0.0/30" # Kubernetes API endpoint subnet CIDR
+    destination      = "10.0.0.0/30"
     destination_type = "CIDR_BLOCK"
-    protocol         = "6" # TCP protocol number
-    stateless        = "false"
+    protocol         = "6"
+    stateless        = false
     tcp_options {
-      max = "6443"
-      min = "6443"
+      min = 6443
+      max = 6443
     }
   }
+
   egress_security_rules {
     description      = "Path Discovery"
-    destination      = "0.0.0.0/0" # Allow all destinations for outbound traffic from worker nodes
+    destination      = "0.0.0.0/0"
     destination_type = "CIDR_BLOCK"
+    protocol         = "1"
+    stateless        = false
     icmp_options {
-      code = 4
       type = 3
+      code = 4
     }
-    protocol  = "1" # ICMP protocol number
-    stateless = "false"
   }
+
   egress_security_rules {
     description      = "Kubernetes worker to control plane communication"
-    destination      = "10.0.0.0/30" # Kubernetes API endpoint subnet CIDR
+    destination      = "10.0.0.0/30"
     destination_type = "CIDR_BLOCK"
-    protocol         = "6" # TCP protocol number
-    stateless        = "false"
+    protocol         = "6"
+    stateless        = false
     tcp_options {
-      max = "12250"
-      min = "12250"
+      min = 12250
+      max = 12250
     }
   }
+
   egress_security_rules {
-    description      = "Path Discovery"
-    destination      = "10.0.0.0/30" # Kubernetes API endpoint subnet CIDR
+    description      = "Path Discovery to Kubernetes API endpoint subnet"
+    destination      = "10.0.0.0/30"
     destination_type = "CIDR_BLOCK"
-    protocol         = "1" # ICMP protocol number
-    stateless        = "false"
+    protocol         = "1"
+    stateless        = false
     icmp_options {
-      code = "4"
-      type = "3"
+      type = 3
+      code = 4
     }
   }
 
@@ -457,20 +432,20 @@ resource "oci_core_security_list" "seclist_workernodes" {
     description      = "Allow worker nodes to communicate with OKE control plane"
     destination      = "all-str-services-in-oracle-services-network"
     destination_type = "SERVICE_CIDR_BLOCK"
-    protocol         = "6" # TCP protocol number
-    stateless        = "false"
+    protocol         = "6"
+    stateless        = false
     tcp_options {
-      max = "443"
-      min = "443"
+      min = 443
+      max = 443
     }
   }
 
   egress_security_rules {
     description      = "Allow pods on one worker node to communicate with pods on other worker nodes"
-    destination      = "10.0.1.0/24" # Worker nodes subnet CIDR
+    destination      = "10.0.1.0/24"
     destination_type = "CIDR_BLOCK"
-    protocol         = "all" # Allow all protocols for internal communication        
-    stateless        = "false"
+    protocol         = "all"
+    stateless        = false
   }
 }
 
@@ -480,72 +455,72 @@ resource "oci_core_security_list" "seclist_loadbalancers" {
   display_name   = "seclist-loadbalancers"
 
   ingress_security_rules {
-    description = "Load balancer listener protocol and ports for external access to load balancer"
-    protocol    = "6"         # TCP protocol number
-    source      = "0.0.0.0/0" # Allow access from any IP
+    description = "Load balancer listener - external access on port 80"
+    protocol    = "6"
+    source      = "0.0.0.0/0"
     tcp_options {
-      max = 80
       min = 80
+      max = 80
     }
   }
 
   egress_security_rules {
     description = "Load balancer to worker nodes node ports"
-    protocol    = "all"         # TCP protocol number
-    destination = "10.0.1.0/24" # Worker nodes subnet CIDR
+    protocol    = "all"
+    destination = "10.0.1.0/24"
   }
 
   egress_security_rules {
-    description = "Allow load balancer to communicate with kube-proxy on worker nodes for health checks and node port traffic"
-    protocol    = "all"         # TCP protocol number
-    destination = "10.0.1.0/24" # Worker nodes subnet CIDR
+    description = "Allow load balancer to communicate with kube-proxy on worker nodes for health checks"
+    protocol    = "all"
+    destination = "10.0.1.0/24"
   }
 }
 
 resource "oci_core_security_list" "seclist_bastion" {
-    compartment_id = local.compartment_id
-    vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
-    display_name = "seclist-Bastion"
+  compartment_id = local.compartment_id
+  vcn_id         = oci_core_vcn.rdap_chatbot_vcn.id
+  display_name   = "seclist-Bastion"
 
-    # På bastion-subnet security list
-    ingress_security_rules {
-        description = "Allow SSH from allowed CIDRs"
-        source      = "4.210.177.128/32"
-        source_type = "CIDR_BLOCK"
-        protocol    = "6"
-        tcp_options {
-            min = 22
-            max = 22
-        }
+  ingress_security_rules {
+    description = "Allow SSH from allowed CIDRs"
+    source      = "4.210.177.128/32"
+    source_type = "CIDR_BLOCK"
+    protocol    = "6"
+    tcp_options {
+      min = 22
+      max = 22
     }
+  }
 
-    egress_security_rules {
-        description = "Allow bastion to access the Kubernetes API endpoint"
-        protocol = "6" # TCP protocol number
-        destination = "10.0.0.0/30" # Kubernetes API endpoint subnet CIDR
-        tcp_options {
-            max = 6443
-            min = 6443
-        }
+  egress_security_rules {
+    description = "Allow bastion to access the Kubernetes API endpoint"
+    protocol    = "6"
+    destination = "10.0.0.0/30"
+    tcp_options {
+      min = 6443
+      max = 6443
     }
+  }
 
-    egress_security_rules {
-        description = "Allow SSH traffic to worker nodes from bastion host"
-        protocol = "6" # TCP protocol number
-        destination = "10.0.1.0/24" # Worker nodes subnet CIDR
-        tcp_options {
-            max = 22
-            min = 22
-        }
+  egress_security_rules {
+    description = "Allow SSH traffic to worker nodes from bastion host"
+    protocol    = "6"
+    destination = "10.0.1.0/24"
+    tcp_options {
+      min = 22
+      max = 22
     }
-    egress_security_rules {
-      description = "Allow SSH to functions from bastion host"
-      destination = "10.0.4.0/24"
-      destination_type = "CIDR_BLOCK"
-      protocol = "6"
-        tcp_options {
-            max = 22
-            min = 22
-        }
+  }
+
+  egress_security_rules {
+    description      = "Allow SSH to functions subnet from bastion host"
+    destination      = "10.0.4.0/24"
+    destination_type = "CIDR_BLOCK"
+    protocol         = "6"
+    tcp_options {
+      min = 22
+      max = 22
     }
+  }
 }

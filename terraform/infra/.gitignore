@@ -1,0 +1,34 @@
+# Terraform state
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+
+# Terraform plan output (may contain sensitive data)
+*.out
+plan.out
+
+# Terraform working directory
+.terraform/
+.terraform.lock.hcl
+
+# Variable files with secrets (use TF_VAR_ env vars instead)
+*.tfvars
+*.tfvars.json
+!example.tfvars
+
+# Wallet files
+*.zip
+*.pem
+*.p12
+*.jks
+oracle_wallet/
+
+# Local overrides
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Crash log
+crash.log
+crash.*.log
