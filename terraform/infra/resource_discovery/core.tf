@@ -2256,7 +2256,7 @@ resource oci_core_instance export_db-test_1 {
     security_attributes = {
     }
 
-    subnet_id = oci_core_subnet..id
+    subnet_id = oci_core_subnet.export_db-test-subnet.id
   }
   #dedicated_vm_host_id = <<Optional value not found in discovery>>
   defined_tags = {
