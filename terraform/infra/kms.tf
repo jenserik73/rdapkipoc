@@ -29,7 +29,7 @@ resource "oci_vault_secret" "rdapkipocdb_wallet" {
   vault_id    = oci_kms_vault.rdap_chatbot_vault.id
   secret_content {
     content_type = "BASE64"
-    content      = filebase64("/home/vscode/oracle_wallet/Wallet_rdapkipocdb_min.zip")
+    content      = filebase64("/home/vscode/oracle_wallet/wallet_rdapkipocdb_slim.zip")
   }
 }
 

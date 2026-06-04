@@ -32,3 +32,31 @@ resource oci_functions_application export_rdap-chatbot-application {
   }
 }
 
+resource oci_functions_function export_sql-executor {
+  application_id = oci_functions_application.export_rdap-chatbot-application.id
+  config = {
+    "AI_PROFILE"             = "QUERYCHAT_PROFILE"
+    "DBPASS_SECRET_OCID"     = oci_vault_secret.export_secret_2.id
+    "DB_DSN"                 = "rdapkipocdb_high"
+    "DB_USER"                = "rdap_chatbot_app_user"
+    "MAX_ROWS"               = "500"
+    "WALLETPASS_SECRET_OCID" = oci_vault_secret.export_secret.id
+    "WALLET_SECRET_OCID"     = oci_vault_secret.export_secret_1.id
+  }
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-30T23:45:04.206Z"
+  }
+  #detached_mode_timeout_in_seconds = <<Optional value not found in discovery>>
+  display_name = "sql-executor"
+  freeform_tags = {
+  }
+  image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/rdap-chatbot-container-rep/sql-executor:0.0.45"
+  image_digest       = "sha256:2e4020f63d83353f7d70842605b2c9256ab55e71e9936e5f4d2d848e81f4add6"
+  memory_in_mbs      = "256"
+  timeout_in_seconds = "300"
+  trace_config {
+    is_enabled = "false"
+  }
+}
+

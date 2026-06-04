@@ -132,13 +132,22 @@ resource "oci_core_subnet" "bastion_subnet" {
 resource oci_core_route_table routetable_functions {
   compartment_id = local.compartment_id
   display_name = "routetable-functions"
+
   route_rules {
-    description       = "Internet Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_internet_gateway.rdap_chatbot_internet_gateway.id
+    description       = "Service Gateway Route Rule"
+    destination       = "all-str-services-in-oracle-services-network"
+    destination_type  = "SERVICE_CIDR_BLOCK"
+    network_entity_id = oci_core_service_gateway.rdap_chatbot_service_gateway.id
     route_type        = "STATIC"
   }
+  route_rules {
+    description       = "NAT Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_nat_gateway.rdap_chatbot_nat_gateway.id
+    route_type        = "STATIC"
+  }
+
   vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
 }
 
@@ -220,6 +229,28 @@ resource oci_core_security_list seclist_functions {
   compartment_id = local.compartment_id
   display_name = "seclist-functions"
   vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
+
+  egress_security_rules {
+    #description = "Allow traffic to all Oracle services in the network"
+    destination      = "all-str-services-in-oracle-services-network"
+    destination_type = "SERVICE_CIDR_BLOCK"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol  = "6"
+    stateless = "false"
+    #tcp_options = <<Optional value not found in discovery>>
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  egress_security_rules {
+    #description = "Allow traffic to on port 1522 to Oracle Autonomous Database for RDAP Chatbot"
+    destination      = "0.0.0.0/0"
+    destination_type = "CIDR_BLOCK"
+    protocol  = "6"
+    stateless = "false"
+    tcp_options {
+      max = "1522"
+      min = "1522"
+    }
+  }
 }
 
 resource "oci_core_security_list" "seclist_KubernetesAPIendpoint" {
@@ -455,6 +486,16 @@ resource "oci_core_security_list" "seclist_bastion" {
         description = "Allow SSH traffic to worker nodes from bastion host"
         protocol = "6" # TCP protocol number
         destination = "10.0.1.0/24" # Worker nodes subnet CIDR
+        tcp_options {
+            max = 22
+            min = 22
+        }
+    }
+    egress_security_rules {
+      description = "Allow SSH to functions from bastion host"
+      destination = "10.0.4.0/24"
+      destination_type = "CIDR_BLOCK"
+      protocol = "6"
         tcp_options {
             max = 22
             min = 22

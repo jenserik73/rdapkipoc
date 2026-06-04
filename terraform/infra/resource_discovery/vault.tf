@@ -4,6 +4,24 @@ resource oci_vault_secret export_secret {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-06-02T13:07:08.259Z"
+  }
+  #description = <<Optional value not found in discovery>>
+  #enable_auto_generation = <<Optional value not found in discovery>>
+  freeform_tags = {
+  }
+  key_id = "ocid1.key.oc19.eu-frankfurt-2.onvbtcxbaage6.abzxiljri3k2lgzfqdn7oytv6mrdir7gd6ug6sovvg2opvifoydgrywlku5a"
+  metadata = {
+  }
+  #secret_content = <<Optional value not found in discovery>>
+  secret_name = "rdapkipocdb-wallet-password"
+  vault_id    = oci_kms_vault.export_rdap-chatbot-vault.id
+}
+
+resource oci_vault_secret export_secret_1 {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
     "Oracle-Tags.CreatedOn" = "2026-05-29T19:02:52.194Z"
   }
   description = "Oracle Wallet for Autonomous Database used by RDAP Chatbot"
@@ -18,7 +36,7 @@ resource oci_vault_secret export_secret {
   vault_id    = oci_kms_vault.export_rdap-chatbot-vault.id
 }
 
-resource oci_vault_secret export_secret_1 {
+resource oci_vault_secret export_secret_2 {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
     "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"

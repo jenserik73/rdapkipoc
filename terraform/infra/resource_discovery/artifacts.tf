@@ -5,18 +5,14 @@ resource oci_artifacts_container_configuration export_container_configuration {
   is_repository_created_on_first_push = "true"
 }
 
-resource oci_artifacts_container_repository export_rdap-chatbot-container-rep {
+resource oci_artifacts_container_repository export_rdap-chatbot-container-rep-sql-executor {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
   }
-  display_name = "rdap-chatbot-container-rep"
+  display_name = "rdap-chatbot-container-rep/sql-executor"
   freeform_tags = {
   }
   is_immutable = "false"
-  is_public    = "true"
-  readme {
-    content = "Readme content"
-    format  = " text/markdown"
-  }
+  is_public    = "false"
 }
 

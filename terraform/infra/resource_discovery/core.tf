@@ -71,29 +71,6 @@ resource oci_core_public_ip export_Floating-Public-IP-for-cluster-ocid1-cluster-
   #public_ip_pool_id = <<Optional value not found in discovery>>
 }
 
-resource oci_core_vcn export_rdap-chatbot-vcn {
-  #byoipv6cidr_details = <<Optional value not found in discovery>>
-  #cidr_block = <<Optional value not found in discovery>>
-  cidr_blocks = [
-    "10.0.0.0/16",
-  ]
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:08.827Z"
-  }
-  display_name = "rdap-chatbot-vcn"
-  dns_label    = "rdapchatbotvcn"
-  freeform_tags = {
-  }
-  ipv6private_cidr_blocks = [
-  ]
-  #is_ipv6enabled = <<Optional value not found in discovery>>
-  #is_oracle_gua_allocation_enabled = <<Optional value not found in discovery>>
-  security_attributes = {
-  }
-}
-
 resource oci_core_subnet export_functions-subnet {
   #availability_domain = <<Optional value not found in discovery>>
   cidr_block     = "10.0.4.0/24"
@@ -234,6 +211,48 @@ resource oci_core_subnet export_load-balancers-subnet {
   vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
 }
 
+resource oci_core_vcn export_rdap-chatbot-vcn {
+  #byoipv6cidr_details = <<Optional value not found in discovery>>
+  #cidr_block = <<Optional value not found in discovery>>
+  cidr_blocks = [
+    "10.0.0.0/16",
+  ]
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:08.827Z"
+  }
+  display_name = "rdap-chatbot-vcn"
+  dns_label    = "rdapchatbotvcn"
+  freeform_tags = {
+  }
+  ipv6private_cidr_blocks = [
+  ]
+  #is_ipv6enabled = <<Optional value not found in discovery>>
+  #is_oracle_gua_allocation_enabled = <<Optional value not found in discovery>>
+  security_attributes = {
+  }
+}
+
+resource oci_core_private_ip export_db-test {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-06-02T10:01:50.866Z"
+  }
+  display_name = "db-test"
+  freeform_tags = {
+  }
+  hostname_label = "db-test"
+  ip_address     = "10.0.4.240"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_functions-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrsploxnrpwfkqb4qgikw53olmwycoqhxaxwkuh7bbe77wzctiyjsa"
+}
+
 resource oci_core_service_gateway export_rdap-chatbot-service-gateway {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
@@ -250,6 +269,149 @@ resource oci_core_service_gateway export_rdap-chatbot-service-gateway {
   vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
 }
 
+resource oci_core_private_ip export_ReverseConnectionIp {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+  }
+  display_name = "ReverseConnectionIp"
+  freeform_tags = {
+  }
+  #hostname_label = <<Optional value not found in discovery>>
+  ip_address = "10.0.3.17"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_bastion-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrgwl4duejfnba7szzrh6mbb4lfvp75jfu7jdjmmonogxopdwzqjlq"
+}
+
+resource oci_core_private_ip export_ocid1-bastion-oc19-eu-frankfurt-2-amaaaaaalgam66yabbexk25f6ocpjyy7dq56hl2zzjvu57i3oooqf3gutpxa {
+  #cidr_prefix_length = <<Optional value not found in discovery>>
+  defined_tags = {
+  }
+  display_name = oci_bastion_bastion.export_rdapchatbotbastion.id
+  freeform_tags = {
+  }
+  hostname_label = "host-10-0-3-173"
+  ip_address     = "10.0.3.173"
+  #ipv4subnet_cidr_at_creation = <<Optional value not found in discovery>>
+  lifetime = "EPHEMERAL"
+  #route_table_id = <<Optional value not found in discovery>>
+  subnet_id = oci_core_subnet.export_bastion-subnet.id
+  #vlan_id = <<Optional value not found in discovery>>
+  vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrgwl4duejfnba7szzrh6mbb4lfvp75jfu7jdjmmonogxopdwzqjlq"
+}
+
+resource oci_core_route_table export_routetable-functions {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T11:06:10.392Z"
+  }
+  display_name = "routetable-functions"
+  freeform_tags = {
+  }
+  route_rules {
+    description       = "Service Gateway Route Rule"
+    destination       = "all-str-services-in-oracle-services-network"
+    destination_type  = "SERVICE_CIDR_BLOCK"
+    network_entity_id = oci_core_service_gateway.export_rdap-chatbot-service-gateway.id
+    route_type        = "STATIC"
+  }
+  route_rules {
+    #description = <<Optional value not found in discovery>>
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_nat_gateway.export_rdap-chatbot-nat-gateway.id
+    route_type        = "STATIC"
+  }
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+}
+
+resource oci_core_route_table export_routetable-Workernodes {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.841Z"
+  }
+  display_name = "routetable-Workernodes"
+  freeform_tags = {
+  }
+  route_rules {
+    description       = "Service Gateway Route Rule"
+    destination       = "all-str-services-in-oracle-services-network"
+    destination_type  = "SERVICE_CIDR_BLOCK"
+    network_entity_id = oci_core_service_gateway.export_rdap-chatbot-service-gateway.id
+    route_type        = "STATIC"
+  }
+  route_rules {
+    description       = "NAT Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_nat_gateway.export_rdap-chatbot-nat-gateway.id
+    route_type        = "STATIC"
+  }
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+}
+
+resource oci_core_route_table export_routetable-KubernetesAPIendpoint {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.649Z"
+  }
+  display_name = "routetable-KubernetesAPIendpoint"
+  freeform_tags = {
+  }
+  route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
+    route_type        = "STATIC"
+  }
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+}
+
+resource oci_core_route_table export_routetable-Serviceloadbalancers {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.620Z"
+  }
+  display_name = "routetable-Serviceloadbalancers"
+  freeform_tags = {
+  }
+  route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
+    route_type        = "STATIC"
+  }
+  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
+}
+
+resource oci_core_default_route_table export_default-route-table-rdap-chatbot-vcn {
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:08.827Z"
+  }
+  display_name = "default-route-table-rdap-chatbot-vcn"
+  freeform_tags = {
+  }
+  manage_default_resource_id = oci_core_vcn.export_rdap-chatbot-vcn.default_route_table_id
+  route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
+    route_type        = "STATIC"
+  }
+}
+
 resource oci_core_security_list export_seclist-functions {
   compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
   defined_tags = {
@@ -257,6 +419,44 @@ resource oci_core_security_list export_seclist-functions {
     "Oracle-Tags.CreatedOn" = "2026-05-29T11:06:10.374Z"
   }
   display_name = "seclist-functions"
+  egress_security_rules {
+    #description = <<Optional value not found in discovery>>
+    destination      = "all-str-services-in-oracle-services-network"
+    destination_type = "SERVICE_CIDR_BLOCK"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol  = "6"
+    stateless = "false"
+    #tcp_options = <<Optional value not found in discovery>>
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  egress_security_rules {
+    #description = <<Optional value not found in discovery>>
+    destination      = "0.0.0.0/0"
+    destination_type = "CIDR_BLOCK"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol  = "6"
+    stateless = "false"
+    tcp_options {
+      max = "1522"
+      min = "1522"
+      #source_port_range = <<Optional value not found in discovery>>
+    }
+    #udp_options = <<Optional value not found in discovery>>
+  }
+  egress_security_rules {
+    #description = <<Optional value not found in discovery>>
+    destination      = "0.0.0.0/0"
+    destination_type = "CIDR_BLOCK"
+    #icmp_options = <<Optional value not found in discovery>>
+    protocol  = "6"
+    stateless = "false"
+    tcp_options {
+      max = "443"
+      min = "443"
+      #source_port_range = <<Optional value not found in discovery>>
+    }
+    #udp_options = <<Optional value not found in discovery>>
+  }
   freeform_tags = {
   }
   vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
@@ -667,108 +867,6 @@ resource oci_core_default_security_list export_Default-Security-List-for-rdap-ch
   manage_default_resource_id = oci_core_vcn.export_rdap-chatbot-vcn.default_security_list_id
 }
 
-resource oci_core_route_table export_routetable-functions {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-29T11:06:10.392Z"
-  }
-  display_name = "routetable-functions"
-  freeform_tags = {
-  }
-  route_rules {
-    description       = "Internet Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
-    route_type        = "STATIC"
-  }
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
-}
-
-resource oci_core_route_table export_routetable-Workernodes {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.841Z"
-  }
-  display_name = "routetable-Workernodes"
-  freeform_tags = {
-  }
-  route_rules {
-    description       = "Service Gateway Route Rule"
-    destination       = "all-str-services-in-oracle-services-network"
-    destination_type  = "SERVICE_CIDR_BLOCK"
-    network_entity_id = oci_core_service_gateway.export_rdap-chatbot-service-gateway.id
-    route_type        = "STATIC"
-  }
-  route_rules {
-    description       = "NAT Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_nat_gateway.export_rdap-chatbot-nat-gateway.id
-    route_type        = "STATIC"
-  }
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
-}
-
-resource oci_core_route_table export_routetable-KubernetesAPIendpoint {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.649Z"
-  }
-  display_name = "routetable-KubernetesAPIendpoint"
-  freeform_tags = {
-  }
-  route_rules {
-    description       = "Internet Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
-    route_type        = "STATIC"
-  }
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
-}
-
-resource oci_core_route_table export_routetable-Serviceloadbalancers {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:09.620Z"
-  }
-  display_name = "routetable-Serviceloadbalancers"
-  freeform_tags = {
-  }
-  route_rules {
-    description       = "Internet Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
-    route_type        = "STATIC"
-  }
-  vcn_id = oci_core_vcn.export_rdap-chatbot-vcn.id
-}
-
-resource oci_core_default_route_table export_default-route-table-rdap-chatbot-vcn {
-  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
-  defined_tags = {
-    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
-    "Oracle-Tags.CreatedOn" = "2026-05-29T10:19:08.827Z"
-  }
-  display_name = "default-route-table-rdap-chatbot-vcn"
-  freeform_tags = {
-  }
-  manage_default_resource_id = oci_core_vcn.export_rdap-chatbot-vcn.default_route_table_id
-  route_rules {
-    description       = "Internet Gateway Route Rule"
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-    network_entity_id = oci_core_internet_gateway.export_rdap-chatbot-internet-gateway.id
-    route_type        = "STATIC"
-  }
-}
-
 resource oci_core_private_ip export_privateip20260529102619 {
   #cidr_prefix_length = <<Optional value not found in discovery>>
   defined_tags = {
@@ -959,7 +1057,7 @@ resource oci_core_private_ip export_privateip20260529102621 {
   vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrghpznntm64gi5gl7bbbpomb4y6wmdinupctoicq5upghwwjxqafq"
 }
 
-resource oci_core_private_ip export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0_1 {
+resource oci_core_private_ip export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0 {
   #cidr_prefix_length = <<Optional value not found in discovery>>
   defined_tags = {
     "Oracle-Tags.CreatedBy" = oci_containerengine_node_pool.export_rdap-chatbot-oke-node-pool.id
@@ -2080,7 +2178,160 @@ resource oci_core_private_ip export_Service-VNIC-for-cluster-ocid1-cluster-oc19-
   vnic_id = "ocid1.vnic.oc19.eu-frankfurt-2.abzxiljrr67ehzrbv5exxi3o2zksirntn474cbcxtyrr6rg5t3odkaesvhuq"
 }
 
-resource oci_core_instance export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0 {
+resource oci_core_instance export_db-test_1 {
+  agent_config {
+    are_all_plugins_disabled = "false"
+    is_management_disabled   = "false"
+    is_monitoring_disabled   = "false"
+    plugins_config {
+      desired_state = "DISABLED"
+      name          = "Vulnerability Scanning"
+    }
+    plugins_config {
+      desired_state = "DISABLED"
+      name          = "Oracle Java Management Service"
+    }
+    plugins_config {
+      desired_state = "DISABLED"
+      name          = "OS Management Hub Agent"
+    }
+    plugins_config {
+      desired_state = "DISABLED"
+      name          = "Management Agent"
+    }
+    plugins_config {
+      desired_state = "DISABLED"
+      name          = "Fleet Application Management Service"
+    }
+    plugins_config {
+      desired_state = "ENABLED"
+      name          = "Custom Logs Monitoring"
+    }
+    plugins_config {
+      desired_state = "ENABLED"
+      name          = "Compute Instance Run Command"
+    }
+    plugins_config {
+      desired_state = "ENABLED"
+      name          = "Compute Instance Monitoring"
+    }
+    plugins_config {
+      desired_state = "ENABLED"
+      name          = "Cloud Guard Workload Protection"
+    }
+    plugins_config {
+      desired_state = "DISABLED"
+      name          = "Block Volume Management"
+    }
+    plugins_config {
+      desired_state = "ENABLED"
+      name          = "Bastion"
+    }
+  }
+  #async = <<Optional value not found in discovery>>
+  availability_config {
+    #is_live_migration_preferred = <<Optional value not found in discovery>>
+    recovery_action = "RESTORE_INSTANCE"
+  }
+  availability_domain = var.availability_domain--uOWN-eu-frankfurt-2-ad-1
+  #capacity_reservation_id = <<Optional value not found in discovery>>
+  #cluster_placement_group_id = <<Optional value not found in discovery>>
+  compartment_id = oci_artifacts_container_configuration.export_container_configuration.id
+  #compute_cluster_id = <<Optional value not found in discovery>>
+  create_vnic_details {
+    #assign_ipv6ip = <<Optional value not found in discovery>>
+    #assign_private_dns_record = <<Optional value not found in discovery>>
+    assign_public_ip = "false"
+    defined_tags = {
+      "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+      "Oracle-Tags.CreatedOn" = "2026-06-02T10:01:50.866Z"
+    }
+    display_name = "db-test"
+    freeform_tags = {
+    }
+    hostname_label = "db-test"
+    nsg_ids = [
+    ]
+    private_ip = "10.0.4.240"
+    #private_ip_id = <<Optional value not found in discovery>>
+    security_attributes = {
+    }
+    skip_source_dest_check = "false"
+    #subnet_cidr = <<Optional value not found in discovery>>
+    subnet_id = oci_core_subnet.export_functions-subnet.id
+    #vlan_id = <<Optional value not found in discovery>>
+  }
+  #dedicated_vm_host_id = <<Optional value not found in discovery>>
+  defined_tags = {
+    "Oracle-Tags.CreatedBy" = "default/jens.erik.myhra@sykehuspartner.no"
+    "Oracle-Tags.CreatedOn" = "2026-06-02T10:01:50.821Z"
+  }
+  display_name = "db-test"
+  extended_metadata = {
+  }
+  fault_domain = var.fault_domain--FAULT-DOMAIN-3
+  freeform_tags = {
+  }
+  #instance_configuration_id = <<Optional value not found in discovery>>
+  instance_options {
+    are_legacy_imds_endpoints_disabled = "true"
+  }
+  #ipxe_script = <<Optional value not found in discovery>>
+  #is_ai_enterprise_enabled = <<Optional value not found in discovery>>
+  #is_pv_encryption_in_transit_enabled = <<Optional value not found in discovery>>
+  launch_options {
+    boot_volume_type                    = "PARAVIRTUALIZED"
+    firmware                            = "UEFI_64"
+    is_consistent_volume_naming_enabled = "true"
+    is_pv_encryption_in_transit_enabled = "true"
+    network_type                        = "PARAVIRTUALIZED"
+    remote_data_volume_type             = "PARAVIRTUALIZED"
+  }
+  #launch_volume_attachments = <<Optional value not found in discovery>>
+  metadata = {
+    "ssh_authorized_keys" = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCgpgslDDEsAFgQp7+0n6KfzP4AXLiKReHB34UJj5gc09tzAZ1UYfs9Es1o3fPJQsBUCCLaITDKM4pvxvUDJceaGGVhbs2AQ4bkV0WmDV6/tMzPNfldY2s52izPSLnIiwj+L7cqG+EiuRLQ2PZX1ZMYveBSgTKrLFLFYaFZY4BBGgwiCfDCCdTrWFVBjrJEaTQD0cYOO2Y23QylZGQ9yuzyXXpU6ubfNArSS551yfDzLQVR9u4fWm/r9hiBOoiBv9ZWIuvQ0rn2s6OSK+yO/5qTqC9tO5H4zqc5O6cceYCOzD4Upsx5DvuBIaGfMtRRVUekjKcBHycWols+5GSX7vul ssh-key-2026-06-02"
+  }
+  platform_config {
+    #are_virtual_instructions_enabled = <<Optional value not found in discovery>>
+    #config_map = <<Optional value not found in discovery>>
+    #is_access_control_service_enabled = <<Optional value not found in discovery>>
+    #is_input_output_memory_management_unit_enabled = <<Optional value not found in discovery>>
+    is_measured_boot_enabled             = "false"
+    is_memory_encryption_enabled         = "false"
+    is_secure_boot_enabled               = "false"
+    is_symmetric_multi_threading_enabled = "true"
+    is_trusted_platform_module_enabled   = "false"
+    #numa_nodes_per_socket = <<Optional value not found in discovery>>
+    #percentage_of_cores_enabled = <<Optional value not found in discovery>>
+    type = "AMD_VM"
+  }
+  #preserve_boot_volume = <<Optional value not found in discovery>>
+  #preserve_data_volumes_created_at_launch = <<Optional value not found in discovery>>
+  security_attributes = {
+  }
+  shape = "VM.Standard.E5.Flex"
+  shape_config {
+    baseline_ocpu_utilization = ""
+    memory_in_gbs             = "12"
+    nvmes                     = "0"
+    ocpus                     = "1"
+    resource_management       = ""
+    vcpus                     = "2"
+  }
+  source_details {
+    #boot_volume_size_in_gbs = <<Optional value not found in discovery>>
+    boot_volume_vpus_per_gb = "10"
+    #instance_source_image_filter_details = <<Optional value not found in discovery>>
+    #is_preserve_boot_volume_enabled = <<Optional value not found in discovery>>
+    #kms_key_id = <<Optional value not found in discovery>>
+    source_id   = var.oci_core_instance--source_details-source_id--export_db-test_1
+    source_type = "image"
+  }
+  state = "RUNNING"
+  #update_operation_constraint = <<Optional value not found in discovery>>
+}
+
+resource oci_core_instance export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0_1 {
   agent_config {
     are_all_plugins_disabled = "false"
     is_management_disabled   = "false"
@@ -2364,7 +2615,7 @@ resource oci_core_vnic_attachment export_vnicattachment20260529102559 {
     #vlan_id = <<Optional value not found in discovery>>
   }
   display_name = "vnicattachment20260529102559"
-  instance_id  = oci_core_instance.export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0.id
+  instance_id  = oci_core_instance.export_oke-cburyzxciiq-nbwc7loxi5q-s7icahamozq-0_1.id
   nic_index    = "0"
 }
 
