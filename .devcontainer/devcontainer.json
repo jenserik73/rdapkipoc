@@ -1,6 +1,6 @@
 {
     "name": "OCI Dev Environment",
-    "image": "mcr.microsoft.com/devcontainers/base:noble",
+    "image": "mcr.microsoft.com/vscode/devcontainers/python:3",
 
     "features": {
         "ghcr.io/devcontainers/features/docker-in-docker:2": {
