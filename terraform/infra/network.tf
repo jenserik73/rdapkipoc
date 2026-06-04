@@ -230,6 +230,17 @@ resource oci_core_security_list seclist_functions {
   display_name = "seclist-functions"
   vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
 
+  ingress_security_rules {
+    description = "Allow SSH traffic from Bastion subnet"
+    source      = "10.0.3.0/24"
+    source_type = "CIDR_BLOCK"
+    protocol  = "6"
+    stateless = "false"
+    tcp_options {
+      max = "22"
+      min = "22"
+    }
+  }
   egress_security_rules {
     #description = "Allow traffic to all Oracle services in the network"
     destination      = "all-str-services-in-oracle-services-network"
