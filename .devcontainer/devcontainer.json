@@ -1,52 +1,43 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
-	"name": "Ubuntu",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:noble",
+    "name": "OCI Dev Environment",
+    "image": "mcr.microsoft.com/devcontainers/python:3.12",
 
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-	  "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {
-    	"version": "latest"
-    	},
-	"ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
-    	"installHelm": true,
-    	"installKubectl": true,
-    	"installMinikube": false
-    	}
-  	},
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "latest"
+        },
+        "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+            "installHelm": true,
+            "installKubectl": true,
+            "installMinikube": false
+        }
+    },
 
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
+    "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/setup.sh",
 
-	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "mkdir /home/vscode/oracle_wallet && echo \"$RDAPKIPOCDB_WALLET\" | base64 -d > /home/vscode/oracle_wallet/wallet_rdapkipocdb.zip && unzip -o /home/vscode/oracle_wallet/wallet_rdapkipocdb.zip -d /home/vscode/oracle_wallet",
-
-	// Configure tool-specific properties.
-	"customizations": {
-    "vscode": {
-		"extensions": [
+    "customizations": {
+        "vscode": {
+            "extensions": [
                 "hashicorp.terraform",
-			    "4ops.terraform",
-			    "oracle.sql-developer",
-			    "ms-python.python"
-            	],
-        "settings": {
-            "terminal.integrated.profiles.linux": {
-                "bash": {
-                    "path": "/bin/bash",
-                    "icon": "terminal-bash",
-					"args": ["-l"]
-                	}
-            	},
-            	"terminal.integrated.defaultProfile.linux": "bash",
-			    "terraform.languageServer.enabled": true,
-			    "terminal.integrated.showOnLaunch": "never"
-        	}
-    	}
-	}
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+                "4ops.terraform",
+                "oracle.sql-developer",
+                "ms-python.python",
+                "ms-python.pylint",
+                "ms-python.black-formatter"
+            ],
+            "settings": {
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash",
+                        "icon": "terminal-bash",
+                        "args": ["-l"]
+                    }
+                },
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terraform.languageServer.enabled": true,
+                "terminal.integrated.showOnLaunch": "never",
+                "python.defaultInterpreterPath": "/usr/local/bin/python"
+            }
+        }
+    }
 }
