@@ -2252,14 +2252,11 @@ resource oci_core_instance export_db-test_1 {
     hostname_label = "db-test"
     nsg_ids = [
     ]
-    private_ip = "10.0.4.240"
-    #private_ip_id = <<Optional value not found in discovery>>
+
     security_attributes = {
     }
-    skip_source_dest_check = "false"
-    #subnet_cidr = <<Optional value not found in discovery>>
-    subnet_id = oci_core_subnet.export_functions-subnet.id
-    #vlan_id = <<Optional value not found in discovery>>
+
+    subnet_id = oci_core_subnet..id
   }
   #dedicated_vm_host_id = <<Optional value not found in discovery>>
   defined_tags = {
@@ -2292,21 +2289,13 @@ resource oci_core_instance export_db-test_1 {
     "ssh_authorized_keys" = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCgpgslDDEsAFgQp7+0n6KfzP4AXLiKReHB34UJj5gc09tzAZ1UYfs9Es1o3fPJQsBUCCLaITDKM4pvxvUDJceaGGVhbs2AQ4bkV0WmDV6/tMzPNfldY2s52izPSLnIiwj+L7cqG+EiuRLQ2PZX1ZMYveBSgTKrLFLFYaFZY4BBGgwiCfDCCdTrWFVBjrJEaTQD0cYOO2Y23QylZGQ9yuzyXXpU6ubfNArSS551yfDzLQVR9u4fWm/r9hiBOoiBv9ZWIuvQ0rn2s6OSK+yO/5qTqC9tO5H4zqc5O6cceYCOzD4Upsx5DvuBIaGfMtRRVUekjKcBHycWols+5GSX7vul ssh-key-2026-06-02"
   }
   platform_config {
-    #are_virtual_instructions_enabled = <<Optional value not found in discovery>>
-    #config_map = <<Optional value not found in discovery>>
-    #is_access_control_service_enabled = <<Optional value not found in discovery>>
-    #is_input_output_memory_management_unit_enabled = <<Optional value not found in discovery>>
     is_measured_boot_enabled             = "false"
     is_memory_encryption_enabled         = "false"
     is_secure_boot_enabled               = "false"
     is_symmetric_multi_threading_enabled = "true"
     is_trusted_platform_module_enabled   = "false"
-    #numa_nodes_per_socket = <<Optional value not found in discovery>>
-    #percentage_of_cores_enabled = <<Optional value not found in discovery>>
     type = "AMD_VM"
   }
-  #preserve_boot_volume = <<Optional value not found in discovery>>
-  #preserve_data_volumes_created_at_launch = <<Optional value not found in discovery>>
   security_attributes = {
   }
   shape = "VM.Standard.E5.Flex"
@@ -2317,15 +2306,6 @@ resource oci_core_instance export_db-test_1 {
     ocpus                     = "1"
     resource_management       = ""
     vcpus                     = "2"
-  }
-  source_details {
-    #boot_volume_size_in_gbs = <<Optional value not found in discovery>>
-    boot_volume_vpus_per_gb = "10"
-    #instance_source_image_filter_details = <<Optional value not found in discovery>>
-    #is_preserve_boot_volume_enabled = <<Optional value not found in discovery>>
-    #kms_key_id = <<Optional value not found in discovery>>
-    source_id   = var.oci_core_instance--source_details-source_id--export_db-test_1
-    source_type = "image"
   }
   state = "RUNNING"
   #update_operation_constraint = <<Optional value not found in discovery>>

@@ -126,7 +126,22 @@ resource "oci_core_subnet" "bastion_subnet" {
   prohibit_public_ip_on_vnic = false # Allows public IPs (Public Subnet)
 
   # Optional: Attach specific Route Table and Security Lists
+  route_table_id    = oci_core_route_table.routetable_bastion.id
   security_list_ids          = [oci_core_security_list.seclist_bastion.id]
+}
+
+resource oci_core_route_table routetable_bastion {
+  compartment_id = local.compartment_id
+  display_name = "routetable-bastion"
+
+  route_rules {
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.rdap_chatbot_internet_gateway.id
+    route_type        = "STATIC"
+  }
+
+  vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
 }
 
 resource oci_core_route_table routetable_functions {
@@ -147,7 +162,6 @@ resource oci_core_route_table routetable_functions {
     network_entity_id = oci_core_nat_gateway.rdap_chatbot_nat_gateway.id
     route_type        = "STATIC"
   }
-
   vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
 }
 
@@ -262,6 +276,16 @@ resource oci_core_security_list seclist_functions {
       min = "1522"
     }
   }
+  egress_security_rules {
+  description      = "Allow HTTPS outbound via NAT"
+  destination      = "0.0.0.0/0"
+  destination_type = "CIDR_BLOCK"
+  protocol         = "6"
+  tcp_options {
+    min = 443
+    max = 443
+  }
+}
 }
 
 resource "oci_core_security_list" "seclist_KubernetesAPIendpoint" {
@@ -482,6 +506,18 @@ resource "oci_core_security_list" "seclist_bastion" {
     compartment_id = local.compartment_id
     vcn_id = oci_core_vcn.rdap_chatbot_vcn.id
     display_name = "seclist-Bastion"
+
+    # På bastion-subnet security list
+    ingress_security_rules {
+        description = "Allow SSH from allowed CIDRs"
+        source      = "4.210.177.128/32"
+        source_type = "CIDR_BLOCK"
+        protocol    = "6"
+        tcp_options {
+            min = 22
+            max = 22
+        }
+    }
 
     egress_security_rules {
         description = "Allow bastion to access the Kubernetes API endpoint"
