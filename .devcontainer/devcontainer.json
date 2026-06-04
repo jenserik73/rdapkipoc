@@ -1,6 +1,6 @@
 {
     "name": "OCI Dev Environment",
-    "image": "mcr.microsoft.com/devcontainers/python:3.12",
+    "image": "mcr.microsoft.com/devcontainers/base:noble",
 
     "features": {
         "ghcr.io/devcontainers/features/docker-in-docker:2": {
@@ -13,7 +13,7 @@
         }
     },
 
-    "postCreateCommand": "bash /workspaces/${localWorkspaceFolderBasename}/.devcontainer/setup.sh",
+    "postCreateCommand": "bash .devcontainer/setup.sh",
 
     "customizations": {
         "vscode": {
@@ -35,8 +35,7 @@
                 },
                 "terminal.integrated.defaultProfile.linux": "bash",
                 "terraform.languageServer.enabled": true,
-                "terminal.integrated.showOnLaunch": "never",
-                "python.defaultInterpreterPath": "/usr/local/bin/python"
+                "terminal.integrated.showOnLaunch": "never"
             }
         }
     }
