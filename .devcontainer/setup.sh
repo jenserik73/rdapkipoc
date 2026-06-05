@@ -76,7 +76,7 @@ fi
 
 # Legg til på slutten av setup.sh
 echo "=== Setting up terminal prompt ==="
-cat >> ~/.bashrc << 'EOF'
+cat >> ~/.bash_profile << 'EOF'
 
 # Custom prompt
 PS1="\[\e[34m\]\w\[\e[33m\]\$(git branch 2>/dev/null | grep '^*' | sed 's/* / (/' | sed 's/$/)/')\[\e[0m\] \$ "
