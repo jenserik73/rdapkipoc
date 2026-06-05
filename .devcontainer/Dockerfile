@@ -2,7 +2,7 @@ FROM python:3.12-bookworm
 
 # System dependencies
 RUN apt-get update && apt-get install -y \
-    curl unzip git sudo gnupg lsb-release wget \
+    curl unzip git zip sudo gnupg lsb-release wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Docker CLI
