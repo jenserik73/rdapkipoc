@@ -80,4 +80,8 @@ PS1="\[\e[34m\]\w\[\e[33m\]\$(git branch --show-current 2>/dev/null | sed 's/.*/
 EOF
 echo "✓ PS1 prompt set"
 
+echo "=== Setting up Clause CLI ==="
+curl -fsSL https://claude.ai/install.sh | bash
+echo "✓ Setting up Clause CLI"
+
 echo "=== Dev container setup complete ==="
