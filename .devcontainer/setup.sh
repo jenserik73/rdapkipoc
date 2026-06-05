@@ -84,4 +84,9 @@ echo "=== Setting up Clause CLI ==="
 curl -fsSL https://claude.ai/install.sh | bash
 echo "✓ Setting up Clause CLI"
 
+echo "=== Setting up Claude credentials ==="
+mkdir -p ~/.claude
+echo "$CLAUDE_CREDENTIALS" > ~/.claude/.credentials.json
+chmod 600 ~/.claude/.credentials.json
+
 echo "=== Dev container setup complete ==="
