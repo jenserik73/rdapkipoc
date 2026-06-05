@@ -74,9 +74,12 @@ else
     echo "WARNING: RDAPKIPOCDB_WALLET not set – skipping wallet setup"
 fi
 
+# Legg til på slutten av setup.sh
 echo "=== Setting up terminal prompt ==="
-cat >> $HOME/.bashrc << 'EOF'
-export PS1="\[\e[34m\]\w\[\e[33m\]\$(git branch 2>/dev/null | grep '^*' | sed 's/* / (/' | sed 's/$/)/')\[\e[0m\] \$ "
+cat >> ~/.bashrc << 'EOF'
+
+# Custom prompt
+PS1="\[\e[34m\]\w\[\e[33m\]\$(git branch 2>/dev/null | grep '^*' | sed 's/* / (/' | sed 's/$/)/')\[\e[0m\] \$ "
 EOF
 echo "✓ PS1 prompt set"
 
