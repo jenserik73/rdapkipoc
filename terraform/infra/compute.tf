@@ -40,7 +40,7 @@ resource "oci_core_instance" "admin_instance" {
   }
 
   metadata = {
-    "ssh_authorized_keys" = var.admin_instance_ssh_public_key
+    "ssh_authorized_keys" = local.admin_instance_ssh_public_key
   }
 
   platform_config {
