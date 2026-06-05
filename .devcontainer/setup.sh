@@ -75,7 +75,9 @@ else
 fi
 
 echo "=== Setting up terminal prompt ==="
-cat "$CODESPACE_VSCODE_FOLDER/.devcontainer/prompt.sh" >> ~/.bashrc
+# Get the absolute path of the .devcontainer folder
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cat "$SCRIPT_DIR/prompt.sh" >> ~/.bashrc
 echo "✓ PS1 prompt set"
 
 echo "=== Dev container setup complete ==="
