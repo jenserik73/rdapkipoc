@@ -54,11 +54,23 @@ fi
 
 echo "=== Setting up Oracle Wallet ==="
 if [ -n "$RDAPKIPOCDB_WALLET" ]; then
+    mkdir -p $HOME/oracle_wallet
     echo "$RDAPKIPOCDB_WALLET" | base64 -d > $HOME/oracle_wallet/wallet_rdapkipocdb.zip
     unzip -o $HOME/oracle_wallet/wallet_rdapkipocdb.zip -d $HOME/oracle_wallet
     echo "✓ Wallet extracted OK"
+
+    echo "=== Creating slim wallet for OCI Vault ==="
+    cd $HOME/oracle_wallet
+    zip oracle_wallet_slim.zip ewallet.pem tnsnames.ora sqlnet.ora
+    echo "✓ oracle_wallet_slim.zip created"
+    echo "   Size: $(du -sh oracle_wallet_slim.zip | cut -f1)"
+    echo "   Base64 size: $(base64 oracle_wallet_slim.zip | wc -c) bytes"
+    echo ""
+    echo "--- Base64 encoded slim wallet (copy to OCI Vault secret) ---"
+    base64 oracle_wallet_slim.zip
+    echo "--- End of base64 wallet ---"
+    cd $HOME
 else
     echo "WARNING: RDAPKIPOCDB_WALLET not set – skipping wallet setup"
 fi
-
 echo "=== Dev container setup complete ==="
