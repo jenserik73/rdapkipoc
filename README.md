@@ -15,3 +15,6 @@ fn version
 
 ## Verifiser HELM
 helm version
+
+## Importer OCI ressurs som finnes inn i terraform state slik at den blir oppdatert og håndtert i terraform fra nå av
+terraform import oci_vault_secret.rdapkipocdb_wallet_password <OCID>
