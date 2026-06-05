@@ -61,13 +61,13 @@ if [ -n "$RDAPKIPOCDB_WALLET" ]; then
 
     echo "=== Creating slim wallet for OCI Vault ==="
     cd $HOME/oracle_wallet
-    zip oracle_wallet_slim.zip ewallet.pem tnsnames.ora sqlnet.ora
-    echo "✓ oracle_wallet_slim.zip created"
-    echo "   Size: $(du -sh oracle_wallet_slim.zip | cut -f1)"
-    echo "   Base64 size: $(base64 oracle_wallet_slim.zip | wc -c) bytes"
+    zip wallet_rdapkipocdb_slim.zip ewallet.pem tnsnames.ora sqlnet.ora
+    echo "✓ wallet_rdapkipocdb_slim.zip created"
+    echo "   Size: $(du -sh wallet_rdapkipocdb_slim.zip | cut -f1)"
+    echo "   Base64 size: $(base64 wallet_rdapkipocdb_slim.zip | wc -c) bytes"
     echo ""
     echo "--- Base64 encoded slim wallet (copy to OCI Vault secret) ---"
-    base64 oracle_wallet_slim.zip
+    base64 wallet_rdapkipocdb_slim.zip
     echo "--- End of base64 wallet ---"
     cd $HOME
 else
