@@ -75,9 +75,9 @@ else
 fi
 
 echo "=== Setting up terminal prompt ==="
-# Get the absolute path of the .devcontainer folder
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cat "$SCRIPT_DIR/prompt.sh" >> ~/.bashrc
+cat >> ~/.bashrc << 'EOF'
+PS1="\[\e[34m\]\w\[\e[33m\]\$(git branch --show-current 2>/dev/null | sed 's/.*/ (&)/')\[\e[0m\] \$ "
+EOF
 echo "✓ PS1 prompt set"
 
 echo "=== Dev container setup complete ==="
