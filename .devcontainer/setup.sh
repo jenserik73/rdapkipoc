@@ -75,7 +75,7 @@ else
 fi
 
 echo "=== Setting up terminal prompt ==="
-cat .devcontainer/prompt.sh >> ~/.bashrc
+cat "$CODESPACE_VSCODE_FOLDER/.devcontainer/prompt.sh" >> ~/.bashrc
 echo "✓ PS1 prompt set"
 
 echo "=== Dev container setup complete ==="
