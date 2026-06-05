@@ -18,7 +18,8 @@
                 "oracle.sql-developer",
                 "ms-python.python",
                 "ms-python.pylint",
-                "ms-python.black-formatter"
+                "ms-python.black-formatter",
+                "anthropic.claude-code"
             ],
             "settings": {
                 "terminal.integrated.profiles.linux": {
