@@ -75,11 +75,7 @@ else
 fi
 
 echo "=== Setting up terminal prompt ==="
-{
-    echo ''
-    echo '# Custom prompt'
-    echo 'unset color_prompt force_color_prompt'
-    echo 'PS1="\[\e[34m\]\w\[\e[33m\]\$(git branch --show-current 2>/dev/null | sed '"'"'s/.*/ (&)/'"'"')\[\e[0m\] \$ "' >> ~/.bashrc
-    echo "✓ PS1 prompt set"
+cat .devcontainer/prompt.sh >> ~/.bashrc
+echo "✓ PS1 prompt set"
 
 echo "=== Dev container setup complete ==="
