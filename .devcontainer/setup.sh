@@ -74,7 +74,7 @@ else
     echo "WARNING: RDAPKIPOCDB_WALLET not set – skipping wallet setup"
 fi
 
-echo "=== Setting up terminal prompt ==="
+echo -e "\n=== Setting up terminal prompt ==="
 cat >> ~/.bashrc << 'EOF'
 PS1="\[\e[34m\]\w\[\e[33m\]\$(git branch --show-current 2>/dev/null | sed 's/.*/ (&)/')\[\e[0m\] \$ "
 EOF
