@@ -1,16 +1,12 @@
 {
     "name": "OCI Dev Environment",
-    "image": "mcr.microsoft.com/devcontainers/python:3",
-    "mounts": [
-            "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
-    ],
-    "features": {
-        "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
-            "installHelm": true,
-            "installKubectl": true,
-            "installMinikube": false
-        }
+    "build": {
+        "dockerfile": "Dockerfile"
     },
+
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
 
     "postCreateCommand": "bash .devcontainer/setup.sh",
 
@@ -34,7 +30,7 @@
                 },
                 "terminal.integrated.defaultProfile.linux": "bash",
                 "terraform.languageServer.enabled": true,
-                "terminal.integrated.showOnLaunch": "never"
+                "terminal.integrated.showOnlLaunch": "never"
             }
         }
     }
