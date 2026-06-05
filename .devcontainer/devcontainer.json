@@ -1,7 +1,9 @@
 {
     "name": "OCI Dev Environment",
     "image": "mcr.microsoft.com/devcontainers/python:3",
-
+    "mounts": [
+            "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
     "features": {
         "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
             "installHelm": true,
