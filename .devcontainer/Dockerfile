@@ -53,6 +53,10 @@ RUN useradd -m -s /bin/bash vscode \
 USER vscode
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh)" \
     -- --accept-all-defaults \
-    && echo 'export PATH="$HOME/bin:$HOME/lib/oracle-cli:$PATH"' >> /home/vscode/.bashrc
-
+    && echo 'export PATH="$HOME/bin:$HOME/lib/oracle-cli:$PATH"' >> /home/vscode/.bashrc \
+    && echo '' >> /home/vscode/.bashrc \
+    && echo '# Custom prompt' >> /home/vscode/.bashrc \
+    && echo 'unset color_prompt force_color_prompt' >> /home/vscode/.bashrc \
+    && echo 'PS1="\[\e[34m\]\w\[\e[33m\]\$(git branch 2>/dev/null | grep '"'"'^*'"'"' | sed '"'"'s/* / (/'"'"' | sed '"'"'s/$/)'"'"')\[\e[0m\] \$ "' >> /home/vscode/.bashrc
 WORKDIR /workspaces
+
