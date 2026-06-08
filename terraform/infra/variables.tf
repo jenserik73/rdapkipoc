@@ -8,6 +8,15 @@ locals {
   container_repository_readme_format = "text/markdown"
   kubernetes_version                 = "v1.34.2"
   admin_instance_ssh_public_key      = file(pathexpand("~/.ssh/ssh-key.key.pub"))
+  certbot_instance_ssh_public_key    = file(pathexpand("~/.ssh/ssh-key.key.pub"))
+}
+
+# ── Provider Configuration ───────────────────────────────────────────────────
+
+variable "codespace_public_cidr_block" {
+  description = "Public IP address of the Codespace"
+  type        = string
+  default     = "20.61.127.53/32"
 }
 
 # ── VCN ──────────────────────────────────────────────────────────────────────

@@ -52,6 +52,17 @@ resource "oci_core_subnet" "functions_subnet" {
   security_list_ids          = [oci_core_security_list.seclist_functions.id]
 }
 
+resource "oci_core_subnet" "api_gateway_subnet" {
+  compartment_id             = local.compartment_id
+  vcn_id                     = oci_core_vcn.rdap_chatbot_vcn.id
+  cidr_block                 = "10.0.5.0/24"
+  display_name               = "api-gateway-subnet"
+  dns_label                  = "api"
+  prohibit_public_ip_on_vnic = false # Public subnet
+  route_table_id             = oci_core_route_table.routetable_api_gateway.id
+  security_list_ids          = [oci_core_security_list.seclist_api_gateway.id]
+}
+
 resource "oci_core_subnet" "KubernetesAPIendpointSubnet" {
   compartment_id             = local.compartment_id
   vcn_id                     = oci_core_vcn.rdap_chatbot_vcn.id
@@ -118,6 +129,20 @@ resource "oci_core_route_table" "routetable_bastion" {
   compartment_id = local.compartment_id
   vcn_id         = oci_core_vcn.rdap_chatbot_vcn.id
   display_name   = "routetable-bastion"
+
+  route_rules {
+    description       = "Internet Gateway Route Rule"
+    destination       = "0.0.0.0/0"
+    destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.rdap_chatbot_internet_gateway.id
+    route_type        = "STATIC"
+  }
+}
+
+resource "oci_core_route_table" "routetable_api_gateway" {
+  compartment_id = local.compartment_id
+  vcn_id         = oci_core_vcn.rdap_chatbot_vcn.id
+  display_name   = "routetable-api-gateway"
 
   route_rules {
     description       = "Internet Gateway Route Rule"
@@ -199,6 +224,82 @@ resource "oci_core_route_table" "routetable_serviceloadbalancers" {
 }
 
 # ── Security lists ────────────────────────────────────────────────────────────
+
+resource "oci_core_security_list" "seclist_api_gateway" {
+  compartment_id = local.compartment_id
+  vcn_id         = oci_core_vcn.rdap_chatbot_vcn.id
+  display_name   = "seclist-api-gateway"
+
+  ingress_security_rules {
+    description = "Allow SSH from allowed CIDRs"
+    source      = var.codespace_public_cidr_block
+    source_type = "CIDR_BLOCK"
+    protocol    = "6"
+    tcp_options {
+      min = 22
+      max = 22
+    }
+  }
+  ingress_security_rules {
+    description = "Allow HTTP traffic from anywhere"
+    source      = "0.0.0.0/0"
+    source_type = "CIDR_BLOCK"
+    protocol    = "6"
+    tcp_options {
+      min = 80
+      max = 80
+    }
+  }
+  ingress_security_rules {
+    description = "Allow HTTP traffic from anywhere"
+    source      = "0.0.0.0/0"
+    source_type = "CIDR_BLOCK"
+    protocol    = "6"
+    tcp_options {
+      min = 443
+      max = 443
+    }
+  }
+  ingress_security_rules {
+    description = "Allow Ping (ICMP) from anywhere"
+    source   = "0.0.0.0/0" # Allow from anywhere; restrict to your IP/CIDR for better security
+    source_type = "CIDR_BLOCK"
+    protocol = "1" # ICMP protocol number
+    icmp_options {
+      type = 8 # Echo Request (Ping)
+      code = 0 # Code 0 is required for Echo Request
+    } 
+  }
+  ingress_security_rules {
+    description = "Allow SSH traffic from Bastion subnet"
+    source      = "10.0.3.0/24"
+    source_type = "CIDR_BLOCK"
+    protocol    = "6"
+    stateless   = false
+    tcp_options {
+      min = 22
+      max = 22
+    }
+  }
+  egress_security_rules {
+    description      = "Allow traffic to all Oracle services in the network"
+    destination      = "all-str-services-in-oracle-services-network"
+    destination_type = "SERVICE_CIDR_BLOCK"
+    protocol         = "6"
+    stateless        = false
+  }
+  egress_security_rules {
+    description      = "Allow HTTPS outbound via NAT"
+    destination      = "0.0.0.0/0"
+    destination_type = "CIDR_BLOCK"
+    protocol         = "6"
+    stateless        = false
+    tcp_options {
+      min = 443
+      max = 443
+    }
+  }
+}
 
 resource "oci_core_security_list" "seclist_functions" {
   compartment_id = local.compartment_id
@@ -484,7 +585,7 @@ resource "oci_core_security_list" "seclist_bastion" {
 
   ingress_security_rules {
     description = "Allow SSH from allowed CIDRs"
-    source      = "4.210.177.128/32"
+    source      = var.codespace_public_cidr_block
     source_type = "CIDR_BLOCK"
     protocol    = "6"
     tcp_options {
@@ -492,7 +593,6 @@ resource "oci_core_security_list" "seclist_bastion" {
       max = 22
     }
   }
-
   egress_security_rules {
     description = "Allow bastion to access the Kubernetes API endpoint"
     protocol    = "6"
@@ -502,7 +602,6 @@ resource "oci_core_security_list" "seclist_bastion" {
       max = 6443
     }
   }
-
   egress_security_rules {
     description = "Allow SSH traffic to worker nodes from bastion host"
     protocol    = "6"
@@ -512,10 +611,19 @@ resource "oci_core_security_list" "seclist_bastion" {
       max = 22
     }
   }
-
   egress_security_rules {
     description      = "Allow SSH to functions subnet from bastion host"
     destination      = "10.0.4.0/24"
+    destination_type = "CIDR_BLOCK"
+    protocol         = "6"
+    tcp_options {
+      min = 22
+      max = 22
+    }
+  }
+  egress_security_rules {
+    description      = "Allow SSH to api-gateway subnet from bastion host"
+    destination      = "10.0.5.0/24"
     destination_type = "CIDR_BLOCK"
     protocol         = "6"
     tcp_options {

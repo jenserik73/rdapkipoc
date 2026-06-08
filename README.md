@@ -18,3 +18,6 @@ helm version
 
 ## Importer OCI ressurs som finnes inn i terraform state slik at den blir oppdatert og håndtert i terraform fra nå av
 terraform import oci_vault_secret.rdapkipocdb_wallet_password <OCID>
+
+## Find the current ip address of the codespace instance
+curl -s https://api.ipify.org
