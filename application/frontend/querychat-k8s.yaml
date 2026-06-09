@@ -1,0 +1,76 @@
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: querychat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: querychat
+  template:
+    metadata:
+      labels:
+        app: querychat
+    spec:
+      imagePullSecrets:
+      - name: ocir-secret
+      containers:
+      - name: querychat
+        image: ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/querychat:latest
+        ports:
+        - containerPort: 80
+---
+# Service (ClusterIP - eksponeres via Ingress)
+apiVersion: v1
+kind: Service
+metadata:
+  name: querychat
+spec:
+  type: ClusterIP
+  selector:
+    app: querychat
+  ports:
+  - port: 80
+    targetPort: 80
+---
+# TLS Certificate
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: querychat-tls
+  namespace: default
+spec:
+  secretName: querychat-tls-secret
+  issuerRef:
+    name: letsencrypt-godaddy
+    kind: ClusterIssuer
+  dnsNames:
+  - querychat.elcarocloud.no
+---
+# Ingress med TLS
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: querychat
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - querychat.elcarocloud.no
+    secretName: querychat-tls-secret
+  rules:
+  - host: querychat.elcarocloud.no
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: querychat
+            port:
+              number: 80

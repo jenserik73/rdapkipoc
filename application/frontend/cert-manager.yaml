@@ -1,0 +1,47 @@
+---
+# GoDaddy API credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: godaddy-api-key
+  namespace: cert-manager
+type: Opaque
+stringData:
+  api-key: h1JgS5NFuohE_9LDbzDeLydVprhmPn8fjBF7MMrzS6Qmcr1Hysr6hn5Nz
+  api-secret: 7MMrzS6Qmcr1Hysr6hn5Nz
+---
+# ClusterIssuer med GoDaddy DNS-validering
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-godaddy
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: jens.erik.myhra@sykehuspartner.no
+    privateKeySecretRef:
+      name: letsencrypt-godaddy-key
+    solvers:
+    - dns01:
+        webhook:
+          groupName: acme.mycompany.com
+          solverName: godaddy
+          config:
+            authApiKey: h1JgS5NFuohE_9LDbzDeLydVprhmPn8fjBF7MMrzS6Qmcr1Hysr6hn5Nz
+            authApiSecret: 7MMrzS6Qmcr1Hysr6hn5Nz
+            production: true
+            ttl: 600
+---
+# Certificate
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: querychat-tls
+  namespace: default
+spec:
+  secretName: querychat-tls-secret
+  issuerRef:
+    name: letsencrypt-godaddy
+    kind: ClusterIssuer
+  dnsNames:
+  - querychat.elcarocloud.no

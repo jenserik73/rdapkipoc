@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<title>QueryChat</title>
+<style>
+  body { font-family: monospace; background: #111; color: #eee; margin: 0; padding: 20px; }
+  input { width: 70%; padding: 8px; background: #222; border: 1px solid #444; color: #eee; font-family: monospace; font-size: 14px; }
+  button { padding: 8px 16px; background: #5b7fff; border: none; color: white; cursor: pointer; font-size: 14px; }
+  button:disabled { background: #444; }
+  #log { margin-top: 20px; }
+  .entry { margin-bottom: 16px; border-left: 3px solid #333; padding-left: 12px; }
+  .q { color: #9ab; margin-bottom: 4px; }
+  .r { color: #3ecf8e; white-space: pre-wrap; word-break: break-all; }
+  .err { color: #f06060; }
+</style>
+</head>
+<body>
+<h2 style="color:#5b7fff;margin-top:0">QueryChat</h2>
+<input id="q" placeholder="Skriv spørsmål..." onkeydown="if(event.key==='Enter')send()" />
+<button id="btn" onclick="send()">Send</button>
+<div id="log"></div>
+<script>
+const API = "https://api.elcarocloud.no/v1/ask";
+
+async function send() {
+  const q = document.getElementById("q").value.trim();
+  if (!q) return;
+  document.getElementById("btn").disabled = true;
+  document.getElementById("q").value = "";
+  addEntry(q, "...", false);
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q })
+    });
+    const text = await res.text();
+    updateLast(text, false);
+  } catch (e) {
+    updateLast(e.message, true);
+  }
+  document.getElementById("btn").disabled = false;
+}
+
+function addEntry(q, r, isErr) {
+  const d = document.createElement("div");
+  d.className = "entry";
+  d.innerHTML = `<div class="q">&gt; ${esc(q)}</div><div class="${isErr?'err':'r'}">${esc(r)}</div>`;
+  document.getElementById("log").prepend(d);
+}
+
+function updateLast(r, isErr) {
+  const last = document.getElementById("log").firstChild;
+  if (last) {
+    last.querySelector("div:last-child").className = isErr ? "err" : "r";
+    last.querySelector("div:last-child").textContent = r;
+  }
+}
+
+function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+</script>
+</body>
+</html>

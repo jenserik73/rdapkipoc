@@ -89,4 +89,8 @@ mkdir -p ~/.claude
 echo "$CLAUDE_CREDENTIALS" > ~/.claude/.credentials.json
 chmod 600 ~/.claude/.credentials.json
 
+echo "=== Installing DNS tools ==="
+sudo apt-get update -qq && sudo apt-get install -y -qq dnsutils
+echo "✓ dnsutils installed (dig, nslookup, host)"
+
 echo "=== Dev container setup complete ==="

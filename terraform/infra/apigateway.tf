@@ -54,7 +54,7 @@ resource "oci_apigateway_deployment" "v1" {
     request_policies {
 
       cors {
-        allowed_origins              = ["*"]  # begrens til frontend-domenet i prod
+        allowed_origins              = ["*"] # begrens til frontend-domenet i prod
         allowed_methods              = ["POST", "OPTIONS"]
         allowed_headers              = ["Content-Type", "Authorization"]
         max_age_in_seconds           = 3600
@@ -90,6 +90,21 @@ resource "oci_apigateway_deployment" "v1" {
       response_policies {
         header_transformations {
           set_headers {
+            items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Access-Control-Allow-Methods"
+              values    = ["POST, OPTIONS"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Access-Control-Allow-Headers"
+              values    = ["Content-Type, Authorization"]
+              if_exists = "OVERWRITE"
+            }
             items {
               name      = "Strict-Transport-Security"
               values    = ["max-age=31536000; includeSubDomains"]
@@ -175,7 +190,7 @@ output "gateway_hostname" {
 
 output "api_endpoint" {
   description = "Base URL til API-et"
-  value       = "${oci_apigateway_deployment.v1.endpoint}"
+  value       = oci_apigateway_deployment.v1.endpoint
 }
 
 output "gateway_id" {

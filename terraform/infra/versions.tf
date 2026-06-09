@@ -5,6 +5,14 @@ terraform {
       version = "= 8.15.0"
       configuration_aliases = [oci.home]
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 2.12.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.27.0"
+    }
   }
 
   backend "s3" {

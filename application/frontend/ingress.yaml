@@ -1,0 +1,39 @@
+---
+# Service endres til ClusterIP (ikke lenger LoadBalancer direkte)
+apiVersion: v1
+kind: Service
+metadata:
+  name: querychat
+spec:
+  type: ClusterIP
+  selector:
+    app: querychat
+  ports:
+  - port: 80
+    targetPort: 80
+---
+# Ingress med TLS
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: querychat
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - querychat.elcarocloud.no
+    secretName: querychat-tls-secret
+  rules:
+  - host: querychat.elcarocloud.no
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: querychat
+            port:
+              number: 80
