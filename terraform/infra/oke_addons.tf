@@ -1,12 +1,12 @@
 # ── Variables ─────────────────────────────────────────────────────────────────
 
-variable "godaddy_api_key" {
+variable "GODADDY_API_KEY" {
   description = "GoDaddy API key for cert-manager DNS01 challenge"
   type        = string
   sensitive   = true
 }
 
-variable "godaddy_api_secret" {
+variable "GODADDY_API_SECRET" {
   description = "GoDaddy API secret for cert-manager DNS01 challenge"
   type        = string
   sensitive   = true
@@ -27,10 +27,10 @@ data "oci_containerengine_cluster_kube_config" "oke_kubeconfig" {
 # ── Providers: Helm + Kubernetes ──────────────────────────────────────────────
 
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     host                   = yamldecode(data.oci_containerengine_cluster_kube_config.oke_kubeconfig.content)["clusters"][0]["cluster"]["server"]
     cluster_ca_certificate = base64decode(yamldecode(data.oci_containerengine_cluster_kube_config.oke_kubeconfig.content)["clusters"][0]["cluster"]["certificate-authority-data"])
-    exec {
+    exec = {
       api_version = "client.authentication.k8s.io/v1beta1"
       command     = "oci"
       args = [
@@ -66,10 +66,10 @@ resource "helm_release" "cert_manager" {
   create_namespace = true
   version          = "v1.17.0"
 
-  set {
-    name  = "crds.enabled"
-    value = "true"
-  }
+  values = [<<-EOT
+    installCRDs: true
+  EOT
+  ]
 
   depends_on = [oci_containerengine_node_pool.rdap_chatbot_oke_node_pool]
 }
@@ -95,24 +95,20 @@ resource "helm_release" "godaddy_webhook" {
   namespace        = "cert-manager"
   create_namespace = false
 
-  set {
-    name  = "logging.level"
-    value = "info"
-  }
 
   depends_on = [helm_release.cert_manager]
 }
 
 # ── GoDaddy API secret ────────────────────────────────────────────────────────
 
-resource "kubernetes_secret" "godaddy_api_key" {
+resource "kubernetes_secret_v1" "godaddy_api_key" {
   metadata {
     name      = "godaddy-api-key"
     namespace = "cert-manager"
   }
 
   data = {
-    token = "${var.godaddy_api_key}:${var.godaddy_api_secret}"
+    token = "${var.GODADDY_API_KEY}:${var.GODADDY_API_SECRET}"
   }
 
   depends_on = [helm_release.godaddy_webhook]
@@ -156,25 +152,25 @@ resource "kubernetes_manifest" "cluster_issuer" {
 
   depends_on = [
     helm_release.godaddy_webhook,
-    kubernetes_secret.godaddy_api_key
+    kubernetes_secret_v1.godaddy_api_key
   ]
 }
 
 # ── OCIR pull secret ──────────────────────────────────────────────────────────
 
-variable "ocir_username" {
+variable "OCIR_USERNAME" {
   description = "OCIR username (namespace/email)"
   type        = string
   default     = "axpqbvkhoxdj/jens.erik.myhra@sykehuspartner.no"
 }
 
-variable "ocir_password" {
+variable "OCIR_PASSWORD" {
   description = "OCI auth token for OCIR"
   type        = string
   sensitive   = true
 }
 
-resource "kubernetes_secret" "ocir_secret" {
+resource "kubernetes_secret_v1" "ocir_secret" {
   metadata {
     name      = "ocir-secret"
     namespace = "default"
@@ -186,9 +182,9 @@ resource "kubernetes_secret" "ocir_secret" {
     ".dockerconfigjson" = jsonencode({
       auths = {
         "ocir.eu-frankfurt-2.oci.oraclecloud.eu" = {
-          username = var.ocir_username
-          password = var.ocir_password
-          auth     = base64encode("${var.ocir_username}:${var.ocir_password}")
+          username = var.OCIR_USERNAME
+          password = var.OCIR_PASSWORD
+          auth     = base64encode("${var.OCIR_USERNAME}:${var.OCIR_PASSWORD}")
         }
       }
     })

@@ -14,14 +14,6 @@ variable "custom_hostname" {
 
 # ── Data: hent sql-executor function OCID dynamisk ────────────
 
-data "oci_functions_functions" "sql_executor" {
-  application_id = oci_functions_application.rdap_chatbot_application.id
-
-  filter {
-    name   = "display_name"
-    values = ["sql-executor"]
-  }
-}
 
 # ── API Gateway ───────────────────────────────────────────────
 
@@ -74,7 +66,7 @@ resource "oci_apigateway_deployment" "v1" {
 
       backend {
         type        = "ORACLE_FUNCTIONS_BACKEND"
-        function_id = data.oci_functions_functions.sql_executor.functions[0].id
+        function_id = oci_functions_function.sql_executor.id
       }
 
       request_policies {
@@ -132,7 +124,7 @@ resource "oci_apigateway_deployment" "v1" {
 
       backend {
         type        = "ORACLE_FUNCTIONS_BACKEND"
-        function_id = data.oci_functions_functions.sql_executor.functions[0].id
+        function_id = oci_functions_function.feedback_executor.id
       }
 
       request_policies {

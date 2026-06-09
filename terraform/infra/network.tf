@@ -262,13 +262,13 @@ resource "oci_core_security_list" "seclist_api_gateway" {
   }
   ingress_security_rules {
     description = "Allow Ping (ICMP) from anywhere"
-    source   = "0.0.0.0/0" # Allow from anywhere; restrict to your IP/CIDR for better security
+    source      = "0.0.0.0/0" # Allow from anywhere; restrict to your IP/CIDR for better security
     source_type = "CIDR_BLOCK"
-    protocol = "1" # ICMP protocol number
+    protocol    = "1" # ICMP protocol number
     icmp_options {
       type = 8 # Echo Request (Ping)
       code = 0 # Code 0 is required for Echo Request
-    } 
+    }
   }
   ingress_security_rules {
     description = "Allow SSH traffic from Bastion subnet"
@@ -564,7 +564,15 @@ resource "oci_core_security_list" "seclist_loadbalancers" {
       max = 80
     }
   }
-
+  ingress_security_rules {
+    description = "Load balancer listener - HTTPS on port 443"
+    protocol    = "6"
+    source      = "0.0.0.0/0"
+    tcp_options {
+      min = 443
+      max = 443
+    }
+  }
   egress_security_rules {
     description = "Load balancer to worker nodes node ports"
     protocol    = "all"

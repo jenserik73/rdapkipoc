@@ -4,13 +4,14 @@
 -- =============================================================
 
 CREATE TABLE querychat.querychat_feedback (
-  id            NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  question      VARCHAR2(2000)  NOT NULL,
-  generated_sql VARCHAR2(32767) NOT NULL,
-  correct_sql   VARCHAR2(32767),
-  vote          NUMBER(2) DEFAULT 0,   -- 1=bra, -1=dårlig, 0=ikke vurdert
-  created_at    TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
-  updated_at    TIMESTAMP
+  id             NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  question       VARCHAR2(2000)  NOT NULL,
+  generated_sql  VARCHAR2(32767) NOT NULL,
+  corrected_sql  VARCHAR2(32767),
+  feedback_text  VARCHAR2(4000),
+  vote           NUMBER(2) DEFAULT 0,   -- 1=bra, -1=dårlig, 0=ikke vurdert
+  created_at     TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+  updated_at     TIMESTAMP
 );
 
 COMMENT ON TABLE querychat.querychat_feedback IS
@@ -22,7 +23,7 @@ CREATE INDEX querychat.qcf_vote_idx
 
 CREATE OR REPLACE VIEW querychat.querychat_few_shot AS
   SELECT question,
-         NVL(correct_sql, generated_sql) AS correct_sql,
+         NVL(corrected_sql, generated_sql) AS correct_sql,
          vote,
          created_at
   FROM   querychat.querychat_feedback

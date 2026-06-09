@@ -3,7 +3,6 @@ CREATE OR REPLACE PACKAGE BODY querychat.querychat_pkg AS
   FUNCTION error_json(p_code IN VARCHAR2, p_msg IN VARCHAR2) RETURN CLOB IS
     v_clob CLOB;
   BEGIN
-    --v_clob := TO_CLOB('{"ok":false,"code":"' || p_code || '","error":"' || JSON_SCALAR(p_msg) || '"}');
     v_clob := TO_CLOB('{"ok":false,"code":'||p_code||',"error":"'||p_msg||'"}');
     RETURN v_clob;
   END;
@@ -24,7 +23,7 @@ CREATE OR REPLACE PACKAGE BODY querychat.querychat_pkg AS
     END LOOP;
   END;
 
-  -- ── Hent few-shot eksempler og bygg prompt ─────────────────
+  -- Hent few-shot eksempler og bygg prompt
   FUNCTION build_prompt(p_question IN VARCHAR2) RETURN VARCHAR2 IS
     v_examples VARCHAR2(32767);
   BEGIN
@@ -36,7 +35,7 @@ CREATE OR REPLACE PACKAGE BODY querychat.querychat_pkg AS
              ) INTO v_examples
       FROM (
         SELECT question,
-               NVL(correct_sql, generated_sql) AS correct_sql
+               NVL(corrected_sql, generated_sql) AS correct_sql
         FROM   querychat.querychat_feedback
         WHERE  vote > 0
         ORDER  BY vote DESC, created_at DESC
@@ -61,19 +60,24 @@ CREATE OR REPLACE PACKAGE BODY querychat.querychat_pkg AS
     END IF;
   END;
 
-
-  procedure logg(p_question IN VARCHAR2, p_sql IN VARCHAR2, p_vote IN VARCHAR2) IS
+  -- logg: inserter rad og returnerer id
+  FUNCTION logg(p_question IN VARCHAR2, p_sql IN VARCHAR2, p_vote IN NUMBER)
+  RETURN NUMBER IS
     PRAGMA AUTONOMOUS_TRANSACTION;
-    BEGIN
-      INSERT INTO querychat.querychat_feedback(question, generated_sql, vote, created_at)
-      VALUES (p_question, p_sql, p_vote, SYSTIMESTAMP);
-      COMMIT;
-    EXCEPTION 
-      WHEN OTHERS THEN 
-        dbms_output.put_line(sqlerrm);
-    END logg;
+    v_id NUMBER;
+  BEGIN
+    INSERT INTO querychat.querychat_feedback(question, generated_sql, vote, created_at)
+    VALUES (p_question, p_sql, p_vote, SYSTIMESTAMP)
+    RETURNING id INTO v_id;
+    COMMIT;
+    RETURN v_id;
+  EXCEPTION
+    WHEN OTHERS THEN
+      dbms_output.put_line(sqlerrm);
+      RETURN NULL;
+  END logg;
 
-  -- ── generate_sql ────────────────────────────────────────────
+  -- generate_sql
   FUNCTION generate_sql(
     p_question IN VARCHAR2,
     p_profile  IN VARCHAR2 DEFAULT 'QUERYCHAT_PROFILE'
@@ -85,10 +89,8 @@ CREATE OR REPLACE PACKAGE BODY querychat.querychat_pkg AS
       profile_name => p_profile,
       action       => 'showsql'
     );
-    -- Rens markdown-wrapper som LLM av og til legger til
     v_sql := REGEXP_REPLACE(v_sql, '^```sql\s*', '',  1, 1, 'im');
     v_sql := REGEXP_REPLACE(v_sql, '\s*```\s*$', '',  1, 1, 'im');
-    -- Sikre at skjema-prefiks er med (fallback-fix)
     v_sql := REGEXP_REPLACE(
                v_sql,
                '\b(FROM|JOIN)\s+(KI_GRUNNLAG_ORACLE_RDAP_)',
@@ -98,9 +100,7 @@ CREATE OR REPLACE PACKAGE BODY querychat.querychat_pkg AS
     RETURN TRIM(v_sql);
   END;
 
-
-
-  -- ── ask_nl ──────────────────────────────────────────────────
+  -- ask_nl
   FUNCTION ask_nl(
     p_question IN VARCHAR2,
     p_profile  IN VARCHAR2 DEFAULT 'QUERYCHAT_PROFILE',
@@ -117,30 +117,26 @@ CREATE OR REPLACE PACKAGE BODY querychat.querychat_pkg AS
     v_col_cnt   NUMBER;
     v_desc      DBMS_SQL.DESC_TAB;
     v_col_val   VARCHAR2(4000);
+    v_log_id    NUMBER;
   BEGIN
-    -- 1. Generer SQL
     BEGIN
       v_sql := generate_sql(p_question, p_profile);
     EXCEPTION WHEN OTHERS THEN
       RETURN error_json('AI_ERROR', SQLERRM);
     END;
 
-    -- 2. Valider
     BEGIN
       validate_sql(v_sql);
     EXCEPTION WHEN OTHERS THEN
       RETURN error_json('VALIDATION_ERROR', SQLERRM);
     END;
 
-    -- 3. Legg til FETCH FIRST hvis mangler
     IF INSTR(UPPER(v_sql), 'FETCH FIRST') = 0
        AND INSTR(UPPER(v_sql), 'ROWNUM') = 0 THEN
       v_sql := v_sql || CHR(10) || 'FETCH FIRST ' || p_max_rows || ' ROWS ONLY';
     END IF;
 
-    -- 4. Kjør
     BEGIN
-      dbms_output.put_line('SQL:'||v_sql);
       v_cursor := DBMS_SQL.OPEN_CURSOR;
       DBMS_SQL.PARSE(v_cursor, v_sql, DBMS_SQL.NATIVE);
       DBMS_SQL.DESCRIBE_COLUMNS(v_cursor, v_col_cnt, v_desc);
@@ -171,33 +167,38 @@ CREATE OR REPLACE PACKAGE BODY querychat.querychat_pkg AS
       RETURN error_json('DB_ERROR', SQLERRM);
     END;
 
-    logg(p_question, v_sql, 0);
+    v_log_id := logg(p_question, v_sql, 0);
 
-    -- 6. Bygg JSON
     DBMS_LOB.CREATETEMPORARY(v_result, TRUE);
-    DBMS_LOB.APPEND(v_result, TO_CLOB('{"ok":true,"sql":"' || v_sql || '","columns":"' || v_cols.TO_STRING()      || '","rows":"'     || v_rows_arr.TO_STRING()   || '","rowCount":"' || v_row_count              || '","truncated":"' || v_truncated || '"}'));
+    DBMS_LOB.APPEND(v_result, TO_CLOB(
+      '{"ok":true' ||
+      ',"logId":' || NVL(TO_CHAR(v_log_id), 'null') ||
+      ',"sql":"' || REPLACE(REPLACE(REPLACE(v_sql, CHR(10), '\n'), CHR(13), '\r'), '"', '\"') || '"' ||
+      ',"columns":' || v_cols.TO_STRING() ||
+      ',"rows":' || v_rows_arr.TO_STRING() ||
+      ',"rowCount":' || v_row_count ||
+      ',"truncated":' || v_truncated ||
+      '}'
+    ));
     RETURN v_result;
   END ask_nl;
 
-  -- ── save_feedback ───────────────────────────────────────────
+  -- save_feedback: oppdaterer rad via id
   PROCEDURE save_feedback(
-    p_question  IN VARCHAR2,
-    p_sql       IN VARCHAR2,
-    p_vote      IN NUMBER,
-    p_corrected IN VARCHAR2 DEFAULT NULL
+    p_id            IN NUMBER,
+    p_vote          IN NUMBER,
+    p_feedback_text IN VARCHAR2 DEFAULT NULL,
+    p_corrected_sql IN VARCHAR2 DEFAULT NULL
   ) IS
   BEGIN
-    MERGE INTO querychat.querychat_feedback dst
-    USING (SELECT p_question AS q FROM DUAL) src
-    ON (dst.question = src.q AND dst.generated_sql = p_sql)
-    WHEN MATCHED THEN
-      UPDATE SET vote        = p_vote,
-                 correct_sql = NVL(p_corrected, dst.correct_sql),
-                 updated_at  = SYSTIMESTAMP
-    WHEN NOT MATCHED THEN
-      INSERT (question, generated_sql, vote, correct_sql, created_at)
-      VALUES (p_question, p_sql, p_vote, p_corrected, SYSTIMESTAMP);
+    UPDATE querychat.querychat_feedback
+    SET    vote           = p_vote,
+           feedback_text  = NVL(p_feedback_text, feedback_text),
+           corrected_sql  = NVL(p_corrected_sql, corrected_sql),
+           updated_at     = SYSTIMESTAMP
+    WHERE  id = p_id;
     COMMIT;
   END;
 
 END querychat_pkg;
+/

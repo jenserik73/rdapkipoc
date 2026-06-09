@@ -1,0 +1,15 @@
+schema_version: 20180708
+name: feedback-executor
+version: 0.0.1
+runtime: python
+build_image: fnproject/python:3.12-dev
+run_image: fnproject/python:3.12
+entrypoint: /python/bin/fdk /function/func.py handler
+memory: 256
+timeout: 60
+config:
+  DB_DSN: rdapkipocdb_high
+  DB_USER: rdap_chatbot_app_user
+  DBPASS_SECRET_OCID: ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yauk7ukm6zwo65vuygwr6pay4ajv3cyg3vbvixygqzfovq
+  WALLET_SECRET_OCID: ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yaxjtwi247netyi2vuamlrspftpykh2t37miwi2m4yll2q
+  WALLETPASS_SECRET_OCID: ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yac4hzlxmaenlhwgv4lujti7jbtudp7xzexjgi6elqpmda

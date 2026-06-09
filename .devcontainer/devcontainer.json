@@ -19,7 +19,8 @@
                 "ms-python.python",
                 "ms-python.pylint",
                 "ms-python.black-formatter",
-                "anthropic.claude-code"
+                "anthropic.claude-code",
+                "ms-azuretools.vscode-containers"
             ],
             "settings": {
                 "terminal.integrated.profiles.linux": {
