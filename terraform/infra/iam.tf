@@ -63,3 +63,12 @@ resource "oci_identity_policy" "certbot_certificates_policy" {
     "allow dynamic-group certbot-dynamic-group to manage leaf-certificate-family in compartment id ocid1.compartment.oc19..aaaaaaaaw7nfek7szdgjrdidzqhkjzx7bw4txy2y3kdydjryavxmei52t5xq"
   ]
 }
+
+resource "oci_identity_policy" "querychat_email_policy" {
+  compartment_id = local.compartment_id
+  name           = "querychat-email-policy"
+  description    = "Tillater QueryChat functions å sende epost via OCI Email Delivery"
+  statements = [
+    "Allow dynamic-group FunctionsDynamicGroup to use email-family in compartment rdap-chatbot-cmp"
+  ]
+}
