@@ -39,7 +39,7 @@ resource "oci_functions_function" "feedback_executor" {
   timeout_in_seconds = 60
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/feedback-executor:latest"
   image_digest = "sha256:6ee1a30670ec33f2fecbba88bf43fc1c19bf0a212d0e4379b7ee3055bd85aa69"
-  
+
   config = {
     DB_DSN                 = "rdapkipocdb_high"
     DB_USER                = "rdap_chatbot_app_user"
@@ -55,7 +55,7 @@ resource "oci_functions_function" "auth_handler" {
   memory_in_mbs      = "256"
   timeout_in_seconds = 60
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/auth-handler:latest"
-  image_digest       = "sha256:5baa2bfa493a4f81f43f4943ef9658aab820b3fd024578e33de8d21e5a550eb6"
+  image_digest       = "sha256:b5824bc7c1805e5a1e004f15209f0f6fe85c77fb552281bf1499dd1f651b43d1"
 
   config = {
     DB_DSN                    = "rdapkipocdb_high"
