@@ -162,17 +162,6 @@ resource "oci_apigateway_deployment" "v1" {
   }
 }
 
-# ── IAM Policy: API Gateway → Functions ───────────────────────
-
-resource "oci_identity_policy" "apigw_functions" {
-  compartment_id = local.compartment_id
-  name           = "apigw-invoke-functions"
-  description    = "Tillater API Gateway å kalle OCI Functions"
-  statements = [
-    "allow any-user to use functions-family in compartment id ${local.compartment_id} where request.principal.type = 'ApiGateway'"
-  ]
-}
-
 # ── Outputs ───────────────────────────────────────────────────
 
 output "gateway_hostname" {
