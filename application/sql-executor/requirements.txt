@@ -1,3 +1,4 @@
-fdk>=0.1.73
-oci>=2.126.0
-oracledb>=2.3.0
+fdk>=0.1.67
+oci>=2.0
+oracledb>=2.0
+PyJWT>=2.8

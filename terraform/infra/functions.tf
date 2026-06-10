@@ -18,7 +18,7 @@ resource "oci_functions_function" "sql_executor" {
   memory_in_mbs      = "256"
   timeout_in_seconds = 300
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/sql-executor:latest"
-  image_digest       = "sha256:b74d9ba921a7f9afd30861392f3a2489782e3e97c3492af371220514ee36c70c"
+  image_digest       = "sha256:85fdb51c5c4a719bf4ca832e6b712c123b4364fa18dc75c8728765712d92bf42"
 
   config = {
     AI_PROFILE             = "QUERYCHAT_PROFILE"
@@ -28,6 +28,7 @@ resource "oci_functions_function" "sql_executor" {
     DBPASS_SECRET_OCID     = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yauk7ukm6zwo65vuygwr6pay4ajv3cyg3vbvixygqzfovq"
     WALLET_SECRET_OCID     = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yaxjtwi247netyi2vuamlrspftpykh2t37miwi2m4yll2q"
     WALLETPASS_SECRET_OCID = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yac4hzlxmaenlhwgv4lujti7jbtudp7xzexjgi6elqpmda"
+    JWT_SECRET_OCID        = oci_vault_secret.querychat_jwt_secret.id
   }
 }
 
@@ -37,15 +38,15 @@ resource "oci_functions_function" "feedback_executor" {
   memory_in_mbs      = "256"
   timeout_in_seconds = 60
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/feedback-executor:latest"
-  image_digest       = "sha256:41b96642eaa786877507053265fdf1b0dbccbe42c7e7014f2aba034f434ca217"
-
+  image_digest = "sha256:6ee1a30670ec33f2fecbba88bf43fc1c19bf0a212d0e4379b7ee3055bd85aa69"
+  
   config = {
     DB_DSN                 = "rdapkipocdb_high"
     DB_USER                = "rdap_chatbot_app_user"
     DBPASS_SECRET_OCID     = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yauk7ukm6zwo65vuygwr6pay4ajv3cyg3vbvixygqzfovq"
     WALLET_SECRET_OCID     = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yaxjtwi247netyi2vuamlrspftpykh2t37miwi2m4yll2q"
     WALLETPASS_SECRET_OCID = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yac4hzlxmaenlhwgv4lujti7jbtudp7xzexjgi6elqpmda"
-  }
+    JWT_SECRET_OCID        = oci_vault_secret.querychat_jwt_secret.id}
 }
 
 resource "oci_functions_function" "auth_handler" {
@@ -54,7 +55,7 @@ resource "oci_functions_function" "auth_handler" {
   memory_in_mbs      = "256"
   timeout_in_seconds = 60
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/auth-handler:latest"
-  image_digest       = "sha256:2023215b7b359e22d9b686ebf43b502184003a553def17180809ddc7221694fc"
+  image_digest       = "sha256:5baa2bfa493a4f81f43f4943ef9658aab820b3fd024578e33de8d21e5a550eb6"
 
   config = {
     DB_DSN                    = "rdapkipocdb_high"
@@ -79,7 +80,7 @@ resource "oci_functions_function" "admin_handler" {
   memory_in_mbs      = "256"
   timeout_in_seconds = 60
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/admin-handler:latest"
-  image_digest       = "sha256:2023215b7b359e22d9b686ebf43b502184003a553def17180809ddc7221694fc"
+  image_digest       = "sha256:33755800695ed41dd2cc76c923783dd94a0dbffee9d85c21cb5b07a44c845e3f"
 
   config = {
     DB_DSN                 = "rdapkipocdb_high"

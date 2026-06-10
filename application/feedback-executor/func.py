@@ -19,6 +19,7 @@ import logging
 import os
 import zipfile
 import base64
+import jwt
 
 import fdk.response
 import oci
@@ -39,10 +40,12 @@ DB_DSN                 = _require_env("DB_DSN")
 WALLET_SECRET_OCID     = _require_env("WALLET_SECRET_OCID")
 DBPASS_SECRET_OCID     = _require_env("DBPASS_SECRET_OCID")
 WALLETPASS_SECRET_OCID = _require_env("WALLETPASS_SECRET_OCID")
+JWT_SECRET_OCID        = _require_env("JWT_SECRET_OCID")
 
 _pool           = None
 _secrets_client = None
 _wallet_dir     = "/tmp/wallet"
+_jwt_secret     = None
 
 
 def _get_secrets_client() -> oci.secrets.SecretsClient:
@@ -57,6 +60,19 @@ def _get_secret(ocid: str) -> bytes:
     bundle = _get_secrets_client().get_secret_bundle(secret_id=ocid).data
     return base64.b64decode(bundle.secret_bundle_content.content)
 
+def _get_jwt_secret() -> str:
+    global _jwt_secret
+    if _jwt_secret is None:
+        _jwt_secret = _get_secret(JWT_SECRET_OCID).decode().strip()
+    return _jwt_secret
+
+def _verify_jwt(ctx) -> dict:
+    headers = dict(ctx.Headers())
+    auth = headers.get("authorization", headers.get("Authorization", ""))
+    if not auth.startswith("Bearer "):
+        raise PermissionError("Mangler Authorization-header")
+    token = auth.removeprefix("Bearer ").strip()
+    return jwt.decode(token, _get_jwt_secret(), algorithms=["HS256"])
 
 def _init_pool() -> oracledb.ConnectionPool:
     logger.info("Henter secrets fra Vault …")
@@ -116,6 +132,13 @@ def _save_feedback(log_id: int, vote: int,
 
 def handler(ctx, data: io.BytesIO = None):
     try:
+        _verify_jwt(ctx)
+    except PermissionError as e:
+        return _resp(ctx, {"ok": False, "error": str(e)}, 401)
+    except Exception:
+        return _resp(ctx, {"ok": False, "error": "Ugyldig eller utløpt token"}, 401)
+
+    # resten er uendret ...    try:
         body = json.loads(data.getvalue())
     except Exception:
         return _resp(ctx, {"ok": False, "error": "Ugyldig JSON"}, 400)
