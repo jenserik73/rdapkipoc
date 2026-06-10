@@ -159,6 +159,261 @@ resource "oci_apigateway_deployment" "v1" {
         }
       }
     }
+    # ── Route: /v1/auth/login ─────────────────────────────────
+    routes {
+      path    = "/auth/login"
+      methods = ["POST", "OPTIONS"]
+
+      backend {
+        type        = "ORACLE_FUNCTIONS_BACKEND"
+        function_id = oci_functions_function.auth_handler.id
+      }
+
+      request_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "X-Auth-Action"
+              values    = ["login"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+
+      response_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Strict-Transport-Security"
+              values    = ["max-age=31536000; includeSubDomains"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+    }
+
+    # ── Route: /v1/auth/refresh ───────────────────────────────
+    routes {
+      path    = "/auth/refresh"
+      methods = ["POST", "OPTIONS"]
+
+      backend {
+        type        = "ORACLE_FUNCTIONS_BACKEND"
+        function_id = oci_functions_function.auth_handler.id
+      }
+
+      request_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "X-Auth-Action"
+              values    = ["refresh"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+
+      response_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Strict-Transport-Security"
+              values    = ["max-age=31536000; includeSubDomains"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+    }
+
+    # ── Route: /v1/auth/logout ────────────────────────────────
+    routes {
+      path    = "/auth/logout"
+      methods = ["POST", "OPTIONS"]
+
+      backend {
+        type        = "ORACLE_FUNCTIONS_BACKEND"
+        function_id = oci_functions_function.auth_handler.id
+      }
+
+      request_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "X-Auth-Action"
+              values    = ["logout"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+
+      response_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Strict-Transport-Security"
+              values    = ["max-age=31536000; includeSubDomains"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+    }
+
+    # ── Route: /v1/auth/forgot-password ──────────────────────
+    routes {
+      path    = "/auth/forgot-password"
+      methods = ["POST", "OPTIONS"]
+
+      backend {
+        type        = "ORACLE_FUNCTIONS_BACKEND"
+        function_id = oci_functions_function.auth_handler.id
+      }
+
+      request_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "X-Auth-Action"
+              values    = ["forgot-password"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+
+      response_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Strict-Transport-Security"
+              values    = ["max-age=31536000; includeSubDomains"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+    }
+
+    # ── Route: /v1/auth/reset-password ───────────────────────
+    routes {
+      path    = "/auth/reset-password"
+      methods = ["POST", "OPTIONS"]
+
+      backend {
+        type        = "ORACLE_FUNCTIONS_BACKEND"
+        function_id = oci_functions_function.auth_handler.id
+      }
+
+      request_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "X-Auth-Action"
+              values    = ["reset-password"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+
+      response_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Strict-Transport-Security"
+              values    = ["max-age=31536000; includeSubDomains"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+    }
+
+    # ── Route: /v1/me ─────────────────────────────────────────
+    routes {
+      path    = "/me"
+      methods = ["GET", "PUT", "OPTIONS"]
+
+      backend {
+        type        = "ORACLE_FUNCTIONS_BACKEND"
+        function_id = oci_functions_function.auth_handler.id
+      }
+
+      response_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Strict-Transport-Security"
+              values    = ["max-age=31536000; includeSubDomains"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+    }
+
+    # ── Route: /v1/admin ─────────────────────────────────────
+    routes {
+      path    = "/admin/{path*}"
+      methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+
+      backend {
+        type        = "ORACLE_FUNCTIONS_BACKEND"
+        function_id = oci_functions_function.admin_handler.id
+      }
+
+      response_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Strict-Transport-Security"
+              values    = ["max-age=31536000; includeSubDomains"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+    }
   }
 }
 
