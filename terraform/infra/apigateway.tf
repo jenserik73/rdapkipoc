@@ -39,6 +39,10 @@ resource "oci_apigateway_deployment" "v1" {
   gateway_id     = oci_apigateway_gateway.main.id
   display_name   = "rdap-chatbot-v1"
   path_prefix    = "/v1"
+  freeform_tags = {
+    deployed_at = "2026-06-10-v2"
+  }
+
 
   specification {
 
@@ -185,6 +189,11 @@ resource "oci_apigateway_deployment" "v1" {
         header_transformations {
           set_headers {
             items {
+              name      = "Content-Type"
+              values    = ["application/json"]
+              if_exists = "OVERWRITE"
+            }
+            items {
               name      = "Access-Control-Allow-Origin"
               values    = ["*"]
               if_exists = "OVERWRITE"
@@ -224,6 +233,11 @@ resource "oci_apigateway_deployment" "v1" {
       response_policies {
         header_transformations {
           set_headers {
+            items {
+              name      = "Content-Type"
+              values    = ["application/json"]
+              if_exists = "OVERWRITE"
+            }
             items {
               name      = "Access-Control-Allow-Origin"
               values    = ["*"]
@@ -265,6 +279,11 @@ resource "oci_apigateway_deployment" "v1" {
         header_transformations {
           set_headers {
             items {
+              name      = "Content-Type"
+              values    = ["application/json"]
+              if_exists = "OVERWRITE"
+            }
+            items {
               name      = "Access-Control-Allow-Origin"
               values    = ["*"]
               if_exists = "OVERWRITE"
@@ -305,6 +324,11 @@ resource "oci_apigateway_deployment" "v1" {
         header_transformations {
           set_headers {
             items {
+              name      = "Content-Type"
+              values    = ["application/json"]
+              if_exists = "OVERWRITE"
+            }
+            items {
               name      = "Access-Control-Allow-Origin"
               values    = ["*"]
               if_exists = "OVERWRITE"
@@ -344,6 +368,11 @@ resource "oci_apigateway_deployment" "v1" {
       response_policies {
         header_transformations {
           set_headers {
+            items {
+              name      = "Content-Type"
+              values    = ["application/json"]
+              if_exists = "OVERWRITE"
+            }
             items {
               name      = "Access-Control-Allow-Origin"
               values    = ["*"]

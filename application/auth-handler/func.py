@@ -10,7 +10,7 @@ Håndterer alle autentiserings-endepunkter for QueryChat:
   - GET  /v1/me
   - PUT  /v1/me/password
 
-Ruting skjer via X-Auth-Action header satt av API Gateway.
+Ruting skjer via URL-path fra Fn-Http-Request-Url header.
 """
 
 import base64
@@ -56,9 +56,9 @@ SMTP_USER                 = _require_env("SMTP_USER")
 EMAIL_SENDER              = _require_env("EMAIL_SENDER")
 FRONTEND_URL              = _require_env("FRONTEND_URL")
 
-JWT_EXPIRY_SECONDS     = 15 * 60           # 15 minutter
-REFRESH_EXPIRY_DAYS    = 30
-RESET_EXPIRY_MINUTES   = 60
+JWT_EXPIRY_SECONDS   = 15 * 60
+REFRESH_EXPIRY_DAYS  = 30
+RESET_EXPIRY_MINUTES = 60
 
 _secrets_client = None
 _pool           = None
@@ -107,6 +107,7 @@ def _get_smtp_password() -> str:
 # ── Database ───────────────────────────────────────────────────
 
 def _init_pool():
+    logger.info("Initialiserer connection pool")
     db_password     = _get_secret(DBPASS_SECRET_OCID).decode().strip()
     wallet_password = _get_secret(WALLETPASS_SECRET_OCID).decode().strip()
     wallet_zip      = _get_secret(WALLET_SECRET_OCID)
@@ -138,7 +139,7 @@ def _get_pool():
 def _make_access_token(user: dict) -> str:
     now = datetime.now(timezone.utc)
     payload = {
-        "sub":         str(user["id"]),
+        "sub":         user["id"],
         "email":       user["email"],
         "name":        user["display_name"],
         "roles":       user["roles"],
@@ -161,6 +162,7 @@ def _get_auth_header(ctx) -> str:
 # ── DB-operasjoner ─────────────────────────────────────────────
 
 def _get_user_by_email(conn, email: str) -> dict | None:
+    logger.info("Henter bruker: %s", email)
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -173,9 +175,8 @@ def _get_user_by_email(conn, email: str) -> dict | None:
         row = cur.fetchone()
         if not row:
             return None
-        user_id = row[0].hex() if row[0] else None
         return {
-            "id":           user_id,
+            "id":           row[0],
             "email":        row[1],
             "display_name": row[2],
             "pw_hash":      row[3],
@@ -183,16 +184,17 @@ def _get_user_by_email(conn, email: str) -> dict | None:
         }
 
 
-def _get_user_roles_permissions(conn, user_id_hex: str) -> tuple[list, list]:
+def _get_user_roles_permissions(conn, user_id: str) -> tuple[list, list]:
+    logger.info("Henter roller/rettigheter for: %s", user_id)
     with conn.cursor() as cur:
         cur.execute(
             """
             SELECT DISTINCT r.name
             FROM qc_user_roles ur
             JOIN qc_roles r ON ur.role_id = r.id
-            WHERE ur.user_id = HEXTORAW(:uid)
+            WHERE ur.user_id = :user_id
             """,
-            uid=user_id_hex,
+            user_id=user_id,
         )
         roles = [row[0] for row in cur.fetchall()]
 
@@ -202,33 +204,39 @@ def _get_user_roles_permissions(conn, user_id_hex: str) -> tuple[list, list]:
             FROM qc_user_roles ur
             JOIN qc_role_permissions rp ON ur.role_id = rp.role_id
             JOIN qc_permissions p ON rp.permission_id = p.id
-            WHERE ur.user_id = HEXTORAW(:uid)
+            WHERE ur.user_id = :user_id
             """,
-            uid=user_id_hex,
+            user_id=user_id,
         )
         permissions = [row[0] for row in cur.fetchall()]
+
+    logger.info("Roller: %s", roles)
     return roles, permissions
 
 
-def _update_last_login(conn, user_id_hex: str):
+def _update_last_login(conn, user_id: str):
     with conn.cursor() as cur:
         cur.execute(
-            "UPDATE qc_users SET last_login = SYSTIMESTAMP WHERE id = HEXTORAW(:uid)",
-            uid=user_id_hex,
+            "UPDATE qc_users SET last_login = SYSTIMESTAMP WHERE id = :user_id",
+            user_id=user_id,
         )
     conn.commit()
 
 
-def _store_refresh_token(conn, user_id_hex: str, token: str, device_hint: str = None):
+def _store_refresh_token(conn, user_id: str, token: str, device_hint: str = None):
     expires = datetime.now(timezone.utc) + timedelta(days=REFRESH_EXPIRY_DAYS)
+    logger.info("_store_refresh_token user_id type=%s value=%s", type(user_id), repr(user_id))
+    logger.info("_store_refresh_token token type=%s", type(token))
+    logger.info("_store_refresh_token hint type=%s value=%s", type(device_hint), repr(device_hint)[:50])
+    logger.info("_store_refresh_token expires type=%s value=%s", type(expires), repr(expires))
     with conn.cursor() as cur:
         cur.execute(
             """
             INSERT INTO qc_refresh_tokens (token, user_id, device_hint, expires_at)
-            VALUES (:token, HEXTORAW(:uid), :hint, :expires)
+            VALUES (:token, :user_id, :hint, :expires)
             """,
             token=token,
-            uid=user_id_hex,
+            user_id=user_id,
             hint=device_hint,
             expires=expires,
         )
@@ -249,7 +257,7 @@ def _get_refresh_token(conn, token: str) -> dict | None:
         if not row:
             return None
         return {
-            "user_id":    row[0].hex() if row[0] else None,
+            "user_id":    row[0],
             "expires_at": row[1],
             "revoked":    row[2],
         }
@@ -264,29 +272,29 @@ def _revoke_refresh_token(conn, token: str):
     conn.commit()
 
 
-def _revoke_all_user_tokens(conn, user_id_hex: str):
+def _revoke_all_user_tokens(conn, user_id: str):
     with conn.cursor() as cur:
         cur.execute(
-            "UPDATE qc_refresh_tokens SET revoked = 1 WHERE user_id = HEXTORAW(:uid)",
-            uid=user_id_hex,
+            "UPDATE qc_refresh_tokens SET revoked = 1 WHERE user_id = :user_id",
+            user_id=user_id,
         )
     conn.commit()
 
 
-def _get_user_by_id(conn, user_id_hex: str) -> dict | None:
+def _get_user_by_id(conn, user_id: str) -> dict | None:
     with conn.cursor() as cur:
         cur.execute(
             """
             SELECT id, email, display_name, active
-            FROM qc_users WHERE id = HEXTORAW(:uid)
+            FROM qc_users WHERE id = :user_id
             """,
-            uid=user_id_hex,
+            user_id=user_id,
         )
         row = cur.fetchone()
         if not row:
             return None
         return {
-            "id":           row[0].hex() if row[0] else None,
+            "id":           row[0],
             "email":        row[1],
             "display_name": row[2],
             "active":       row[3],
@@ -319,276 +327,357 @@ def _send_reset_email(to_email: str, reset_token: str):
 # ── Action-handlers ────────────────────────────────────────────
 
 def _action_login(body: dict, ctx) -> fdk.response.Response:
-    email    = body.get("email", "").strip().lower()
-    password = body.get("password", "")
+    try:
+        email    = body.get("email", "").strip().lower()
+        password = body.get("password", "")
 
-    if not email or not password:
-        return _resp(ctx, {"ok": False, "error": "Mangler e-post eller passord"}, 400)
+        if not email or not password:
+            return _resp(ctx, {"ok": False, "error": "Mangler e-post eller passord"}, 400)
 
-    with _get_pool().acquire() as conn:
-        user = _get_user_by_email(conn, email)
+        with _get_pool().acquire() as conn:
+            logger.info("STEG 1: Henter bruker")
+            user = _get_user_by_email(conn, email)
+            logger.info("STEG 2: Bruker hentet: %s", user is not None)
 
-        if not user or not user["active"]:
-            return _resp(ctx, {"ok": False, "error": "Ugyldig e-post eller passord"}, 401)
+            if not user or not user["active"]:
+                return _resp(ctx, {"ok": False, "error": "Ugyldig e-post eller passord"}, 401)
 
-        pw_hash = user["pw_hash"]
-        if isinstance(pw_hash, oracledb.LOB):
-            pw_hash = pw_hash.read()
-        if isinstance(pw_hash, str):
-            pw_hash = pw_hash.encode()
+            logger.info("STEG 3: Sjekker passord")
+            pw_hash = user["pw_hash"]
+            if isinstance(pw_hash, oracledb.LOB):
+                pw_hash = pw_hash.read()
+            if isinstance(pw_hash, str):
+                pw_hash = pw_hash.encode()
 
-        if not bcrypt.checkpw(password.encode(), pw_hash):
-            return _resp(ctx, {"ok": False, "error": "Ugyldig e-post eller passord"}, 401)
+            if not bcrypt.checkpw(password.encode(), pw_hash):
+                return _resp(ctx, {"ok": False, "error": "Ugyldig e-post eller passord"}, 401)
 
-        roles, permissions = _get_user_roles_permissions(conn, user["id"])
-        user["roles"]       = roles
-        user["permissions"] = permissions
+            logger.info("STEG 4: Henter roller")
+            roles, permissions = _get_user_roles_permissions(conn, user["id"])
+            user["roles"]       = roles
+            user["permissions"] = permissions
+            logger.info("STEG 5: Lager tokens")
+            access_token  = _make_access_token(user)
+            refresh_token = secrets.token_hex(32)
 
-        access_token  = _make_access_token(user)
-        refresh_token = secrets.token_hex(32)
+            logger.info("STEG 6: Lagrer refresh token")
+            headers     = dict(ctx.Headers())
+            user_agent  = headers.get("user-agent", "")
+            if isinstance(user_agent, list):
+                user_agent = user_agent[0] if user_agent else ""
+            device_hint = user_agent[:255]
+            _store_refresh_token(conn, user["id"], refresh_token, device_hint)
+            logger.info("STEG 7: Oppdaterer last_login")
+            _update_last_login(conn, user["id"])
+            logger.info("STEG 8: Ferdig")
+            return _resp(ctx, {
+                "ok":            True,
+                "access_token":  access_token,
+                "refresh_token": refresh_token,
+                "user": {
+                    "email":        user["email"],
+                    "display_name": user["display_name"],
+                    "roles":        roles,
+                    "permissions":  permissions,
+                },
+            })
 
-        headers = dict(ctx.Headers())
-        device_hint = headers.get("user-agent", "")[:255]
-        _store_refresh_token(conn, user["id"], refresh_token, device_hint)
-        _update_last_login(conn, user["id"])
-
-    return _resp(ctx, {
-        "ok":            True,
-        "access_token":  access_token,
-        "refresh_token": refresh_token,
-        "user": {
-            "email":        user["email"],
-            "display_name": user["display_name"],
-            "roles":        roles,
-            "permissions":  permissions,
-        },
-    })
+    except oracledb.DatabaseError as e:
+        logger.exception("Database-feil i login")
+        return _resp(ctx, {"ok": False, "error": "Databasefeil", "detail": str(e)}, 500)
+    except Exception as e:
+        logger.exception("Uventet feil i login")
+        return _resp(ctx, {"ok": False, "error": str(e), "type": type(e).__name__}, 500)
 
 
 def _action_refresh(body: dict, ctx) -> fdk.response.Response:
-    refresh_token = body.get("refresh_token", "").strip()
-    if not refresh_token:
-        return _resp(ctx, {"ok": False, "error": "Mangler refresh_token"}, 400)
+    try:
+        refresh_token = body.get("refresh_token", "").strip()
+        if not refresh_token:
+            return _resp(ctx, {"ok": False, "error": "Mangler refresh_token"}, 400)
 
-    with _get_pool().acquire() as conn:
-        stored = _get_refresh_token(conn, refresh_token)
+        with _get_pool().acquire() as conn:
+            stored = _get_refresh_token(conn, refresh_token)
 
-        if not stored or stored["revoked"]:
-            return _resp(ctx, {"ok": False, "error": "Ugyldig refresh token"}, 401)
+            if not stored or stored["revoked"]:
+                return _resp(ctx, {"ok": False, "error": "Ugyldig refresh token"}, 401)
 
-        if stored["expires_at"].replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
-            return _resp(ctx, {"ok": False, "error": "Refresh token utløpt"}, 401)
+            if stored["expires_at"].replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+                return _resp(ctx, {"ok": False, "error": "Refresh token utløpt"}, 401)
 
-        # Rotation – invalider gammelt token
-        _revoke_refresh_token(conn, refresh_token)
+            _revoke_refresh_token(conn, refresh_token)
 
-        user = _get_user_by_id(conn, stored["user_id"])
-        if not user or not user["active"]:
-            return _resp(ctx, {"ok": False, "error": "Bruker ikke funnet eller deaktivert"}, 401)
+            user = _get_user_by_id(conn, stored["user_id"])
+            if not user or not user["active"]:
+                return _resp(ctx, {"ok": False, "error": "Bruker ikke funnet eller deaktivert"}, 401)
 
-        roles, permissions = _get_user_roles_permissions(conn, user["id"])
-        user["roles"]       = roles
-        user["permissions"] = permissions
+            roles, permissions = _get_user_roles_permissions(conn, user["id"])
+            user["roles"]       = roles
+            user["permissions"] = permissions
 
-        new_access_token  = _make_access_token(user)
-        new_refresh_token = secrets.token_hex(32)
+            new_access_token  = _make_access_token(user)
+            new_refresh_token = secrets.token_hex(32)
 
-        headers = dict(ctx.Headers())
-        device_hint = headers.get("user-agent", "")[:255]
-        _store_refresh_token(conn, user["id"], new_refresh_token, device_hint)
+            headers     = dict(ctx.Headers())
+            user_agent  = headers.get("user-agent", "")
+            if isinstance(user_agent, list):
+                user_agent = user_agent[0] if user_agent else ""
+            device_hint = user_agent[:255]
+            _store_refresh_token(conn, user["id"], new_refresh_token, device_hint)
 
-    return _resp(ctx, {
-        "ok":            True,
-        "access_token":  new_access_token,
-        "refresh_token": new_refresh_token,
-    })
+        return _resp(ctx, {
+            "ok":            True,
+            "access_token":  new_access_token,
+            "refresh_token": new_refresh_token,
+        })
+
+    except oracledb.DatabaseError as e:
+        logger.exception("Database-feil i refresh")
+        return _resp(ctx, {"ok": False, "error": "Databasefeil", "detail": str(e)}, 500)
+    except Exception as e:
+        logger.exception("Uventet feil i refresh")
+        return _resp(ctx, {"ok": False, "error": str(e), "type": type(e).__name__}, 500)
 
 
 def _action_logout(body: dict, ctx) -> fdk.response.Response:
-    refresh_token = body.get("refresh_token", "").strip()
-    if not refresh_token:
-        return _resp(ctx, {"ok": True})  # allerede logget ut
+    try:
+        refresh_token = body.get("refresh_token", "").strip()
+        if not refresh_token:
+            return _resp(ctx, {"ok": True})
 
-    with _get_pool().acquire() as conn:
-        _revoke_refresh_token(conn, refresh_token)
+        with _get_pool().acquire() as conn:
+            _revoke_refresh_token(conn, refresh_token)
 
-    return _resp(ctx, {"ok": True})
+        return _resp(ctx, {"ok": True})
+
+    except Exception as e:
+        logger.exception("Feil i logout")
+        return _resp(ctx, {"ok": False, "error": str(e)}, 500)
 
 
 def _action_forgot_password(body: dict, ctx) -> fdk.response.Response:
-    email = body.get("email", "").strip().lower()
-    if not email:
-        return _resp(ctx, {"ok": False, "error": "Mangler e-post"}, 400)
+    try:
+        email = body.get("email", "").strip().lower()
+        if not email:
+            return _resp(ctx, {"ok": False, "error": "Mangler e-post"}, 400)
 
-    with _get_pool().acquire() as conn:
-        user = _get_user_by_email(conn, email)
-        if user and user["active"]:
-            reset_token = secrets.token_hex(32)
-            expires = datetime.now(timezone.utc) + timedelta(minutes=RESET_EXPIRY_MINUTES)
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    INSERT INTO qc_password_resets (token, user_id, expires_at)
-                    VALUES (:token, HEXTORAW(:uid), :expires)
-                    """,
-                    token=reset_token,
-                    uid=user["id"],
-                    expires=expires,
-                )
-            conn.commit()
-            try:
-                _send_reset_email(email, reset_token)
-            except Exception:
-                logger.exception("Feil ved sending av reset-epost")
+        with _get_pool().acquire() as conn:
+            user = _get_user_by_email(conn, email)
+            if user and user["active"]:
+                reset_token = secrets.token_hex(32)
+                expires     = datetime.now(timezone.utc) + timedelta(minutes=RESET_EXPIRY_MINUTES)
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        INSERT INTO qc_password_resets (token, user_id, expires_at)
+                        VALUES (:token, :user_id, :expires)
+                        """,
+                        token=reset_token,
+                        user_id=user["id"],
+                        expires=expires,
+                    )
+                conn.commit()
+                try:
+                    _send_reset_email(email, reset_token)
+                except Exception:
+                    logger.exception("Feil ved sending av reset-epost")
 
-    # Returner alltid OK for å ikke lekke om e-post finnes
-    return _resp(ctx, {"ok": True, "message": "Hvis e-postadressen finnes vil du motta en lenke"})
+        return _resp(ctx, {"ok": True, "message": "Hvis e-postadressen finnes vil du motta en lenke"})
+
+    except oracledb.DatabaseError as e:
+        logger.exception("Database-feil i forgot-password")
+        return _resp(ctx, {"ok": False, "error": "Databasefeil", "detail": str(e)}, 500)
+    except Exception as e:
+        logger.exception("Uventet feil i forgot-password")
+        return _resp(ctx, {"ok": False, "error": str(e), "type": type(e).__name__}, 500)
 
 
 def _action_reset_password(body: dict, ctx) -> fdk.response.Response:
-    token        = body.get("token", "").strip()
-    new_password = body.get("password", "")
+    try:
+        token        = body.get("token", "").strip()
+        new_password = body.get("password", "")
 
-    if not token or not new_password:
-        return _resp(ctx, {"ok": False, "error": "Mangler token eller passord"}, 400)
+        if not token or not new_password:
+            return _resp(ctx, {"ok": False, "error": "Mangler token eller passord"}, 400)
 
-    if len(new_password) < 8:
-        return _resp(ctx, {"ok": False, "error": "Passordet må være minst 8 tegn"}, 400)
+        if len(new_password) < 8:
+            return _resp(ctx, {"ok": False, "error": "Passordet må være minst 8 tegn"}, 400)
 
-    with _get_pool().acquire() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT user_id, expires_at, used
-                FROM qc_password_resets
-                WHERE token = :token
-                """,
-                token=token,
-            )
-            row = cur.fetchone()
+        with _get_pool().acquire() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT user_id, expires_at, used
+                    FROM qc_password_resets
+                    WHERE token = :token
+                    """,
+                    token=token,
+                )
+                row = cur.fetchone()
 
-        if not row:
-            return _resp(ctx, {"ok": False, "error": "Ugyldig token"}, 400)
+            if not row:
+                return _resp(ctx, {"ok": False, "error": "Ugyldig token"}, 400)
 
-        user_id_raw, expires_at, used = row
-        if used:
-            return _resp(ctx, {"ok": False, "error": "Token allerede brukt"}, 400)
+            user_id, expires_at, used = row
+            if used:
+                return _resp(ctx, {"ok": False, "error": "Token allerede brukt"}, 400)
 
-        if expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
-            return _resp(ctx, {"ok": False, "error": "Token utløpt"}, 400)
+            if expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+                return _resp(ctx, {"ok": False, "error": "Token utløpt"}, 400)
 
-        pw_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
-        user_id_hex = user_id_raw.hex()
+            pw_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
 
-        with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE qc_users SET pw_hash = :hash WHERE id = HEXTORAW(:uid)",
-                hash=pw_hash,
-                uid=user_id_hex,
-            )
-            cur.execute(
-                "UPDATE qc_password_resets SET used = 1 WHERE token = :token",
-                token=token,
-            )
-        conn.commit()
-        _revoke_all_user_tokens(conn, user_id_hex)
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE qc_users SET pw_hash = :hash WHERE id = :user_id",
+                    hash=pw_hash,
+                    user_id=user_id,
+                )
+                cur.execute(
+                    "UPDATE qc_password_resets SET used = 1 WHERE token = :token",
+                    token=token,
+                )
+            conn.commit()
+            _revoke_all_user_tokens(conn, user_id)
 
-    return _resp(ctx, {"ok": True, "message": "Passord oppdatert"})
+        return _resp(ctx, {"ok": True, "message": "Passord oppdatert"})
+
+    except oracledb.DatabaseError as e:
+        logger.exception("Database-feil i reset-password")
+        return _resp(ctx, {"ok": False, "error": "Databasefeil", "detail": str(e)}, 500)
+    except Exception as e:
+        logger.exception("Uventet feil i reset-password")
+        return _resp(ctx, {"ok": False, "error": str(e), "type": type(e).__name__}, 500)
 
 
 def _action_me_get(ctx) -> fdk.response.Response:
-    auth = _get_auth_header(ctx)
-    if not auth.startswith("Bearer "):
-        return _resp(ctx, {"ok": False, "error": "Ikke autentisert"}, 401)
     try:
-        payload = _verify_access_token(auth.removeprefix("Bearer ").strip())
-    except Exception:
-        return _resp(ctx, {"ok": False, "error": "Ugyldig token"}, 401)
+        auth = _get_auth_header(ctx)
+        if not auth.startswith("Bearer "):
+            return _resp(ctx, {"ok": False, "error": "Ikke autentisert"}, 401)
+        try:
+            payload = _verify_access_token(auth.removeprefix("Bearer ").strip())
+        except jwt.ExpiredSignatureError:
+            return _resp(ctx, {"ok": False, "error": "Token utløpt"}, 401)
+        except Exception:
+            return _resp(ctx, {"ok": False, "error": "Ugyldig token"}, 401)
 
-    return _resp(ctx, {
-        "ok":   True,
-        "user": {
-            "email":        payload["email"],
-            "display_name": payload["name"],
-            "roles":        payload["roles"],
-            "permissions":  payload["permissions"],
-        },
-    })
+        return _resp(ctx, {
+            "ok":   True,
+            "user": {
+                "email":        payload["email"],
+                "display_name": payload["name"],
+                "roles":        payload["roles"],
+                "permissions":  payload["permissions"],
+            },
+        })
+    except Exception as e:
+        logger.exception("Uventet feil i me-get")
+        return _resp(ctx, {"ok": False, "error": str(e)}, 500)
 
 
 def _action_me_put(body: dict, ctx) -> fdk.response.Response:
-    auth = _get_auth_header(ctx)
-    if not auth.startswith("Bearer "):
-        return _resp(ctx, {"ok": False, "error": "Ikke autentisert"}, 401)
     try:
-        payload = _verify_access_token(auth.removeprefix("Bearer ").strip())
-    except Exception:
-        return _resp(ctx, {"ok": False, "error": "Ugyldig token"}, 401)
+        auth = _get_auth_header(ctx)
+        if not auth.startswith("Bearer "):
+            return _resp(ctx, {"ok": False, "error": "Ikke autentisert"}, 401)
+        try:
+            payload = _verify_access_token(auth.removeprefix("Bearer ").strip())
+        except jwt.ExpiredSignatureError:
+            return _resp(ctx, {"ok": False, "error": "Token utløpt"}, 401)
+        except Exception:
+            return _resp(ctx, {"ok": False, "error": "Ugyldig token"}, 401)
 
-    old_password = body.get("old_password", "")
-    new_password = body.get("new_password", "")
+        old_password = body.get("old_password", "")
+        new_password = body.get("new_password", "")
 
-    if not old_password or not new_password:
-        return _resp(ctx, {"ok": False, "error": "Mangler gammelt eller nytt passord"}, 400)
+        if not old_password or not new_password:
+            return _resp(ctx, {"ok": False, "error": "Mangler gammelt eller nytt passord"}, 400)
 
-    if len(new_password) < 8:
-        return _resp(ctx, {"ok": False, "error": "Passordet må være minst 8 tegn"}, 400)
+        if len(new_password) < 8:
+            return _resp(ctx, {"ok": False, "error": "Passordet må være minst 8 tegn"}, 400)
 
-    with _get_pool().acquire() as conn:
-        user = _get_user_by_email(conn, payload["email"])
-        if not user:
-            return _resp(ctx, {"ok": False, "error": "Bruker ikke funnet"}, 404)
+        with _get_pool().acquire() as conn:
+            user = _get_user_by_email(conn, payload["email"])
+            if not user:
+                return _resp(ctx, {"ok": False, "error": "Bruker ikke funnet"}, 404)
 
-        pw_hash = user["pw_hash"]
-        if isinstance(pw_hash, oracledb.LOB):
-            pw_hash = pw_hash.read()
-        if isinstance(pw_hash, str):
-            pw_hash = pw_hash.encode()
+            pw_hash = user["pw_hash"]
+            if isinstance(pw_hash, oracledb.LOB):
+                pw_hash = pw_hash.read()
+            if isinstance(pw_hash, str):
+                pw_hash = pw_hash.encode()
 
-        if not bcrypt.checkpw(old_password.encode(), pw_hash):
-            return _resp(ctx, {"ok": False, "error": "Feil gammelt passord"}, 401)
+            if not bcrypt.checkpw(old_password.encode(), pw_hash):
+                return _resp(ctx, {"ok": False, "error": "Feil gammelt passord"}, 401)
 
-        new_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
-        with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE qc_users SET pw_hash = :hash WHERE id = HEXTORAW(:uid)",
-                hash=new_hash,
-                uid=user["id"],
-            )
-        conn.commit()
+            new_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE qc_users SET pw_hash = :hash WHERE id = :user_id",
+                    hash=new_hash,
+                    user_id=user["id"],
+                )
+            conn.commit()
 
-    return _resp(ctx, {"ok": True, "message": "Passord oppdatert"})
+        return _resp(ctx, {"ok": True, "message": "Passord oppdatert"})
+
+    except oracledb.DatabaseError as e:
+        logger.exception("Database-feil i me-put")
+        return _resp(ctx, {"ok": False, "error": "Databasefeil", "detail": str(e)}, 500)
+    except Exception as e:
+        logger.exception("Uventet feil i me-put")
+        return _resp(ctx, {"ok": False, "error": str(e), "type": type(e).__name__}, 500)
 
 
 # ── Function handler ───────────────────────────────────────────
 
 def handler(ctx, data: io.BytesIO = None):
-    headers = dict(ctx.Headers())
-    action  = headers.get("x-auth-action", headers.get("X-Auth-Action", ""))
-    method  = headers.get("fn-http-method", headers.get("Fn-Http-Method", "GET")).upper()
-
     try:
-        body = json.loads(data.getvalue()) if data and data.getvalue() else {}
-    except Exception:
-        return _resp(ctx, {"ok": False, "error": "Ugyldig JSON"}, 400)
+        headers = dict(ctx.Headers())
+        url     = headers.get("fn-http-request-url", headers.get("Fn-Http-Request-Url", ""))
+        method  = headers.get("fn-http-method", headers.get("Fn-Http-Method", "GET")).upper()
 
-    if action == "login":
-        return _action_login(body, ctx)
-    elif action == "refresh":
-        return _action_refresh(body, ctx)
-    elif action == "logout":
-        return _action_logout(body, ctx)
-    elif action == "forgot-password":
-        return _action_forgot_password(body, ctx)
-    elif action == "reset-password":
-        return _action_reset_password(body, ctx)
-    elif not action:  # /v1/me
-        if method == "GET":
-            return _action_me_get(ctx)
-        elif method == "PUT":
-            return _action_me_put(body, ctx)
+        logger.info("URL: %s, Method: %s", url, method)
 
-    return _resp(ctx, {"ok": False, "error": "Ukjent action"}, 400)
+        action = ""
+        if "/auth/login" in url:
+            action = "login"
+        elif "/auth/refresh" in url:
+            action = "refresh"
+        elif "/auth/logout" in url:
+            action = "logout"
+        elif "/auth/forgot-password" in url:
+            action = "forgot-password"
+        elif "/auth/reset-password" in url:
+            action = "reset-password"
+
+        try:
+            body = json.loads(data.getvalue()) if data and data.getvalue() else {}
+        except Exception:
+            return _resp(ctx, {"ok": False, "error": "Ugyldig JSON"}, 400)
+
+        if action == "login":
+            return _action_login(body, ctx)
+        elif action == "refresh":
+            return _action_refresh(body, ctx)
+        elif action == "logout":
+            return _action_logout(body, ctx)
+        elif action == "forgot-password":
+            return _action_forgot_password(body, ctx)
+        elif action == "reset-password":
+            return _action_reset_password(body, ctx)
+        else:
+            if method == "GET":
+                return _action_me_get(ctx)
+            elif method == "PUT":
+                return _action_me_put(body, ctx)
+
+        return _resp(ctx, {"ok": False, "error": "Ukjent endepunkt"}, 400)
+
+    except Exception as e:
+        logger.exception("Ubehandlet feil i handler")
+        return _resp(ctx, {"ok": False, "error": str(e), "type": type(e).__name__}, 500)
 
 
 def _resp(ctx, data: dict, status: int = 200) -> fdk.response.Response:

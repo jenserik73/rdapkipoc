@@ -8,4 +8,4 @@ WORKDIR /function
 COPY --from=build-stage /python /python
 COPY func.py .
 ENV PYTHONPATH=/python
-CMD ["func.py"]
+ENTRYPOINT ["/python/bin/fdk", "/function/func.py", "handler"]

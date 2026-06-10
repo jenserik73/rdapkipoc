@@ -21,3 +21,9 @@ terraform import oci_vault_secret.rdapkipocdb_wallet_password <OCID>
 
 ## Find the current ip address of the codespace instance
 curl -s https://api.ipify.org
+
+## Rydd opp codespace slik at vi ikke går tom for diskplass
+Clear package cache: sudo apt-get clean
+Purge Python pip cache: pip cache purge
+Prune hidden Docker data: docker system prune -f
+Remove unused Docker volumes: docker volume prune -f

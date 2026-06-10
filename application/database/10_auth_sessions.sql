@@ -1,6 +1,6 @@
 CREATE TABLE qc_refresh_tokens (
     token        VARCHAR2(64)  NOT NULL,
-    user_id      RAW(16)       NOT NULL,
+    user_id      VARCHAR2(32)  NOT NULL,
     device_hint  VARCHAR2(255),
     created_at   TIMESTAMP     DEFAULT SYSTIMESTAMP NOT NULL,
     expires_at   TIMESTAMP     NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE qc_refresh_tokens (
 
 CREATE TABLE qc_password_resets (
     token      VARCHAR2(64)  NOT NULL,
-    user_id    RAW(16)       NOT NULL,
+    user_id    VARCHAR2(32)  NOT NULL,
     created_at TIMESTAMP     DEFAULT SYSTIMESTAMP NOT NULL,
     expires_at TIMESTAMP     NOT NULL,
     used       NUMBER(1)     DEFAULT 0 NOT NULL,
