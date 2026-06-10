@@ -56,3 +56,42 @@ resource "oci_vault_secret" "rdapkipocdb_password" {
     content      = base64encode(var.RDAPKIPOCDB_PASSWORD)
   }
 }
+
+resource "oci_vault_secret" "querychat_jwt_secret" {
+  compartment_id = local.compartment_id
+  description    = "Secret for signing JWT access tokens in QueryChat"
+  key_id         = oci_kms_key.rdap_chatbot_master_encryption_key.id
+  secret_name    = "querychat-jwt-secret"
+  vault_id       = oci_kms_vault.rdap_chatbot_vault.id
+
+  secret_content {
+    content_type = "BASE64"
+    content      = base64encode(var.QUERYCHAT_JWT_SECRET)
+  }
+}
+
+resource "oci_vault_secret" "querychat_refresh_secret" {
+  compartment_id = local.compartment_id
+  description    = "Secret for signing refresh tokens in QueryChat"
+  key_id         = oci_kms_key.rdap_chatbot_master_encryption_key.id
+  secret_name    = "querychat-refresh-secret"
+  vault_id       = oci_kms_vault.rdap_chatbot_vault.id
+
+  secret_content {
+    content_type = "BASE64"
+    content      = base64encode(var.QUERYCHAT_REFRESH_SECRET)
+  }
+}
+
+resource "oci_vault_secret" "querychat_smtp_password" {
+  compartment_id = local.compartment_id
+  description    = "SMTP password for OCI Email Delivery used by QueryChat auth"
+  key_id         = oci_kms_key.rdap_chatbot_master_encryption_key.id
+  secret_name    = "querychat-smtp-password"
+  vault_id       = oci_kms_vault.rdap_chatbot_vault.id
+
+  secret_content {
+    content_type = "BASE64"
+    content      = base64encode(var.QUERYCHAT_SMTP_PASSWORD)
+  }
+}

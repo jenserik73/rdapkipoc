@@ -71,6 +71,24 @@ variable "RDAPKIPOCDB_WALLET_PASSWORD" {
   sensitive   = true
 }
 
+variable "QUERYCHAT_JWT_SECRET" {
+  description = "Secret for signing JWT access tokens"
+  type        = string
+  sensitive   = true
+}
+
+variable "QUERYCHAT_REFRESH_SECRET" {
+  description = "Secret for signing refresh tokens"
+  type        = string
+  sensitive   = true
+}
+
+variable "QUERYCHAT_SMTP_PASSWORD" {
+  description = "SMTP password for OCI Email Delivery"
+  type        = string
+  sensitive   = true
+}
+
 # ── Compute ───────────────────────────────────────────────────────────────────
 
 # ── Outputs ───────────────────────────────────────────────────────────────────
