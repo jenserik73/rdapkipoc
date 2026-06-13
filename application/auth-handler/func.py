@@ -11,6 +11,7 @@ Håndterer alle autentiserings-endepunkter for QueryChat:
   - PUT  /v1/me/password
 
 Ruting skjer via URL-path fra Fn-Http-Request-Url header.
+Sett LOG_LEVEL=DEBUG i miljøvariabler for detaljert logging.
 """
 
 import base64
@@ -23,6 +24,7 @@ import smtplib
 import zipfile
 from datetime import datetime, timedelta, timezone
 from email.mime.text import MIMEText
+from typing import Optional
 
 import bcrypt
 import fdk.response
@@ -30,17 +32,19 @@ import jwt
 import oci
 import oracledb
 
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(level=getattr(logging, LOG_LEVEL, logging.INFO))
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
-# ── konfigurasjon ──────────────────────────────────────────────
+# ── Konfigurasjon ──────────────────────────────────────────────
 
 def _require_env(name: str) -> str:
     val = os.getenv(name)
     if not val:
         raise EnvironmentError(f"Mangler påkrevd miljøvariabel: {name}")
     return val
+
 
 DB_USER                   = _require_env("DB_USER")
 DB_DSN                    = _require_env("DB_DSN")
@@ -60,17 +64,16 @@ JWT_EXPIRY_SECONDS   = 15 * 60
 REFRESH_EXPIRY_DAYS  = 30
 RESET_EXPIRY_MINUTES = 60
 
-_secrets_client = None
-_pool           = None
-_wallet_dir     = "/tmp/wallet"
-_jwt_secret     = None
-_refresh_secret = None
-_smtp_password  = None
+_secrets_client: Optional[oci.secrets.SecretsClient] = None
+_pool: Optional[oracledb.ConnectionPool] = None
+_wallet_dir    = "/tmp/wallet"
+_jwt_secret:   Optional[str] = None
+_smtp_password: Optional[str] = None
 
 
 # ── Vault ──────────────────────────────────────────────────────
 
-def _get_secrets_client():
+def _get_secrets_client() -> oci.secrets.SecretsClient:
     global _secrets_client
     if _secrets_client is None:
         signer = oci.auth.signers.get_resource_principals_signer()
@@ -90,13 +93,6 @@ def _get_jwt_secret() -> str:
     return _jwt_secret
 
 
-def _get_refresh_secret() -> str:
-    global _refresh_secret
-    if _refresh_secret is None:
-        _refresh_secret = _get_secret(REFRESH_SECRET_OCID).decode().strip()
-    return _refresh_secret
-
-
 def _get_smtp_password() -> str:
     global _smtp_password
     if _smtp_password is None:
@@ -106,7 +102,7 @@ def _get_smtp_password() -> str:
 
 # ── Database ───────────────────────────────────────────────────
 
-def _init_pool():
+def _init_pool() -> oracledb.ConnectionPool:
     logger.info("Initialiserer connection pool")
     db_password     = _get_secret(DBPASS_SECRET_OCID).decode().strip()
     wallet_password = _get_secret(WALLETPASS_SECRET_OCID).decode().strip()
@@ -127,14 +123,14 @@ def _init_pool():
     )
 
 
-def _get_pool():
+def _get_pool() -> oracledb.ConnectionPool:
     global _pool
     if _pool is None:
         _pool = _init_pool()
     return _pool
 
 
-# ── JWT-helpers ────────────────────────────────────────────────
+# ── JWT ────────────────────────────────────────────────────────
 
 def _make_access_token(user: dict) -> str:
     now = datetime.now(timezone.utc)
@@ -161,15 +157,11 @@ def _get_auth_header(ctx) -> str:
 
 # ── DB-operasjoner ─────────────────────────────────────────────
 
-def _get_user_by_email(conn, email: str) -> dict | None:
-    logger.info("Henter bruker: %s", email)
+def _get_user_by_email(conn: oracledb.Connection, email: str) -> Optional[dict]:
+    logger.debug("Henter bruker: %s", email)
     with conn.cursor() as cur:
         cur.execute(
-            """
-            SELECT id, email, display_name, pw_hash, active
-            FROM qc_users
-            WHERE email = :email
-            """,
+            "SELECT id, email, display_name, pw_hash, active FROM qc_users WHERE email = :email",
             email=email,
         )
         row = cur.fetchone()
@@ -184,8 +176,24 @@ def _get_user_by_email(conn, email: str) -> dict | None:
         }
 
 
-def _get_user_roles_permissions(conn, user_id: str) -> tuple[list, list]:
-    logger.info("Henter roller/rettigheter for: %s", user_id)
+def _get_user_by_id(conn: oracledb.Connection, user_id: str) -> Optional[dict]:
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT id, email, display_name, active FROM qc_users WHERE id = :user_id",
+            user_id=user_id,
+        )
+        row = cur.fetchone()
+        if not row:
+            return None
+        return {
+            "id":           row[0],
+            "email":        row[1],
+            "display_name": row[2],
+            "active":       row[3],
+        }
+
+
+def _get_user_roles_permissions(conn: oracledb.Connection, user_id: str) -> tuple:
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -210,11 +218,11 @@ def _get_user_roles_permissions(conn, user_id: str) -> tuple[list, list]:
         )
         permissions = [row[0] for row in cur.fetchall()]
 
-    logger.info("Roller: %s", roles)
+    logger.debug("Roller: %s", roles)
     return roles, permissions
 
 
-def _update_last_login(conn, user_id: str):
+def _update_last_login(conn: oracledb.Connection, user_id: str) -> None:
     with conn.cursor() as cur:
         cur.execute(
             "UPDATE qc_users SET last_login = SYSTIMESTAMP WHERE id = :user_id",
@@ -223,12 +231,13 @@ def _update_last_login(conn, user_id: str):
     conn.commit()
 
 
-def _store_refresh_token(conn, user_id: str, token: str, device_hint: str = None):
+def _store_refresh_token(
+    conn: oracledb.Connection,
+    user_id: str,
+    token: str,
+    device_hint: Optional[str] = None,
+) -> None:
     expires = datetime.now(timezone.utc) + timedelta(days=REFRESH_EXPIRY_DAYS)
-    logger.info("_store_refresh_token user_id type=%s value=%s", type(user_id), repr(user_id))
-    logger.info("_store_refresh_token token type=%s", type(token))
-    logger.info("_store_refresh_token hint type=%s value=%s", type(device_hint), repr(device_hint)[:50])
-    logger.info("_store_refresh_token expires type=%s value=%s", type(expires), repr(expires))
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -243,27 +252,19 @@ def _store_refresh_token(conn, user_id: str, token: str, device_hint: str = None
     conn.commit()
 
 
-def _get_refresh_token(conn, token: str) -> dict | None:
+def _get_refresh_token(conn: oracledb.Connection, token: str) -> Optional[dict]:
     with conn.cursor() as cur:
         cur.execute(
-            """
-            SELECT user_id, expires_at, revoked
-            FROM qc_refresh_tokens
-            WHERE token = :token
-            """,
+            "SELECT user_id, expires_at, revoked FROM qc_refresh_tokens WHERE token = :token",
             token=token,
         )
         row = cur.fetchone()
         if not row:
             return None
-        return {
-            "user_id":    row[0],
-            "expires_at": row[1],
-            "revoked":    row[2],
-        }
+        return {"user_id": row[0], "expires_at": row[1], "revoked": row[2]}
 
 
-def _revoke_refresh_token(conn, token: str):
+def _revoke_refresh_token(conn: oracledb.Connection, token: str) -> None:
     with conn.cursor() as cur:
         cur.execute(
             "UPDATE qc_refresh_tokens SET revoked = 1 WHERE token = :token",
@@ -272,7 +273,7 @@ def _revoke_refresh_token(conn, token: str):
     conn.commit()
 
 
-def _revoke_all_user_tokens(conn, user_id: str):
+def _revoke_all_user_tokens(conn: oracledb.Connection, user_id: str) -> None:
     with conn.cursor() as cur:
         cur.execute(
             "UPDATE qc_refresh_tokens SET revoked = 1 WHERE user_id = :user_id",
@@ -281,33 +282,14 @@ def _revoke_all_user_tokens(conn, user_id: str):
     conn.commit()
 
 
-def _get_user_by_id(conn, user_id: str) -> dict | None:
-    with conn.cursor() as cur:
-        cur.execute(
-            """
-            SELECT id, email, display_name, active
-            FROM qc_users WHERE id = :user_id
-            """,
-            user_id=user_id,
-        )
-        row = cur.fetchone()
-        if not row:
-            return None
-        return {
-            "id":           row[0],
-            "email":        row[1],
-            "display_name": row[2],
-            "active":       row[3],
-        }
+# ── E-post ─────────────────────────────────────────────────────
 
-
-# ── Email ──────────────────────────────────────────────────────
-
-def _send_reset_email(to_email: str, reset_token: str):
+def _send_reset_email(to_email: str, reset_token: str) -> None:
     reset_url = f"{FRONTEND_URL}/chat/#/reset?token={reset_token}"
     msg = MIMEText(
         f"Hei,\n\nDu har bedt om å tilbakestille passordet ditt for QueryChat.\n\n"
-        f"Klikk på lenken under for å sette nytt passord (gyldig i {RESET_EXPIRY_MINUTES} minutter):\n\n"
+        f"Klikk på lenken under for å sette nytt passord "
+        f"(gyldig i {RESET_EXPIRY_MINUTES} minutter):\n\n"
         f"{reset_url}\n\n"
         f"Hvis du ikke ba om dette kan du ignorere denne e-posten.\n\n"
         f"Hilsen QueryChat",
@@ -318,15 +300,24 @@ def _send_reset_email(to_email: str, reset_token: str):
     msg["From"]    = EMAIL_SENDER
     msg["To"]      = to_email
 
-    smtp_password = _get_smtp_password()
-    logger.info("Kobler til SMTP: %s:587", SMTP_HOST)
-    with smtplib.SMTP(SMTP_HOST, 587, timeout=30) as smtp:
+    logger.info("Sender e-post til: %s", to_email)
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as smtp:
         smtp.ehlo()
         smtp.starttls()
         smtp.ehlo()
-        smtp.login(SMTP_USER, smtp_password)
+        smtp.login(SMTP_USER, _get_smtp_password())
         smtp.sendmail(EMAIL_SENDER, to_email, msg.as_string())
-    logger.info("E-post sendt til: %s", to_email)
+    logger.info("E-post sendt")
+
+
+# ── Hjelpefunksjon for device hint ─────────────────────────────
+
+def _get_device_hint(ctx) -> str:
+    headers    = dict(ctx.Headers())
+    user_agent = headers.get("user-agent", "")
+    if isinstance(user_agent, list):
+        user_agent = user_agent[0] if user_agent else ""
+    return user_agent[:255]
 
 
 # ── Action-handlers ────────────────────────────────────────────
@@ -340,14 +331,10 @@ def _action_login(body: dict, ctx) -> fdk.response.Response:
             return _resp(ctx, {"ok": False, "error": "Mangler e-post eller passord"}, 400)
 
         with _get_pool().acquire() as conn:
-            logger.info("STEG 1: Henter bruker")
             user = _get_user_by_email(conn, email)
-            logger.info("STEG 2: Bruker hentet: %s", user is not None)
-
             if not user or not user["active"]:
                 return _resp(ctx, {"ok": False, "error": "Ugyldig e-post eller passord"}, 401)
 
-            logger.info("STEG 3: Sjekker passord")
             pw_hash = user["pw_hash"]
             if isinstance(pw_hash, oracledb.LOB):
                 pw_hash = pw_hash.read()
@@ -357,35 +344,28 @@ def _action_login(body: dict, ctx) -> fdk.response.Response:
             if not bcrypt.checkpw(password.encode(), pw_hash):
                 return _resp(ctx, {"ok": False, "error": "Ugyldig e-post eller passord"}, 401)
 
-            logger.info("STEG 4: Henter roller")
             roles, permissions = _get_user_roles_permissions(conn, user["id"])
             user["roles"]       = roles
             user["permissions"] = permissions
-            logger.info("STEG 5: Lager tokens")
+
             access_token  = _make_access_token(user)
             refresh_token = secrets.token_hex(32)
 
-            logger.info("STEG 6: Lagrer refresh token")
-            headers     = dict(ctx.Headers())
-            user_agent  = headers.get("user-agent", "")
-            if isinstance(user_agent, list):
-                user_agent = user_agent[0] if user_agent else ""
-            device_hint = user_agent[:255]
-            _store_refresh_token(conn, user["id"], refresh_token, device_hint)
-            logger.info("STEG 7: Oppdaterer last_login")
+            _store_refresh_token(conn, user["id"], refresh_token, _get_device_hint(ctx))
             _update_last_login(conn, user["id"])
-            logger.info("STEG 8: Ferdig")
-            return _resp(ctx, {
-                "ok":            True,
-                "access_token":  access_token,
-                "refresh_token": refresh_token,
-                "user": {
-                    "email":        user["email"],
-                    "display_name": user["display_name"],
-                    "roles":        roles,
-                    "permissions":  permissions,
-                },
-            })
+            logger.info("Login vellykket: %s", email)
+
+        return _resp(ctx, {
+            "ok":            True,
+            "access_token":  access_token,
+            "refresh_token": refresh_token,
+            "user": {
+                "email":        user["email"],
+                "display_name": user["display_name"],
+                "roles":        roles,
+                "permissions":  permissions,
+            },
+        })
 
     except oracledb.DatabaseError as e:
         logger.exception("Database-feil i login")
@@ -403,7 +383,6 @@ def _action_refresh(body: dict, ctx) -> fdk.response.Response:
 
         with _get_pool().acquire() as conn:
             stored = _get_refresh_token(conn, refresh_token)
-
             if not stored or stored["revoked"]:
                 return _resp(ctx, {"ok": False, "error": "Ugyldig refresh token"}, 401)
 
@@ -423,12 +402,8 @@ def _action_refresh(body: dict, ctx) -> fdk.response.Response:
             new_access_token  = _make_access_token(user)
             new_refresh_token = secrets.token_hex(32)
 
-            headers     = dict(ctx.Headers())
-            user_agent  = headers.get("user-agent", "")
-            if isinstance(user_agent, list):
-                user_agent = user_agent[0] if user_agent else ""
-            device_hint = user_agent[:255]
-            _store_refresh_token(conn, user["id"], new_refresh_token, device_hint)
+            _store_refresh_token(conn, user["id"], new_refresh_token, _get_device_hint(ctx))
+            logger.info("Token refreshet: %s", user["email"])
 
         return _resp(ctx, {
             "ok":            True,
@@ -447,14 +422,10 @@ def _action_refresh(body: dict, ctx) -> fdk.response.Response:
 def _action_logout(body: dict, ctx) -> fdk.response.Response:
     try:
         refresh_token = body.get("refresh_token", "").strip()
-        if not refresh_token:
-            return _resp(ctx, {"ok": True})
-
-        with _get_pool().acquire() as conn:
-            _revoke_refresh_token(conn, refresh_token)
-
+        if refresh_token:
+            with _get_pool().acquire() as conn:
+                _revoke_refresh_token(conn, refresh_token)
         return _resp(ctx, {"ok": True})
-
     except Exception as e:
         logger.exception("Feil i logout")
         return _resp(ctx, {"ok": False, "error": str(e)}, 500)
@@ -504,18 +475,13 @@ def _action_reset_password(body: dict, ctx) -> fdk.response.Response:
 
         if not token or not new_password:
             return _resp(ctx, {"ok": False, "error": "Mangler token eller passord"}, 400)
-
         if len(new_password) < 8:
             return _resp(ctx, {"ok": False, "error": "Passordet må være minst 8 tegn"}, 400)
 
         with _get_pool().acquire() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    """
-                    SELECT user_id, expires_at, used
-                    FROM qc_password_resets
-                    WHERE token = :token
-                    """,
+                    "SELECT user_id, expires_at, used FROM qc_password_resets WHERE token = :token",
                     token=token,
                 )
                 row = cur.fetchone()
@@ -526,12 +492,10 @@ def _action_reset_password(body: dict, ctx) -> fdk.response.Response:
             user_id, expires_at, used = row
             if used:
                 return _resp(ctx, {"ok": False, "error": "Token allerede brukt"}, 400)
-
             if expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
                 return _resp(ctx, {"ok": False, "error": "Token utløpt"}, 400)
 
             pw_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
-
             with conn.cursor() as cur:
                 cur.execute(
                     "UPDATE qc_users SET pw_hash = :hash WHERE id = :user_id",
@@ -544,6 +508,7 @@ def _action_reset_password(body: dict, ctx) -> fdk.response.Response:
                 )
             conn.commit()
             _revoke_all_user_tokens(conn, user_id)
+            logger.info("Passord tilbakestilt for user_id: %s", user_id)
 
         return _resp(ctx, {"ok": True, "message": "Passord oppdatert"})
 
@@ -598,7 +563,6 @@ def _action_me_put(body: dict, ctx) -> fdk.response.Response:
 
         if not old_password or not new_password:
             return _resp(ctx, {"ok": False, "error": "Mangler gammelt eller nytt passord"}, 400)
-
         if len(new_password) < 8:
             return _resp(ctx, {"ok": False, "error": "Passordet må være minst 8 tegn"}, 400)
 
@@ -624,6 +588,7 @@ def _action_me_put(body: dict, ctx) -> fdk.response.Response:
                     user_id=user["id"],
                 )
             conn.commit()
+            logger.info("Passord endret for: %s", payload["email"])
 
         return _resp(ctx, {"ok": True, "message": "Passord oppdatert"})
 
@@ -643,7 +608,7 @@ def handler(ctx, data: io.BytesIO = None):
         url     = headers.get("fn-http-request-url", headers.get("Fn-Http-Request-Url", ""))
         method  = headers.get("fn-http-method", headers.get("Fn-Http-Method", "GET")).upper()
 
-        logger.info("URL: %s, Method: %s", url, method)
+        logger.debug("URL: %s, Method: %s", url, method)
 
         action = ""
         if "/auth/login" in url:
@@ -672,11 +637,10 @@ def handler(ctx, data: io.BytesIO = None):
             return _action_forgot_password(body, ctx)
         elif action == "reset-password":
             return _action_reset_password(body, ctx)
-        else:
-            if method == "GET":
-                return _action_me_get(ctx)
-            elif method == "PUT":
-                return _action_me_put(body, ctx)
+        elif method == "GET":
+            return _action_me_get(ctx)
+        elif method == "PUT":
+            return _action_me_put(body, ctx)
 
         return _resp(ctx, {"ok": False, "error": "Ukjent endepunkt"}, 400)
 
