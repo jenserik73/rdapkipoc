@@ -313,9 +313,9 @@
         <div id="messages">
           <div id="messages-inner">
             <div id="empty-state">
-              <div class="ql">⟩_</div>
+              <img src="/logo_emptystate.png" style="max-width:240px;width:100%" alt="QueryChat" />
               <h2>QueryChat</h2>
-              <p>Still spørsmål til databasen på naturlig norsk eller engelsk. Resultatene vises som tabell, tekst eller graf.</p>
+              <p>Hei! Hva kan jeg hjelpe deg med? Du kan stille spørsmål på naturlig norsk eller engelsk, og resultatene vises som tabell, tekst eller graf.</p>
               <div class="example-queries">
                 <button class="example-q" onclick="useExample(this)">Vis de 10 siste meldingene fra loggene</button>
                 <button class="example-q" onclick="useExample(this)">Hva er gjennomsnittlig responstid per tjeneste siste uke?</button>
@@ -883,7 +883,7 @@
     function renderMessages() {
       const el = document.getElementById('messages-inner'); el.innerHTML = '';
       const es = document.createElement('div'); es.id = 'empty-state'; es.style.display = currentSession && currentSession.messages.length ? 'none' : '';
-      es.innerHTML = `<div class="ql">⟩_</div><h2>QueryChat</h2><p>Still spørsmål til databasen på naturlig norsk eller engelsk.</p>`; el.appendChild(es);
+      es.innerHTML = `<img src="/logo_emptystate.png" style="max-width:240px;width:100%" alt="QueryChat" /><h2>QueryChat</h2><p>Hei! Hva kan jeg hjelpe deg med? Du kan stille spørsmål på naturlig norsk eller engelsk.</p>`; el.appendChild(es);
       if (currentSession) { currentSession.messages.forEach(m => { if (m.role === 'user') appendUserMessage(m, false); else appendAssistantMessage(m, false); }); }
       scrollToBottom();
     }
