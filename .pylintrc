@@ -2,7 +2,5 @@
 disable=
     broad-exception-caught,
     import-error,
-    invalid-name
-
-[FORMAT]
-module-rgx=[a-z_][a-z0-9_]*
+    invalid-name,
+    global-statement
