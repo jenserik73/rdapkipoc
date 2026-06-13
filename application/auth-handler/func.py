@@ -161,18 +161,22 @@ def _get_user_by_email(conn: oracledb.Connection, email: str) -> Optional[dict]:
     logger.debug("Henter bruker: %s", email)
     with conn.cursor() as cur:
         cur.execute(
-            "SELECT id, email, display_name, pw_hash, active FROM qc_users WHERE email = :email",
+            """
+            SELECT id, email, display_name, pw_hash, active, must_change_password
+            FROM qc_users WHERE email = :email
+            """,
             email=email,
         )
         row = cur.fetchone()
         if not row:
             return None
         return {
-            "id":           row[0],
-            "email":        row[1],
-            "display_name": row[2],
-            "pw_hash":      row[3],
-            "active":       row[4],
+            "id":                   row[0],
+            "email":                row[1],
+            "display_name":         row[2],
+            "pw_hash":              row[3],
+            "active":               row[4],
+            "must_change_password": bool(row[5]),
         }
 
 
@@ -356,9 +360,10 @@ def _action_login(body: dict, ctx) -> fdk.response.Response:
             logger.info("Login vellykket: %s", email)
 
         return _resp(ctx, {
-            "ok":            True,
-            "access_token":  access_token,
-            "refresh_token": refresh_token,
+            "ok":                   True,
+            "access_token":         access_token,
+            "refresh_token":        refresh_token,
+            "must_change_password": user["must_change_password"],
             "user": {
                 "email":        user["email"],
                 "display_name": user["display_name"],
@@ -498,7 +503,11 @@ def _action_reset_password(body: dict, ctx) -> fdk.response.Response:
             pw_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
             with conn.cursor() as cur:
                 cur.execute(
-                    "UPDATE qc_users SET pw_hash = :hash WHERE id = :user_id",
+                    """
+                    UPDATE qc_users
+                    SET pw_hash = :hash, must_change_password = 0
+                    WHERE id = :user_id
+                    """,
                     hash=pw_hash,
                     user_id=user_id,
                 )
@@ -583,7 +592,11 @@ def _action_me_put(body: dict, ctx) -> fdk.response.Response:
             new_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
             with conn.cursor() as cur:
                 cur.execute(
-                    "UPDATE qc_users SET pw_hash = :hash WHERE id = :user_id",
+                    """
+                    UPDATE qc_users
+                    SET pw_hash = :hash, must_change_password = 0
+                    WHERE id = :user_id
+                    """,
                     hash=new_hash,
                     user_id=user["id"],
                 )

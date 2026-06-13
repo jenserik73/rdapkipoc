@@ -26,7 +26,10 @@ import json
 import logging
 import os
 import secrets
+import smtplib
 import zipfile
+from email.mime.text import MIMEText
+from typing import Optional
 
 import bcrypt
 import fdk.response
@@ -39,7 +42,7 @@ logging.basicConfig(level=getattr(logging, LOG_LEVEL, logging.INFO))
 logger = logging.getLogger(__name__)
 
 
-# ── konfigurasjon ──────────────────────────────────────────────
+# ── Konfigurasjon ──────────────────────────────────────────────
 
 def _require_env(name: str) -> str:
     val = os.getenv(name)
@@ -47,22 +50,30 @@ def _require_env(name: str) -> str:
         raise EnvironmentError(f"Mangler påkrevd miljøvariabel: {name}")
     return val
 
-DB_USER                = _require_env("DB_USER")
-DB_DSN                 = _require_env("DB_DSN")
-WALLET_SECRET_OCID     = _require_env("WALLET_SECRET_OCID")
-DBPASS_SECRET_OCID     = _require_env("DBPASS_SECRET_OCID")
-WALLETPASS_SECRET_OCID = _require_env("WALLETPASS_SECRET_OCID")
-JWT_SECRET_OCID        = _require_env("JWT_SECRET_OCID")
 
-_secrets_client = None
-_pool           = None
-_wallet_dir     = "/tmp/wallet"
-_jwt_secret     = None
+DB_USER                   = _require_env("DB_USER")
+DB_DSN                    = _require_env("DB_DSN")
+WALLET_SECRET_OCID        = _require_env("WALLET_SECRET_OCID")
+DBPASS_SECRET_OCID        = _require_env("DBPASS_SECRET_OCID")
+WALLETPASS_SECRET_OCID    = _require_env("WALLETPASS_SECRET_OCID")
+JWT_SECRET_OCID           = _require_env("JWT_SECRET_OCID")
+SMTP_PASSWORD_SECRET_OCID = _require_env("SMTP_PASSWORD_SECRET_OCID")
+SMTP_HOST                 = _require_env("SMTP_HOST")
+SMTP_PORT                 = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER                 = _require_env("SMTP_USER")
+EMAIL_SENDER              = _require_env("EMAIL_SENDER")
+FRONTEND_URL              = _require_env("FRONTEND_URL")
+
+_secrets_client: Optional[oci.secrets.SecretsClient] = None
+_pool:           Optional[oracledb.ConnectionPool]   = None
+_wallet_dir    = "/tmp/wallet"
+_jwt_secret:    Optional[str] = None
+_smtp_password: Optional[str] = None
 
 
 # ── Vault ──────────────────────────────────────────────────────
 
-def _get_secrets_client():
+def _get_secrets_client() -> oci.secrets.SecretsClient:
     global _secrets_client
     if _secrets_client is None:
         signer = oci.auth.signers.get_resource_principals_signer()
@@ -82,15 +93,21 @@ def _get_jwt_secret() -> str:
     return _jwt_secret
 
 
+def _get_smtp_password() -> str:
+    global _smtp_password
+    if _smtp_password is None:
+        _smtp_password = _get_secret(SMTP_PASSWORD_SECRET_OCID).decode().strip()
+    return _smtp_password
+
+
 # ── Database ───────────────────────────────────────────────────
 
-def _init_pool():
+def _init_pool() -> oracledb.ConnectionPool:
     logger.info("Initialiserer connection pool")
     db_password     = _get_secret(DBPASS_SECRET_OCID).decode().strip()
     wallet_password = _get_secret(WALLETPASS_SECRET_OCID).decode().strip()
     wallet_zip      = _get_secret(WALLET_SECRET_OCID)
 
-    logger.debug("DB-passord lengde: %d", len(db_password))
     logger.debug("Wallet zip størrelse: %d bytes", len(wallet_zip))
 
     os.makedirs(_wallet_dir, exist_ok=True)
@@ -108,14 +125,14 @@ def _init_pool():
     )
 
 
-def _get_pool():
+def _get_pool() -> oracledb.ConnectionPool:
     global _pool
     if _pool is None:
         _pool = _init_pool()
     return _pool
 
 
-# ── JWT-validering ─────────────────────────────────────────────
+# ── JWT ────────────────────────────────────────────────────────
 
 def _verify_jwt(ctx) -> dict:
     headers = dict(ctx.Headers())
@@ -126,14 +143,14 @@ def _verify_jwt(ctx) -> dict:
     return jwt.decode(token, _get_jwt_secret(), algorithms=["HS256"])
 
 
-def _require_permission(payload: dict, permission: str):
+def _require_permission(payload: dict, permission: str) -> None:
     if permission not in payload.get("permissions", []):
         raise PermissionError(f"Mangler rettighet: {permission}")
 
 
 # ── Path-parsing ───────────────────────────────────────────────
 
-def _parse_path(ctx) -> list[str]:
+def _parse_path(ctx) -> list:
     headers = dict(ctx.Headers())
     url     = headers.get("fn-http-request-url", headers.get("Fn-Http-Request-Url", ""))
     path    = url.split("?")[0]
@@ -145,9 +162,37 @@ def _parse_path(ctx) -> list[str]:
         return []
 
 
+# ── E-post ─────────────────────────────────────────────────────
+
+def _send_welcome_email(to_email: str, display_name: str, password: str) -> None:
+    msg = MIMEText(
+        f"Hei {display_name},\n\n"
+        f"Du har fått tilgang til QueryChat.\n\n"
+        f"Logg inn på: {FRONTEND_URL}/chat/\n\n"
+        f"E-post:   {to_email}\n"
+        f"Passord:  {password}\n\n"
+        f"Du vil bli bedt om å bytte passord ved første innlogging.\n\n"
+        f"Hilsen QueryChat",
+        "plain",
+        "utf-8",
+    )
+    msg["Subject"] = "Velkommen til QueryChat"
+    msg["From"]    = EMAIL_SENDER
+    msg["To"]      = to_email
+
+    logger.info("Sender velkomst-e-post til: %s", to_email)
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=30) as smtp:
+        smtp.ehlo()
+        smtp.starttls()
+        smtp.ehlo()
+        smtp.login(SMTP_USER, _get_smtp_password())
+        smtp.sendmail(EMAIL_SENDER, to_email, msg.as_string())
+    logger.info("Velkomst-e-post sendt")
+
+
 # ── User handlers ──────────────────────────────────────────────
 
-def _get_user_roles(conn, user_id: str) -> list:
+def _get_user_roles(conn: oracledb.Connection, user_id: str) -> list:
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -163,7 +208,7 @@ def _get_user_roles(conn, user_id: str) -> list:
                 for row in cur.fetchall()]
 
 
-def _list_users(conn, ctx) -> fdk.response.Response:
+def _list_users(conn: oracledb.Connection, ctx) -> fdk.response.Response:
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -190,7 +235,7 @@ def _list_users(conn, ctx) -> fdk.response.Response:
     return _resp(ctx, {"ok": True, "users": users})
 
 
-def _get_user(conn, user_id: str, ctx) -> fdk.response.Response:
+def _get_user(conn: oracledb.Connection, user_id: str, ctx) -> fdk.response.Response:
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -216,10 +261,10 @@ def _get_user(conn, user_id: str, ctx) -> fdk.response.Response:
     return _resp(ctx, {"ok": True, "user": user})
 
 
-def _create_user(conn, body: dict, ctx) -> fdk.response.Response:
+def _create_user(conn: oracledb.Connection, body: dict, ctx) -> fdk.response.Response:
     email        = body.get("email", "").strip().lower()
     display_name = body.get("display_name", "").strip()
-    password     = body.get("password", secrets.token_hex(16))
+    password     = body.get("password") or secrets.token_hex(10)
 
     if not email or not display_name:
         return _resp(ctx, {"ok": False, "error": "Mangler e-post eller navn"}, 400)
@@ -231,8 +276,8 @@ def _create_user(conn, body: dict, ctx) -> fdk.response.Response:
         with conn.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO qc_users (id, email, display_name, pw_hash, active)
-                VALUES (:id, :email, :name, :hash, 1)
+                INSERT INTO qc_users (id, email, display_name, pw_hash, active, must_change_password)
+                VALUES (:id, :email, :name, :hash, 1, 1)
                 """,
                 id=new_id,
                 email=email,
@@ -244,10 +289,15 @@ def _create_user(conn, body: dict, ctx) -> fdk.response.Response:
     except oracledb.IntegrityError:
         return _resp(ctx, {"ok": False, "error": "E-postadressen er allerede i bruk"}, 409)
 
+    try:
+        _send_welcome_email(email, display_name, password)
+    except Exception:
+        logger.exception("Feil ved sending av velkomst-e-post til %s", email)
+
     return _resp(ctx, {"ok": True, "id": new_id}, 201)
 
 
-def _update_user(conn, user_id: str, body: dict, ctx) -> fdk.response.Response:
+def _update_user(conn: oracledb.Connection, user_id: str, body: dict, ctx) -> fdk.response.Response:
     display_name = body.get("display_name")
     active       = body.get("active")
 
@@ -275,7 +325,7 @@ def _update_user(conn, user_id: str, body: dict, ctx) -> fdk.response.Response:
     return _resp(ctx, {"ok": True})
 
 
-def _deactivate_user(conn, user_id: str, ctx) -> fdk.response.Response:
+def _deactivate_user(conn: oracledb.Connection, user_id: str, ctx) -> fdk.response.Response:
     with conn.cursor() as cur:
         cur.execute(
             "UPDATE qc_users SET active = 0 WHERE id = :user_id",
@@ -286,7 +336,7 @@ def _deactivate_user(conn, user_id: str, ctx) -> fdk.response.Response:
     return _resp(ctx, {"ok": True})
 
 
-def _add_user_role(conn, user_id: str, body: dict, granted_by: str, ctx) -> fdk.response.Response:
+def _add_user_role(conn: oracledb.Connection, user_id: str, body: dict, granted_by: str, ctx) -> fdk.response.Response:
     role_id = body.get("role_id", "").strip()
     if not role_id:
         return _resp(ctx, {"ok": False, "error": "Mangler role_id"}, 400)
@@ -310,7 +360,7 @@ def _add_user_role(conn, user_id: str, body: dict, granted_by: str, ctx) -> fdk.
     return _resp(ctx, {"ok": True})
 
 
-def _remove_user_role(conn, user_id: str, role_id: str, ctx) -> fdk.response.Response:
+def _remove_user_role(conn: oracledb.Connection, user_id: str, role_id: str, ctx) -> fdk.response.Response:
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -325,13 +375,17 @@ def _remove_user_role(conn, user_id: str, role_id: str, ctx) -> fdk.response.Res
     return _resp(ctx, {"ok": True})
 
 
-def _admin_reset_password(conn, user_id: str, body: dict, ctx) -> fdk.response.Response:
-    new_password = body.get("password", secrets.token_hex(12))
+def _admin_reset_password(conn: oracledb.Connection, user_id: str, body: dict, ctx) -> fdk.response.Response:
+    new_password = body.get("password") or secrets.token_hex(12)
     pw_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
 
     with conn.cursor() as cur:
         cur.execute(
-            "UPDATE qc_users SET pw_hash = :hash WHERE id = :user_id",
+            """
+            UPDATE qc_users
+            SET pw_hash = :hash, must_change_password = 1
+            WHERE id = :user_id
+            """,
             hash=pw_hash, user_id=user_id,
         )
         cur.execute(
@@ -340,12 +394,12 @@ def _admin_reset_password(conn, user_id: str, body: dict, ctx) -> fdk.response.R
         )
     conn.commit()
     logger.info("Passord tilbakestilt for bruker: %s", user_id)
-    return _resp(ctx, {"ok": True, "temporary_password": new_password})
+    return _resp(ctx, {"ok": True})
 
 
 # ── Role handlers ──────────────────────────────────────────────
 
-def _list_roles(conn, ctx) -> fdk.response.Response:
+def _list_roles(conn: oracledb.Connection, ctx) -> fdk.response.Response:
     with conn.cursor() as cur:
         cur.execute("SELECT id, name, description FROM qc_roles ORDER BY name")
         roles = [{"id": row[0], "name": row[1], "description": row[2]}
@@ -371,7 +425,7 @@ def _list_roles(conn, ctx) -> fdk.response.Response:
     return _resp(ctx, {"ok": True, "roles": roles})
 
 
-def _create_role(conn, body: dict, ctx) -> fdk.response.Response:
+def _create_role(conn: oracledb.Connection, body: dict, ctx) -> fdk.response.Response:
     name        = body.get("name", "").strip().lower()
     description = body.get("description", "")
 
@@ -399,7 +453,7 @@ def _create_role(conn, body: dict, ctx) -> fdk.response.Response:
     return _resp(ctx, {"ok": True, "id": new_id}, 201)
 
 
-def _update_role(conn, role_id: str, body: dict, ctx) -> fdk.response.Response:
+def _update_role(conn: oracledb.Connection, role_id: str, body: dict, ctx) -> fdk.response.Response:
     description = body.get("description")
     if description is None:
         return _resp(ctx, {"ok": False, "error": "Ingen felter å oppdatere"}, 400)
@@ -414,7 +468,7 @@ def _update_role(conn, role_id: str, body: dict, ctx) -> fdk.response.Response:
     return _resp(ctx, {"ok": True})
 
 
-def _delete_role(conn, role_id: str, ctx) -> fdk.response.Response:
+def _delete_role(conn: oracledb.Connection, role_id: str, ctx) -> fdk.response.Response:
     with conn.cursor() as cur:
         cur.execute("DELETE FROM qc_role_permissions WHERE role_id = :role_id", role_id=role_id)
         cur.execute("DELETE FROM qc_user_roles WHERE role_id = :role_id", role_id=role_id)
@@ -426,7 +480,7 @@ def _delete_role(conn, role_id: str, ctx) -> fdk.response.Response:
 
 # ── Function handler ───────────────────────────────────────────
 
-def handler(ctx, data: io.BytesIO = None):
+def handler(ctx, data: Optional[io.BytesIO] = None):
     try:
         payload = _verify_jwt(ctx)
     except PermissionError as e:

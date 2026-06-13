@@ -58,7 +58,7 @@ resource "oci_functions_function" "auth_handler" {
   memory_in_mbs      = "256"
   timeout_in_seconds = 60
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/auth-handler:latest"
-  image_digest = "sha256:1f5bbbf878cc5b2f771d7658559b72af2c05067936bbf50f268d2bdf3e67a092"
+  image_digest = "sha256:f4d78aa73245c66d01d2fb63ed965e2fc801fbca47dab395a6cf7390b86b9662"
   
   config = {
     DB_DSN                    = "rdapkipocdb_high"
@@ -75,8 +75,7 @@ resource "oci_functions_function" "auth_handler" {
     EMAIL_SENDER              = "noreply@elcarocloud.no"
     FRONTEND_URL              = "https://querychat.elcarocloud.no"
     LOG_LEVEL                 = "INFO"   # Sett til "DEBUG" ved feilsøking
-    SMTP_PORT                 = "465"
-    SMTP_HOST                 = "smtp.email.eu-frankfurt-2.oci.oraclecloud.eu"}
+  }
 }
 
 resource "oci_functions_function" "admin_handler" {
@@ -85,7 +84,7 @@ resource "oci_functions_function" "admin_handler" {
   memory_in_mbs      = "256"
   timeout_in_seconds = 60
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/admin-handler:latest"
-  image_digest       = "sha256:566ef245036cb00d35efe8f4207c576fbae391611b24c5a123ab2424dd136d7b"
+  image_digest       = "sha256:31ab23343d23f0447d880a9b2110678655608feb47403cdb8e9a078f52ed7eb9"
 
   config = {
     DB_DSN                 = "rdapkipocdb_high"
@@ -95,5 +94,11 @@ resource "oci_functions_function" "admin_handler" {
     WALLETPASS_SECRET_OCID = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yac4hzlxmaenlhwgv4lujti7jbtudp7xzexjgi6elqpmda"
     JWT_SECRET_OCID        = oci_vault_secret.querychat_jwt_secret.id
     LOG_LEVEL              = "INFO"   # Sett til "DEBUG" ved feilsøking
+    SMTP_PASSWORD_SECRET_OCID = oci_vault_secret.querychat_smtp_password.id
+    SMTP_HOST                 = "smtp.email.eu-frankfurt-2.oci.oraclecloud.eu"
+    SMTP_PORT                 = "587"
+    SMTP_USER                 = "ocid1.user.oc19..aaaaaaaawkogoic3q7guo4huvji3vb5kexemlqthtql3fcc3ickff73og4pq@ocid1.tenancy.oc19..aaaaaaaadu4nynpyltw2mbzb7qhmimjldhzpasq5vzffcv7mkw67vy5fnd3a.9k.com"
+    EMAIL_SENDER              = "noreply@elcarocloud.no"
+    FRONTEND_URL              = "https://querychat.elcarocloud.no"
   }
 }
