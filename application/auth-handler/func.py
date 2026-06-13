@@ -602,7 +602,7 @@ def _action_me_put(body: dict, ctx) -> fdk.response.Response:
 
 # ── Function handler ───────────────────────────────────────────
 
-def handler(ctx, data: io.BytesIO = None):
+def handler(ctx, data: Optional[io.BytesIO] = None):
     try:
         headers = dict(ctx.Headers())
         url     = headers.get("fn-http-request-url", headers.get("Fn-Http-Request-Url", ""))

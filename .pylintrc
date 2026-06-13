@@ -3,4 +3,7 @@ disable=
     broad-exception-caught,
     import-error,
     invalid-name,
-    global-statement
+    global-statement,
+    missing-function-docstring,
+    missing-module-docstring,
+    missing-class-docstring
