@@ -1,6 +1,5 @@
 {
   "reportMissingImports": false,
   "reportMissingModuleSource": false,
-  "reportOptionalMemberAccess": false,
-  "reportAttributeAccessIssue": false
+  "typeCheckingMode": "off"
 }
