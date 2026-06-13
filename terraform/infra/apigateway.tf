@@ -51,7 +51,7 @@ resource "oci_apigateway_deployment" "v1" {
 
       cors {
         allowed_origins              = ["*"] # begrens til frontend-domenet i prod
-        allowed_methods              = ["POST", "OPTIONS"]
+        allowed_methods              = ["POST", "GET", "PUT", "DELETE", "OPTIONS"]
         allowed_headers              = ["Content-Type", "Authorization"]
         max_age_in_seconds           = 3600
         is_allow_credentials_enabled = false
