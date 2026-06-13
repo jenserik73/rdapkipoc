@@ -29,3 +29,10 @@ Purge Python pip cache: pip cache purge
 Prune hidden Docker data: docker system prune -f
 Remove unused Docker volumes: docker volume prune -f
 ```
+
+## Test av login handler med curl
+```
+curl -X POST https://api.elcarocloud.no/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@elcarocloud.no", "password": "NyttPassord123"}'
+```

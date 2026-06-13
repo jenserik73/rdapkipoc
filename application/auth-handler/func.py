@@ -304,7 +304,7 @@ def _get_user_by_id(conn, user_id: str) -> dict | None:
 # ── Email ──────────────────────────────────────────────────────
 
 def _send_reset_email(to_email: str, reset_token: str):
-    reset_url = f"{FRONTEND_URL}/#/reset?token={reset_token}"
+    reset_url = f"{FRONTEND_URL}/chat/#/reset?token={reset_token}"
     msg = MIMEText(
         f"Hei,\n\nDu har bedt om å tilbakestille passordet ditt for QueryChat.\n\n"
         f"Klikk på lenken under for å sette nytt passord (gyldig i {RESET_EXPIRY_MINUTES} minutter):\n\n"
@@ -318,10 +318,15 @@ def _send_reset_email(to_email: str, reset_token: str):
     msg["From"]    = EMAIL_SENDER
     msg["To"]      = to_email
 
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+    smtp_password = _get_smtp_password()
+    logger.info("Kobler til SMTP: %s:587", SMTP_HOST)
+    with smtplib.SMTP(SMTP_HOST, 587, timeout=30) as smtp:
+        smtp.ehlo()
         smtp.starttls()
-        smtp.login(SMTP_USER, _get_smtp_password())
+        smtp.ehlo()
+        smtp.login(SMTP_USER, smtp_password)
         smtp.sendmail(EMAIL_SENDER, to_email, msg.as_string())
+    logger.info("E-post sendt til: %s", to_email)
 
 
 # ── Action-handlers ────────────────────────────────────────────

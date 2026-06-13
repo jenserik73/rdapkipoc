@@ -16,7 +16,7 @@ locals {
 variable "codespace_public_cidr_block" {
   description = "Public IP address of the Codespace"
   type        = string
-  default     = "20.61.127.53/32"
+  default     = "4.180.183.243/32"
 }
 
 # ── VCN ──────────────────────────────────────────────────────────────────────

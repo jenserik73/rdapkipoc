@@ -1401,6 +1401,25 @@
 </head>
 
 <body>
+
+<!-- Reset password screen -->
+  <div id="reset-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:250;align-items:center;justify-content:center;flex-direction:column;">
+    <div class="login-box">
+      <div class="login-logo">query<span>chat</span></div>
+      <div class="login-subtitle">Sett nytt passord</div>
+      <div class="login-field">
+        <label>Nytt passord</label>
+        <input type="password" id="reset-new-password" placeholder="Minst 8 tegn" />
+      </div>
+      <div class="login-field">
+        <label>Bekreft passord</label>
+        <input type="password" id="reset-confirm-password" placeholder="Gjenta passord" />
+      </div>
+      <button class="login-btn" id="reset-screen-btn" onclick="doResetFromUrl()">Sett nytt passord</button>
+      <div class="login-error" id="reset-screen-error"></div>
+    </div>
+  </div>
+
   <div id="login-screen" class="show">
     <div class="login-box">
       <div class="login-logo">query<span>chat</span></div>
@@ -1418,6 +1437,24 @@
       <div class="forgot-link"><a onclick="showForgot()">Glemt passord?</a></div>
     </div>
   </div>
+
+<!-- ── Reset password screen ── -->
+  <div id="reset-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:32px;">
+    <div class="login-box">
+      <div class="login-logo">query<span>chat</span></div>
+      <div class="login-subtitle">Sett nytt passord</div>
+      <div class="login-field">
+        <label>Nytt passord</label>
+        <input type="password" id="reset-new-password" placeholder="Minst 8 tegn" />
+      </div>
+      <div class="login-field">
+        <label>Bekreft passord</label>
+        <input type="password" id="reset-confirm-password" placeholder="Gjenta passord" />
+      </div>
+      <button class="login-btn" id="reset-screen-btn" onclick="doResetFromUrl()">Sett nytt passord</button>
+      <div class="login-error" id="reset-screen-error"></div>
+    </div>
+  </div>  
 
   <div id="forgot-modal">
     <div class="modal-box">
@@ -2188,7 +2225,89 @@
       navigator.clipboard.writeText(decoded).then(() => { btn.textContent = 'kopiert!'; setTimeout(() => { btn.textContent = 'kopier'; }, 1500); });
     }
 
+    async function doResetFromUrl() {
+      const token   = document.getElementById('reset-screen').dataset.token;
+      const pass    = document.getElementById('reset-new-password').value;
+      const confirm = document.getElementById('reset-confirm-password').value;
+      const errEl   = document.getElementById('reset-screen-error');
+      const btn     = document.getElementById('reset-screen-btn');
+
+      if (!pass || !confirm) { errEl.textContent = 'Fyll inn begge feltene'; return; }
+      if (pass.length < 8)   { errEl.textContent = 'Passordet må være minst 8 tegn'; return; }
+      if (pass !== confirm)  { errEl.textContent = 'Passordene er ikke like'; return; }
+
+      btn.disabled = true; btn.textContent = 'Setter passord…'; errEl.textContent = '';
+
+      try {
+        const res  = await fetch(API_BASE + '/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, password: pass })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById('reset-screen').style.display = 'none';
+          showLoginScreen();
+          document.getElementById('login-error').style.color = 'var(--green)';
+          document.getElementById('login-error').textContent = 'Passord oppdatert – logg inn med nytt passord';
+        } else {
+          errEl.textContent = data.error || 'Noe gikk galt';
+        }
+      } catch {
+        errEl.textContent = 'Kunne ikke nå serveren';
+      }
+
+      btn.disabled = false; btn.textContent = 'Sett nytt passord';
+    }
+
+async function doResetFromUrl() {
+      const token   = document.getElementById('reset-screen').dataset.token;
+      const pass    = document.getElementById('reset-new-password').value;
+      const confirm = document.getElementById('reset-confirm-password').value;
+      const errEl   = document.getElementById('reset-screen-error');
+      const btn     = document.getElementById('reset-screen-btn');
+
+      if (!pass || !confirm) { errEl.textContent = 'Fyll inn begge feltene'; return; }
+      if (pass.length < 8)   { errEl.textContent = 'Passordet må være minst 8 tegn'; return; }
+      if (pass !== confirm)  { errEl.textContent = 'Passordene er ikke like'; return; }
+
+      btn.disabled = true; btn.textContent = 'Setter passord…'; errEl.textContent = '';
+
+      try {
+        const res  = await fetch(API_BASE + '/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, password: pass })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById('reset-screen').style.display = 'none';
+          showLoginScreen();
+          document.getElementById('login-error').style.color = 'var(--green)';
+          document.getElementById('login-error').textContent = 'Passord oppdatert – logg inn med nytt passord';
+        } else {
+          errEl.textContent = data.error || 'Noe gikk galt';
+        }
+      } catch {
+        errEl.textContent = 'Kunne ikke nå serveren';
+      }
+
+      btn.disabled = false; btn.textContent = 'Sett nytt passord';
+    }
+
     (async () => {
+      // Sjekk om vi har reset-token i URL
+      const hash = window.location.hash;
+      const resetMatch = hash.match(/\/reset\?token=([a-f0-9]+)/);
+      if (resetMatch) {
+        const token = resetMatch[1];
+        const el = document.getElementById('reset-screen');
+        el.style.display = 'flex';
+        el.dataset.token = token;
+        history.replaceState(null, '', window.location.pathname);
+        return;
+      }
+
       if (authState.accessToken) {
         try {
           const payload = JSON.parse(atob(authState.accessToken.split('.')[1]));
@@ -2196,7 +2315,7 @@
             authState.user = { email: payload.email, display_name: payload.name, roles: payload.roles, permissions: payload.permissions };
             hideLoginScreen(); onLoggedIn(); return;
           }
-        } catch { }
+        } catch {}
       }
       if (authState.refreshToken) { const ok = await tryRefresh(); if (ok) { hideLoginScreen(); onLoggedIn(); return; } }
       showLoginScreen();

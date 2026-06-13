@@ -58,7 +58,7 @@ resource "oci_functions_function" "auth_handler" {
   memory_in_mbs      = "256"
   timeout_in_seconds = 60
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/auth-handler:latest"
-  image_digest = "sha256:69df9f099134048810571f93cdfca677509285dd1ddc89e1257f708b89518a5b"
+  image_digest = "sha256:1f5bbbf878cc5b2f771d7658559b72af2c05067936bbf50f268d2bdf3e67a092"
   
   config = {
     DB_DSN                    = "rdapkipocdb_high"
@@ -74,8 +74,9 @@ resource "oci_functions_function" "auth_handler" {
     SMTP_USER                 = "ocid1.user.oc19..aaaaaaaawkogoic3q7guo4huvji3vb5kexemlqthtql3fcc3ickff73og4pq@ocid1.tenancy.oc19..aaaaaaaadu4nynpyltw2mbzb7qhmimjldhzpasq5vzffcv7mkw67vy5fnd3a.9k.com"
     EMAIL_SENDER              = "noreply@elcarocloud.no"
     FRONTEND_URL              = "https://querychat.elcarocloud.no"
-    LOG_LEVEL                 = "INFO"   # Sett til "DEBUG" ved feilsøking
-  }
+    LOG_LEVEL                 = "DEBUG"   # Sett til "DEBUG" ved feilsøking
+    SMTP_PORT                 = "465"
+    SMTP_HOST                 = "smtp.email.eu-frankfurt-2.oci.oraclecloud.eu"}
 }
 
 resource "oci_functions_function" "admin_handler" {

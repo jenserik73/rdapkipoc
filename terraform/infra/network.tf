@@ -325,7 +325,6 @@ resource "oci_core_security_list" "seclist_functions" {
     protocol         = "6"
     stateless        = false
   }
-
   egress_security_rules {
     description      = "Allow outbound traffic on port 1522 to Oracle Autonomous Database"
     destination      = "0.0.0.0/0"
@@ -337,7 +336,6 @@ resource "oci_core_security_list" "seclist_functions" {
       max = 1522
     }
   }
-
   egress_security_rules {
     description      = "Allow HTTPS outbound via NAT"
     destination      = "0.0.0.0/0"
@@ -347,6 +345,28 @@ resource "oci_core_security_list" "seclist_functions" {
     tcp_options {
       min = 443
       max = 443
+    }
+  }
+  egress_security_rules {
+    description      = "Allow SMTP outbound via NAT (OCI Email Delivery)"
+    destination      = "0.0.0.0/0"
+    destination_type = "CIDR_BLOCK"
+    protocol         = "6"
+    stateless        = false
+    tcp_options {
+      min = 587
+      max = 587
+    }
+  }
+egress_security_rules {
+    description      = "Allow SMTP_SSL outbound via NAT (OCI Email Delivery port 465)"
+    destination      = "0.0.0.0/0"
+    destination_type = "CIDR_BLOCK"
+    protocol         = "6"
+    stateless        = false
+    tcp_options {
+      min = 465
+      max = 465
     }
   }
 }
