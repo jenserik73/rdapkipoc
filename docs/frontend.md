@@ -72,7 +72,6 @@ kubectl rollout status deployment querychat
 
 ### Tving ny image-pull (hvis latest-cache er et problem)
 ```bash
-# Bruk spesifikk digest i stedet for latest
 kubectl set image deployment/querychat \
   querychat=ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/querychat@sha256:<digest>
 ```
@@ -100,6 +99,17 @@ kubectl describe certificate querychat-tls -n default
 - Lenke format: `https://querychat.elcarocloud.no/chat/#/reset?token=<token>`
 - Frontend leser token fra URL-hash ved oppstart og viser reset-skjerm
 - Token er gyldig i 60 minutter og kan kun brukes én gang
+
+### must_change_password
+- Nye brukere og brukere som har fått passord reset av admin får `must_change_password = 1` i databasen
+- Ved innlogging returnerer backend `must_change_password: true` i login-responsen
+- Frontend viser automatisk "Passordbytte påkrevd"-modal – kan ikke lukkes uten å bytte passord
+- Etter vellykket passordbytte nullstilles flagget i databasen
+
+### Bytt passord (frivillig)
+- Alle innloggede brukere ser "Bytt passord"-knapp i sidebar-footer
+- Krever gammelt passord + nytt passord + bekreftelse
+- Passordfeltene har øye-knapp for å vise/skjule passord
 
 ## Lokale innstillinger (localStorage)
 
@@ -146,6 +156,7 @@ Bruk alltid `deploy.sh` som tagger med git SHA, eller sett image eksplisitt med 
 ### Admin-panel
 - Vises kun for brukere med `admin:users` eller `admin:roles` permission
 - Sjekkes via JWT-payload ved innlogging
+- Roller tildeles/fjernes via checkboxer
 
 ### Sykehuspartner-nett
 Sykehuspartners bedriftsproxy blokkerer nyregistrerte domener.

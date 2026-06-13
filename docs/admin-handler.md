@@ -145,6 +145,9 @@ Sjekk at brukeren har admin-rollen tildelt.
 
 **404 på bruker/rolle** – Sjekk at ID-en er korrekt (VARCHAR2(32) format).
 
+**Velkomst-e-post sendes ikke** – Sjekk SMTP-miljøvariabler i `functions.tf`.
+Se også feilsøkingsseksjon i `auth-handler.md` for SMTP-testing.
+
 ### Bygg og deploy ny versjon
 ```bash
 cd application/admin-handler
@@ -156,6 +159,17 @@ cd ../../terraform/infra && terraform apply
 ```
 
 ## Viktige tekniske detaljer
+
+### Brukeropprettelse
+- Nyopprettede brukere får `must_change_password = 1` automatisk
+- Velkomst-e-post sendes automatisk med midlertidig passord
+- E-posten informerer brukeren om at passordbytte kreves ved første innlogging
+- Hvis autogenerert passord brukes (tomt passordfelt) genereres 20 tilfeldige hex-tegn
+
+### Passord-reset via admin
+- `must_change_password` settes til `1` ved reset
+- Alle brukerens refresh tokens revokeres
+- Passordet vises **ikke** i responsen – informer brukeren via annen kanal
 
 ### RBAC-modell
 - Tabeller: `qc_roles`, `qc_permissions`, `qc_role_permissions`, `qc_user_roles`
@@ -184,4 +198,10 @@ Ruting skjer via parsing av `fn-http-request-url` header.
 | `DBPASS_SECRET_OCID` | Vault OCID for DB passord |
 | `WALLETPASS_SECRET_OCID` | Vault OCID for wallet passord |
 | `JWT_SECRET_OCID` | Vault OCID for JWT secret |
+| `SMTP_PASSWORD_SECRET_OCID` | Vault OCID for SMTP passord |
+| `SMTP_HOST` | `smtp.email.eu-frankfurt-2.oci.oraclecloud.eu` |
+| `SMTP_PORT` | `587` |
+| `SMTP_USER` | OCI SMTP brukernavn (langt OCID-format) |
+| `EMAIL_SENDER` | `noreply@elcarocloud.no` |
+| `FRONTEND_URL` | `https://querychat.elcarocloud.no` |
 | `LOG_LEVEL` | `INFO` (sett `DEBUG` ved feilsøking) |
