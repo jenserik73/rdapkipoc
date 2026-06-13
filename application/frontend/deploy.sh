@@ -10,10 +10,15 @@ sudo docker build --no-cache -t $REGISTRY/$IMAGE:$TAG -t $REGISTRY/$IMAGE:latest
 
 echo "Pusher image..."
 sudo docker push $REGISTRY/$IMAGE:$TAG
-sudo docker push $REGISTRY/$IMAGE:latest
+PUSH_OUTPUT=$(sudo docker push $REGISTRY/$IMAGE:latest)
+echo "$PUSH_OUTPUT"
 
-echo "Oppdaterer Kubernetes..."
-kubectl set image deployment/querychat querychat=$REGISTRY/$IMAGE:$TAG
+# Hent digest fra push-output
+DIGEST=$(echo "$PUSH_OUTPUT" | grep -oP 'sha256:[a-f0-9]{64}' | head -1)
+echo "Digest: $DIGEST"
+
+echo "Oppdaterer Kubernetes med digest..."
+kubectl set image deployment/querychat querychat=$REGISTRY/$IMAGE@$DIGEST
 kubectl rollout status deployment querychat
 
-echo "Deploy fullført: $REGISTRY/$IMAGE:$TAG"
+echo "Deploy fullført: $REGISTRY/$IMAGE@$DIGEST"
