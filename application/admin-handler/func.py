@@ -17,6 +17,7 @@ Håndterer admin-endepunkter for QueryChat:
   DELETE /v1/admin/roles/{id}
 
 Krever permission: admin:users eller admin:roles i JWT.
+Sett LOG_LEVEL=DEBUG i miljøvariabler for detaljert logging.
 """
 
 import base64
@@ -33,8 +34,9 @@ import jwt
 import oci
 import oracledb
 
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(level=getattr(logging, LOG_LEVEL, logging.INFO))
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 # ── konfigurasjon ──────────────────────────────────────────────
@@ -83,9 +85,13 @@ def _get_jwt_secret() -> str:
 # ── Database ───────────────────────────────────────────────────
 
 def _init_pool():
+    logger.info("Initialiserer connection pool")
     db_password     = _get_secret(DBPASS_SECRET_OCID).decode().strip()
     wallet_password = _get_secret(WALLETPASS_SECRET_OCID).decode().strip()
     wallet_zip      = _get_secret(WALLET_SECRET_OCID)
+
+    logger.debug("DB-passord lengde: %d", len(db_password))
+    logger.debug("Wallet zip størrelse: %d bytes", len(wallet_zip))
 
     os.makedirs(_wallet_dir, exist_ok=True)
     with zipfile.ZipFile(io.BytesIO(wallet_zip)) as zf:
@@ -180,6 +186,7 @@ def _list_users(conn, ctx) -> fdk.response.Response:
     for user in users:
         user["roles"] = _get_user_roles(conn, user["id"])
 
+    logger.debug("Hentet %d brukere", len(users))
     return _resp(ctx, {"ok": True, "users": users})
 
 
@@ -233,6 +240,7 @@ def _create_user(conn, body: dict, ctx) -> fdk.response.Response:
                 hash=pw_hash,
             )
         conn.commit()
+        logger.info("Opprettet bruker: %s", email)
     except oracledb.IntegrityError:
         return _resp(ctx, {"ok": False, "error": "E-postadressen er allerede i bruk"}, 409)
 
@@ -263,6 +271,7 @@ def _update_user(conn, user_id: str, body: dict, ctx) -> fdk.response.Response:
                 active=int(active), user_id=user_id,
             )
     conn.commit()
+    logger.info("Oppdatert bruker: %s", user_id)
     return _resp(ctx, {"ok": True})
 
 
@@ -273,6 +282,7 @@ def _deactivate_user(conn, user_id: str, ctx) -> fdk.response.Response:
             user_id=user_id,
         )
     conn.commit()
+    logger.info("Deaktivert bruker: %s", user_id)
     return _resp(ctx, {"ok": True})
 
 
@@ -293,6 +303,7 @@ def _add_user_role(conn, user_id: str, body: dict, granted_by: str, ctx) -> fdk.
                 granted_by=granted_by,
             )
         conn.commit()
+        logger.info("Lagt til rolle %s for bruker %s", role_id, user_id)
     except oracledb.IntegrityError:
         return _resp(ctx, {"ok": False, "error": "Bruker har allerede denne rollen"}, 409)
 
@@ -310,6 +321,7 @@ def _remove_user_role(conn, user_id: str, role_id: str, ctx) -> fdk.response.Res
             role_id=role_id,
         )
     conn.commit()
+    logger.info("Fjernet rolle %s fra bruker %s", role_id, user_id)
     return _resp(ctx, {"ok": True})
 
 
@@ -327,6 +339,7 @@ def _admin_reset_password(conn, user_id: str, body: dict, ctx) -> fdk.response.R
             user_id=user_id,
         )
     conn.commit()
+    logger.info("Passord tilbakestilt for bruker: %s", user_id)
     return _resp(ctx, {"ok": True, "temporary_password": new_password})
 
 
@@ -354,6 +367,7 @@ def _list_roles(conn, ctx) -> fdk.response.Response:
                 for row in cur.fetchall()
             ]
 
+    logger.debug("Hentet %d roller", len(roles))
     return _resp(ctx, {"ok": True, "roles": roles})
 
 
@@ -378,6 +392,7 @@ def _create_role(conn, body: dict, ctx) -> fdk.response.Response:
                 desc=description,
             )
         conn.commit()
+        logger.info("Opprettet rolle: %s", name)
     except oracledb.IntegrityError:
         return _resp(ctx, {"ok": False, "error": "Rollenavn er allerede i bruk"}, 409)
 
@@ -395,6 +410,7 @@ def _update_role(conn, role_id: str, body: dict, ctx) -> fdk.response.Response:
             desc=description, role_id=role_id,
         )
     conn.commit()
+    logger.info("Oppdatert rolle: %s", role_id)
     return _resp(ctx, {"ok": True})
 
 
@@ -404,6 +420,7 @@ def _delete_role(conn, role_id: str, ctx) -> fdk.response.Response:
         cur.execute("DELETE FROM qc_user_roles WHERE role_id = :role_id", role_id=role_id)
         cur.execute("DELETE FROM qc_roles WHERE id = :role_id", role_id=role_id)
     conn.commit()
+    logger.info("Slettet rolle: %s", role_id)
     return _resp(ctx, {"ok": True})
 
 
@@ -426,7 +443,7 @@ def handler(ctx, data: io.BytesIO = None):
         return _resp(ctx, {"ok": False, "error": "Ugyldig JSON"}, 400)
 
     path = _parse_path(ctx)
-    logger.info("Path: %s, Method: %s", path, method)
+    logger.debug("Path: %s, Method: %s", path, method)
 
     if not path:
         return _resp(ctx, {"ok": False, "error": "Ukjent endepunkt"}, 404)

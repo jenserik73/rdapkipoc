@@ -13,6 +13,7 @@ Flyten:
   4. Returner JSON direkte til frontend
 
 Ingen data forlater OCI. Ingen ekstern LLM-API kalles.
+Sett LOG_LEVEL=DEBUG i miljøvariabler for detaljert logging.
 """
 
 import io
@@ -27,8 +28,9 @@ import jwt
 import oci
 import oracledb
 
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(level=getattr(logging, LOG_LEVEL, logging.INFO))
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 # ── konfigurasjon ──────────────────────────────────────────────
 def _require_env(name: str) -> str:
@@ -70,7 +72,6 @@ def _get_secret(ocid: str) -> bytes:
 # ── JWT-validering ─────────────────────────────────────────────
 
 def _get_jwt_secret() -> str:
-    """Henter JWT-secret fra Vault én gang og cacher det."""
     global _jwt_secret
     if _jwt_secret is None:
         _jwt_secret = _get_secret(JWT_SECRET_OCID).decode().strip()
@@ -78,11 +79,6 @@ def _get_jwt_secret() -> str:
 
 
 def _verify_jwt(ctx) -> dict:
-    """
-    Verifiserer JWT fra Authorization-header.
-    Returnerer payload-dict hvis gyldig.
-    Kaster Exception hvis ugyldig eller mangler.
-    """
     headers = dict(ctx.Headers())
     auth_header = headers.get("authorization", headers.get("Authorization", ""))
     if not auth_header.startswith("Bearer "):
@@ -94,26 +90,26 @@ def _verify_jwt(ctx) -> dict:
 # ── connection pool ────────────────────────────────────────────
 
 def _init_pool() -> oracledb.ConnectionPool:
-    logger.info("Henter secrets fra Vault …")
+    logger.info("Initialiserer connection pool")
 
     db_password     = _get_secret(DBPASS_SECRET_OCID).decode().strip()
     wallet_password = _get_secret(WALLETPASS_SECRET_OCID).decode().strip()
     wallet_zip      = _get_secret(WALLET_SECRET_OCID)
 
-    logger.info("DB-passord lengde: %d", len(db_password))
-    logger.info("Wallet-passord lengde: %d", len(wallet_password))
-    logger.info("Wallet zip størrelse: %d bytes", len(wallet_zip))
+    logger.debug("DB-passord lengde: %d", len(db_password))
+    logger.debug("Wallet-passord lengde: %d", len(wallet_password))
+    logger.debug("Wallet zip størrelse: %d bytes", len(wallet_zip))
 
     os.makedirs(_wallet_dir, exist_ok=True)
     with zipfile.ZipFile(io.BytesIO(wallet_zip)) as zf:
         zf.extractall(_wallet_dir)
 
-    logger.info("Wallet filer: %s", os.listdir(_wallet_dir))
-    logger.info("DSN: %s", DB_DSN)
+    logger.debug("Wallet filer: %s", os.listdir(_wallet_dir))
+    logger.debug("DSN: %s", DB_DSN)
 
     tns_path = os.path.join(_wallet_dir, "tnsnames.ora")
     with open(tns_path, "r", encoding="utf-8") as f:
-        logger.info("tnsnames.ora:\n%s", f.read())
+        logger.debug("tnsnames.ora:\n%s", f.read())
 
     pool = oracledb.create_pool(
         user=DB_USER,
@@ -139,10 +135,10 @@ def _get_pool() -> oracledb.ConnectionPool:
 
 def _ask_nl(question: str) -> dict:
     pool = _get_pool()
-    logger.info("Henter tilkobling fra pool …")
+    logger.debug("Henter tilkobling fra pool")
     with pool.acquire() as conn:
         with conn.cursor() as cur:
-            logger.info("Kaller PL/SQL-funksjonen …")
+            logger.debug("Kaller PL/SQL-funksjonen")
             result_clob = cur.var(oracledb.DB_TYPE_CLOB)
             cur.execute(
                 """
@@ -161,7 +157,7 @@ def _ask_nl(question: str) -> dict:
             )
             clob_val = result_clob.getvalue()
             clob_content = clob_val.read(1, clob_val.size()) if clob_val else None
-            logger.info("CLOB innhold: %s", clob_content)
+            logger.debug("CLOB innhold: %s", clob_content)
             return json.loads(clob_content or '{"ok":false,"error":"Tom respons"}')
 
 
@@ -190,7 +186,6 @@ def _save_feedback(question: str, sql: str, vote: int, corrected: str = None):
 # ── Function handler ───────────────────────────────────────────
 
 def handler(ctx, data: io.BytesIO = None):
-    # ── JWT-validering ─────────────────────────────────────────
     try:
         jwt_payload = _verify_jwt(ctx)
     except PermissionError as e:
@@ -199,7 +194,6 @@ def handler(ctx, data: io.BytesIO = None):
         logger.warning("JWT-validering feilet: %s", str(e))
         return _resp(ctx, {"ok": False, "error": "Ugyldig eller utløpt token"}, 401)
 
-    # ── parse body ─────────────────────────────────────────────
     try:
         body = json.loads(data.getvalue())
     except Exception:

@@ -11,6 +11,8 @@ Forventet body:
     "feedbackText": "Bra svar!",  # valgfri fritekst
     "correctedSql": "SELECT ..."  # valgfri korrigert SQL
   }
+
+Sett LOG_LEVEL=DEBUG i miljøvariabler for detaljert logging.
 """
 
 import io
@@ -25,8 +27,9 @@ import fdk.response
 import oci
 import oracledb
 
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(level=getattr(logging, LOG_LEVEL, logging.INFO))
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 def _require_env(name: str) -> str:
@@ -60,11 +63,13 @@ def _get_secret(ocid: str) -> bytes:
     bundle = _get_secrets_client().get_secret_bundle(secret_id=ocid).data
     return base64.b64decode(bundle.secret_bundle_content.content)
 
+
 def _get_jwt_secret() -> str:
     global _jwt_secret
     if _jwt_secret is None:
         _jwt_secret = _get_secret(JWT_SECRET_OCID).decode().strip()
     return _jwt_secret
+
 
 def _verify_jwt(ctx) -> dict:
     headers = dict(ctx.Headers())
@@ -74,11 +79,15 @@ def _verify_jwt(ctx) -> dict:
     token = auth.removeprefix("Bearer ").strip()
     return jwt.decode(token, _get_jwt_secret(), algorithms=["HS256"])
 
+
 def _init_pool() -> oracledb.ConnectionPool:
-    logger.info("Henter secrets fra Vault …")
+    logger.info("Initialiserer connection pool")
     db_password     = _get_secret(DBPASS_SECRET_OCID).decode().strip()
     wallet_password = _get_secret(WALLETPASS_SECRET_OCID).decode().strip()
     wallet_zip      = _get_secret(WALLET_SECRET_OCID)
+
+    logger.debug("DB-passord lengde: %d", len(db_password))
+    logger.debug("Wallet zip størrelse: %d bytes", len(wallet_zip))
 
     os.makedirs(_wallet_dir, exist_ok=True)
     with zipfile.ZipFile(io.BytesIO(wallet_zip)) as zf:
@@ -138,7 +147,7 @@ def handler(ctx, data: io.BytesIO = None):
     except Exception:
         return _resp(ctx, {"ok": False, "error": "Ugyldig eller utløpt token"}, 401)
 
-    # resten er uendret ...    try:
+    try:
         body = json.loads(data.getvalue())
     except Exception:
         return _resp(ctx, {"ok": False, "error": "Ugyldig JSON"}, 400)
@@ -157,6 +166,8 @@ def handler(ctx, data: io.BytesIO = None):
 
     if vote not in (1, -1):
         return _resp(ctx, {"ok": False, "error": "vote må være 1 (positiv) eller -1 (negativ)"}, 400)
+
+    logger.debug("Lagrer feedback: logId=%s vote=%d", log_id, vote)
 
     try:
         _save_feedback(
