@@ -80,7 +80,7 @@ resource "oci_functions_function" "admin_handler" {
   memory_in_mbs      = "256"
   timeout_in_seconds = 60
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/admin-handler:latest"
-  image_digest       = "sha256:da2a9d349685e8ae47d8e1eabb9b109da8c6b4bfe2c643dfe5ce0ae32453fd03"
+  image_digest       = "sha256:1e0b00f10da7345e35870c722bb773e0700fcb09eb030c9ddd42f6f67e4e6818"
 
   config = {
     DB_DSN                 = "rdapkipocdb_high"

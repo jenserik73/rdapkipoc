@@ -16,7 +16,6 @@ Håndterer admin-endepunkter for QueryChat:
   PUT    /v1/admin/roles/{id}
   DELETE /v1/admin/roles/{id}
 
-Ruting skjer via Fn-Http-Method og Fn-Http-Request-Url headers.
 Krever permission: admin:users eller admin:roles i JWT.
 """
 
@@ -113,8 +112,8 @@ def _get_pool():
 # ── JWT-validering ─────────────────────────────────────────────
 
 def _verify_jwt(ctx) -> dict:
-    headers    = dict(ctx.Headers())
-    auth       = headers.get("authorization", headers.get("Authorization", ""))
+    headers = dict(ctx.Headers())
+    auth    = headers.get("authorization", headers.get("Authorization", ""))
     if not auth.startswith("Bearer "):
         raise PermissionError("Mangler Authorization-header")
     token = auth.removeprefix("Bearer ").strip()
@@ -126,14 +125,13 @@ def _require_permission(payload: dict, permission: str):
         raise PermissionError(f"Mangler rettighet: {permission}")
 
 
-# ── Hjelpe-funksjoner ──────────────────────────────────────────
+# ── Path-parsing ───────────────────────────────────────────────
 
 def _parse_path(ctx) -> list[str]:
-    """Henter path-segmenter etter /admin/"""
     headers = dict(ctx.Headers())
-    url = headers.get("fn-http-request-url", headers.get("Fn-Http-Request-Url", ""))
-    path = url.split("?")[0]
-    parts = [p for p in path.split("/") if p]
+    url     = headers.get("fn-http-request-url", headers.get("Fn-Http-Request-Url", ""))
+    path    = url.split("?")[0]
+    parts   = [p for p in path.split("/") if p]
     try:
         idx = parts.index("admin")
         return parts[idx + 1:]
@@ -141,34 +139,23 @@ def _parse_path(ctx) -> list[str]:
         return []
 
 
-def _row_to_user(row) -> dict:
-    return {
-        "id":           row[0].hex() if row[0] else None,
-        "email":        row[1],
-        "display_name": row[2],
-        "active":       row[3],
-        "created_at":   str(row[4]) if row[4] else None,
-        "last_login":   str(row[5]) if row[5] else None,
-    }
+# ── User handlers ──────────────────────────────────────────────
 
-
-def _get_user_roles(conn, user_id_hex: str) -> list:
+def _get_user_roles(conn, user_id: str) -> list:
     with conn.cursor() as cur:
         cur.execute(
             """
             SELECT r.id, r.name, r.description
             FROM qc_user_roles ur
             JOIN qc_roles r ON ur.role_id = r.id
-            WHERE ur.user_id = HEXTORAW(:uid)
+            WHERE ur.user_id = :user_id
             ORDER BY r.name
             """,
-            uid=user_id_hex,
+            user_id=user_id,
         )
-        return [{"id": row[0].hex(), "name": row[1], "description": row[2]}
+        return [{"id": row[0], "name": row[1], "description": row[2]}
                 for row in cur.fetchall()]
 
-
-# ── User handlers ──────────────────────────────────────────────
 
 def _list_users(conn, ctx) -> fdk.response.Response:
     with conn.cursor() as cur:
@@ -179,7 +166,16 @@ def _list_users(conn, ctx) -> fdk.response.Response:
             ORDER BY created_at DESC
             """
         )
-        users = [_row_to_user(row) for row in cur.fetchall()]
+        users = []
+        for row in cur.fetchall():
+            users.append({
+                "id":           row[0],
+                "email":        row[1],
+                "display_name": row[2],
+                "active":       row[3],
+                "created_at":   str(row[4]) if row[4] else None,
+                "last_login":   str(row[5]) if row[5] else None,
+            })
 
     for user in users:
         user["roles"] = _get_user_roles(conn, user["id"])
@@ -187,22 +183,29 @@ def _list_users(conn, ctx) -> fdk.response.Response:
     return _resp(ctx, {"ok": True, "users": users})
 
 
-def _get_user(conn, user_id_hex: str, ctx) -> fdk.response.Response:
+def _get_user(conn, user_id: str, ctx) -> fdk.response.Response:
     with conn.cursor() as cur:
         cur.execute(
             """
             SELECT id, email, display_name, active, created_at, last_login
-            FROM qc_users WHERE id = HEXTORAW(:uid)
+            FROM qc_users WHERE id = :user_id
             """,
-            uid=user_id_hex,
+            user_id=user_id,
         )
         row = cur.fetchone()
 
     if not row:
         return _resp(ctx, {"ok": False, "error": "Bruker ikke funnet"}, 404)
 
-    user = _row_to_user(row)
-    user["roles"] = _get_user_roles(conn, user_id_hex)
+    user = {
+        "id":           row[0],
+        "email":        row[1],
+        "display_name": row[2],
+        "active":       row[3],
+        "created_at":   str(row[4]) if row[4] else None,
+        "last_login":   str(row[5]) if row[5] else None,
+    }
+    user["roles"] = _get_user_roles(conn, user_id)
     return _resp(ctx, {"ok": True, "user": user})
 
 
@@ -215,30 +218,28 @@ def _create_user(conn, body: dict, ctx) -> fdk.response.Response:
         return _resp(ctx, {"ok": False, "error": "Mangler e-post eller navn"}, 400)
 
     pw_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    new_id  = secrets.token_hex(16).upper()
 
-    with conn.cursor() as cur:
-        try:
+    try:
+        with conn.cursor() as cur:
             cur.execute(
                 """
                 INSERT INTO qc_users (id, email, display_name, pw_hash, active)
-                VALUES (SYS_GUID(), :email, :name, :hash, 1)
-                RETURNING id INTO :new_id
+                VALUES (:id, :email, :name, :hash, 1)
                 """,
+                id=new_id,
                 email=email,
                 name=display_name,
                 hash=pw_hash,
-                new_id=cur.var(oracledb.DB_TYPE_RAW),
             )
-            new_id = cur.bindvars["new_id"].getvalue()
-            new_id_hex = new_id[0].hex() if new_id else None
-        except oracledb.IntegrityError:
-            return _resp(ctx, {"ok": False, "error": "E-postadressen er allerede i bruk"}, 409)
+        conn.commit()
+    except oracledb.IntegrityError:
+        return _resp(ctx, {"ok": False, "error": "E-postadressen er allerede i bruk"}, 409)
 
-    conn.commit()
-    return _resp(ctx, {"ok": True, "id": new_id_hex}, 201)
+    return _resp(ctx, {"ok": True, "id": new_id}, 201)
 
 
-def _update_user(conn, user_id_hex: str, body: dict, ctx) -> fdk.response.Response:
+def _update_user(conn, user_id: str, body: dict, ctx) -> fdk.response.Response:
     display_name = body.get("display_name")
     active       = body.get("active")
 
@@ -248,83 +249,82 @@ def _update_user(conn, user_id_hex: str, body: dict, ctx) -> fdk.response.Respon
     with conn.cursor() as cur:
         if display_name is not None and active is not None:
             cur.execute(
-                "UPDATE qc_users SET display_name = :name, active = :active WHERE id = HEXTORAW(:uid)",
-                name=display_name, active=int(active), uid=user_id_hex,
+                "UPDATE qc_users SET display_name = :name, active = :active WHERE id = :user_id",
+                name=display_name, active=int(active), user_id=user_id,
             )
         elif display_name is not None:
             cur.execute(
-                "UPDATE qc_users SET display_name = :name WHERE id = HEXTORAW(:uid)",
-                name=display_name, uid=user_id_hex,
+                "UPDATE qc_users SET display_name = :name WHERE id = :user_id",
+                name=display_name, user_id=user_id,
             )
         else:
             cur.execute(
-                "UPDATE qc_users SET active = :active WHERE id = HEXTORAW(:uid)",
-                active=int(active), uid=user_id_hex,
+                "UPDATE qc_users SET active = :active WHERE id = :user_id",
+                active=int(active), user_id=user_id,
             )
-
     conn.commit()
     return _resp(ctx, {"ok": True})
 
 
-def _deactivate_user(conn, user_id_hex: str, ctx) -> fdk.response.Response:
+def _deactivate_user(conn, user_id: str, ctx) -> fdk.response.Response:
     with conn.cursor() as cur:
         cur.execute(
-            "UPDATE qc_users SET active = 0 WHERE id = HEXTORAW(:uid)",
-            uid=user_id_hex,
+            "UPDATE qc_users SET active = 0 WHERE id = :user_id",
+            user_id=user_id,
         )
     conn.commit()
     return _resp(ctx, {"ok": True})
 
 
-def _add_user_role(conn, user_id_hex: str, body: dict, granted_by_hex: str, ctx) -> fdk.response.Response:
-    role_id_hex = body.get("role_id", "").strip()
-    if not role_id_hex:
+def _add_user_role(conn, user_id: str, body: dict, granted_by: str, ctx) -> fdk.response.Response:
+    role_id = body.get("role_id", "").strip()
+    if not role_id:
         return _resp(ctx, {"ok": False, "error": "Mangler role_id"}, 400)
 
-    with conn.cursor() as cur:
-        try:
+    try:
+        with conn.cursor() as cur:
             cur.execute(
                 """
                 INSERT INTO qc_user_roles (user_id, role_id, granted_by)
-                VALUES (HEXTORAW(:uid), HEXTORAW(:rid), HEXTORAW(:gid))
+                VALUES (:user_id, :role_id, :granted_by)
                 """,
-                uid=user_id_hex,
-                rid=role_id_hex,
-                gid=granted_by_hex,
+                user_id=user_id,
+                role_id=role_id,
+                granted_by=granted_by,
             )
-        except oracledb.IntegrityError:
-            return _resp(ctx, {"ok": False, "error": "Bruker har allerede denne rollen"}, 409)
+        conn.commit()
+    except oracledb.IntegrityError:
+        return _resp(ctx, {"ok": False, "error": "Bruker har allerede denne rollen"}, 409)
 
-    conn.commit()
     return _resp(ctx, {"ok": True})
 
 
-def _remove_user_role(conn, user_id_hex: str, role_id_hex: str, ctx) -> fdk.response.Response:
+def _remove_user_role(conn, user_id: str, role_id: str, ctx) -> fdk.response.Response:
     with conn.cursor() as cur:
         cur.execute(
             """
             DELETE FROM qc_user_roles
-            WHERE user_id = HEXTORAW(:uid) AND role_id = HEXTORAW(:rid)
+            WHERE user_id = :user_id AND role_id = :role_id
             """,
-            uid=user_id_hex,
-            rid=role_id_hex,
+            user_id=user_id,
+            role_id=role_id,
         )
     conn.commit()
     return _resp(ctx, {"ok": True})
 
 
-def _admin_reset_password(conn, user_id_hex: str, body: dict, ctx) -> fdk.response.Response:
+def _admin_reset_password(conn, user_id: str, body: dict, ctx) -> fdk.response.Response:
     new_password = body.get("password", secrets.token_hex(12))
     pw_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
 
     with conn.cursor() as cur:
         cur.execute(
-            "UPDATE qc_users SET pw_hash = :hash WHERE id = HEXTORAW(:uid)",
-            hash=pw_hash, uid=user_id_hex,
+            "UPDATE qc_users SET pw_hash = :hash WHERE id = :user_id",
+            hash=pw_hash, user_id=user_id,
         )
         cur.execute(
-            "UPDATE qc_refresh_tokens SET revoked = 1 WHERE user_id = HEXTORAW(:uid)",
-            uid=user_id_hex,
+            "UPDATE qc_refresh_tokens SET revoked = 1 WHERE user_id = :user_id",
+            user_id=user_id,
         )
     conn.commit()
     return _resp(ctx, {"ok": True, "temporary_password": new_password})
@@ -335,7 +335,7 @@ def _admin_reset_password(conn, user_id_hex: str, body: dict, ctx) -> fdk.respon
 def _list_roles(conn, ctx) -> fdk.response.Response:
     with conn.cursor() as cur:
         cur.execute("SELECT id, name, description FROM qc_roles ORDER BY name")
-        roles = [{"id": row[0].hex(), "name": row[1], "description": row[2]}
+        roles = [{"id": row[0], "name": row[1], "description": row[2]}
                  for row in cur.fetchall()]
 
         for role in roles:
@@ -344,13 +344,13 @@ def _list_roles(conn, ctx) -> fdk.response.Response:
                 SELECT p.id, p.perm_resource, p.perm_action
                 FROM qc_role_permissions rp
                 JOIN qc_permissions p ON rp.permission_id = p.id
-                WHERE rp.role_id = HEXTORAW(:rid)
+                WHERE rp.role_id = :role_id
                 ORDER BY p.perm_resource, p.perm_action
                 """,
-                rid=role["id"],
+                role_id=role["id"],
             )
             role["permissions"] = [
-                {"id": row[0].hex(), "resource": row[1], "action": row[2]}
+                {"id": row[0], "resource": row[1], "action": row[2]}
                 for row in cur.fetchall()
             ]
 
@@ -364,55 +364,45 @@ def _create_role(conn, body: dict, ctx) -> fdk.response.Response:
     if not name:
         return _resp(ctx, {"ok": False, "error": "Mangler rollenavn"}, 400)
 
-    with conn.cursor() as cur:
-        try:
+    new_id = secrets.token_hex(16).upper()
+
+    try:
+        with conn.cursor() as cur:
             cur.execute(
                 """
                 INSERT INTO qc_roles (id, name, description)
-                VALUES (SYS_GUID(), :name, :desc)
-                RETURNING id INTO :new_id
+                VALUES (:id, :name, :desc)
                 """,
+                id=new_id,
                 name=name,
                 desc=description,
-                new_id=cur.var(oracledb.DB_TYPE_RAW),
             )
-            new_id = cur.bindvars["new_id"].getvalue()
-            new_id_hex = new_id[0].hex() if new_id else None
-        except oracledb.IntegrityError:
-            return _resp(ctx, {"ok": False, "error": "Rollenavn er allerede i bruk"}, 409)
+        conn.commit()
+    except oracledb.IntegrityError:
+        return _resp(ctx, {"ok": False, "error": "Rollenavn er allerede i bruk"}, 409)
 
-    conn.commit()
-    return _resp(ctx, {"ok": True, "id": new_id_hex}, 201)
+    return _resp(ctx, {"ok": True, "id": new_id}, 201)
 
 
-def _update_role(conn, role_id_hex: str, body: dict, ctx) -> fdk.response.Response:
+def _update_role(conn, role_id: str, body: dict, ctx) -> fdk.response.Response:
     description = body.get("description")
     if description is None:
         return _resp(ctx, {"ok": False, "error": "Ingen felter å oppdatere"}, 400)
 
     with conn.cursor() as cur:
         cur.execute(
-            "UPDATE qc_roles SET description = :desc WHERE id = HEXTORAW(:rid)",
-            desc=description, rid=role_id_hex,
+            "UPDATE qc_roles SET description = :desc WHERE id = :role_id",
+            desc=description, role_id=role_id,
         )
     conn.commit()
     return _resp(ctx, {"ok": True})
 
 
-def _delete_role(conn, role_id_hex: str, ctx) -> fdk.response.Response:
+def _delete_role(conn, role_id: str, ctx) -> fdk.response.Response:
     with conn.cursor() as cur:
-        cur.execute(
-            "DELETE FROM qc_role_permissions WHERE role_id = HEXTORAW(:rid)",
-            rid=role_id_hex,
-        )
-        cur.execute(
-            "DELETE FROM qc_user_roles WHERE role_id = HEXTORAW(:rid)",
-            rid=role_id_hex,
-        )
-        cur.execute(
-            "DELETE FROM qc_roles WHERE id = HEXTORAW(:rid)",
-            rid=role_id_hex,
-        )
+        cur.execute("DELETE FROM qc_role_permissions WHERE role_id = :role_id", role_id=role_id)
+        cur.execute("DELETE FROM qc_user_roles WHERE role_id = :role_id", role_id=role_id)
+        cur.execute("DELETE FROM qc_roles WHERE id = :role_id", role_id=role_id)
     conn.commit()
     return _resp(ctx, {"ok": True})
 
@@ -420,7 +410,6 @@ def _delete_role(conn, role_id_hex: str, ctx) -> fdk.response.Response:
 # ── Function handler ───────────────────────────────────────────
 
 def handler(ctx, data: io.BytesIO = None):
-    # JWT-validering
     try:
         payload = _verify_jwt(ctx)
     except PermissionError as e:
@@ -437,14 +426,10 @@ def handler(ctx, data: io.BytesIO = None):
         return _resp(ctx, {"ok": False, "error": "Ugyldig JSON"}, 400)
 
     path = _parse_path(ctx)
-    # path eksempler:
-    # ["users"]
-    # ["users", "<id>"]
-    # ["users", "<id>", "roles"]
-    # ["users", "<id>", "roles", "<role_id>"]
-    # ["users", "<id>", "reset-password"]
-    # ["roles"]
-    # ["roles", "<id>"]
+    logger.info("Path: %s, Method: %s", path, method)
+
+    if not path:
+        return _resp(ctx, {"ok": False, "error": "Ukjent endepunkt"}, 404)
 
     try:
         with _get_pool().acquire() as conn:
@@ -503,9 +488,12 @@ def handler(ctx, data: io.BytesIO = None):
 
     except PermissionError as e:
         return _resp(ctx, {"ok": False, "error": str(e)}, 403)
+    except oracledb.DatabaseError as e:
+        logger.exception("Database-feil")
+        return _resp(ctx, {"ok": False, "error": "Databasefeil", "detail": str(e)}, 500)
     except Exception as e:
         logger.exception("Uventet feil")
-        return _resp(ctx, {"ok": False, "error": str(e)}, 500)
+        return _resp(ctx, {"ok": False, "error": str(e), "type": type(e).__name__}, 500)
 
     return _resp(ctx, {"ok": False, "error": "Ukjent endepunkt"}, 404)
 
