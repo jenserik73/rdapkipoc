@@ -1664,17 +1664,27 @@
     </div>
   </div>
 
-  <!-- Reset password modal -->
+<!-- Reset password modal -->
   <div id="reset-modal">
     <div class="modal-box">
-      <div class="modal-title">Tilbakestill passord</div>
+      <div class="modal-title">Sett nytt passord</div>
       <input type="hidden" id="reset-user-id" />
-      <div class="field-group"><label>Nytt passord (la stå tomt for autogenerert)</label><input type="text"
-          id="reset-pass" /></div>
+      <div class="field-group">
+        <label>Nytt passord (la stå tomt for autogenerert)</label>
+        <div style="position:relative">
+          <input type="password" id="reset-pass" style="padding-right:36px" />
+          <button onclick="toggleResetPassVisibility()" type="button"
+            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
+            <svg id="reset-pass-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
       <div id="reset-result" style="font-size:12.5px;min-height:18px;margin-bottom:8px;color:var(--green)"></div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeResetModal()">Lukk</button>
-        <button class="btn-save" onclick="doResetPassword()">Tilbakestill</button>
+        <button class="btn-save" onclick="doResetPassword()">Sett passord</button>
       </div>
     </div>
   </div>
@@ -1872,19 +1882,38 @@
       document.getElementById('reset-modal').classList.add('show');
     }
     function closeResetModal() { document.getElementById('reset-modal').classList.remove('show'); }
-    async function doResetPassword() {
-      const userId = document.getElementById('reset-user-id').value;
-      const pass = document.getElementById('reset-pass').value.trim();
-      const resEl = document.getElementById('reset-result');
-      try {
-        const body = {}; if (pass) body.password = pass;
-        const res = await apiFetch(API_BASE + '/admin/users/' + userId + '/reset-password', { method: 'POST', body: JSON.stringify(body) });
-        const data = await res.json();
-        if (data.ok) { resEl.style.color = 'var(--green)'; resEl.textContent = data.temporary_password ? 'Nytt passord: ' + data.temporary_password : 'Passord tilbakestilt'; }
-        else { resEl.style.color = 'var(--red)'; resEl.textContent = data.error || 'Feil'; }
-      } catch (e) { resEl.style.color = 'var(--red)'; resEl.textContent = e.message; }
+    
+    function toggleResetPassVisibility() {
+      const input = document.getElementById('reset-pass');
+      const eye   = document.getElementById('reset-pass-eye');
+      if (input.type === 'password') {
+        input.type = 'text';
+        eye.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+      } else {
+        input.type = 'password';
+        eye.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+      }
     }
 
+    async function doResetPassword() {
+      const userId = document.getElementById('reset-user-id').value;
+      const pass   = document.getElementById('reset-pass').value.trim();
+      const resEl  = document.getElementById('reset-result');
+      try {
+        const body = {}; if (pass) body.password = pass;
+        const res  = await apiFetch(API_BASE + '/admin/users/' + userId + '/reset-password', { method: 'POST', body: JSON.stringify(body) });
+        const data = await res.json();
+        if (data.ok) {
+          resEl.style.color = 'var(--green)';
+          resEl.textContent = pass
+            ? 'Passord satt'
+            : 'Passord tilbakestilt – informer brukeren om nytt passord via annen kanal';
+        } else {
+          resEl.style.color = 'var(--red)';
+          resEl.textContent = data.error || 'Feil';
+        }
+      } catch (e) { resEl.style.color = 'var(--red)'; resEl.textContent = e.message; }
+    }
     // ── Roles modal med checkboxer ─────────────────────────────
     async function openRolesModal(userId, name) {
       document.getElementById('roles-user-id').value = userId;
