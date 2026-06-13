@@ -14,5 +14,5 @@ output "email_sender_id" {
 
 output "smtp_host" {
   description = "SMTP hostname for OCI Email Delivery i eu-frankfurt-2"
-  value       = "smtp.email.eu-frankfurt-2.oci.oraclecloud.com"
+  value       = "smtp.email.eu-frankfurt-2.oci.oraclecloud.eu"
 }
