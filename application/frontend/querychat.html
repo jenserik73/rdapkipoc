@@ -1877,6 +1877,9 @@
       <div id="chat-view">
         <div id="chat-header">
           <div>
+            <nav style="display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:4px">
+              <a onclick="showChat()" style="color:var(--accent);cursor:pointer;text-decoration:none;transition:opacity 0.12s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">Home</a>
+            </nav>
             <div class="title" id="chat-title">Ny samtale</div>
             <div class="meta">sql-executor · API Gateway</div>
           </div>
@@ -1934,13 +1937,11 @@
 
       <div id="admin-view">
         <div id="admin-header">
-          <div class="title">Administrasjon</div>
-          <button class="icon-btn" onclick="showChat()" title="Tilbake til chat">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-          </button>
+          <nav style="display:flex;align-items:center;gap:6px;font-size:13px">
+            <a onclick="showChat()" style="color:var(--accent);cursor:pointer;text-decoration:none;transition:opacity 0.12s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">Home</a>
+            <span style="color:var(--text3)">&#8250;</span>
+            <span id="admin-breadcrumb-tab" style="color:var(--text2)">Administrasjon</span>
+          </nav>
         </div>
         <div id="admin-content">
           <div class="admin-tabs">
@@ -2339,6 +2340,9 @@
       document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('admin-' + tab).classList.add('active');
+      const labels = { users: 'Brukere', roles: 'Roller', metadata: 'Metadata' };
+      const bc = document.getElementById('admin-breadcrumb-tab');
+      if (bc) bc.textContent = 'Administrasjon › ' + (labels[tab] || tab);
       if (tab === 'users') loadAdminUsers();
       if (tab === 'roles') loadAdminRoles();
       if (tab === 'metadata') initMetadataTab();
