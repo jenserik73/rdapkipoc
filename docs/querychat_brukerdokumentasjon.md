@@ -204,13 +204,33 @@ Brukes for interne notater om datakvalitet, fremtidige view-kandidater, eller TO
 | **UTKAST** | Lagret i QueryChat, men ikke publisert til databasen |
 | **ARKIVERT** | Var tidligere aktiv, er nå trukket tilbake og droppet fra databasen |
 
+Hvilke knapper som vises per status:
+
+| Status | Knapper |
+|---|---|
+| AKTIV | **Arkiver** |
+| UTKAST | **Publiser**, **Arkiver** |
+| ARKIVERT | **Publiser** |
+
+### Publisere en annotasjon
+
+**Publiser**-knappen vises på UTKAST og ARKIVERT-rader.
+
+- **UTKAST → AKTIV:** DDL kjøres og annotasjonen blir aktiv i Oracle
+- **ARKIVERT → AKTIV:** Annotasjonen legges tilbake i Oracle med `ADD`-DDL (reaktivering)
+
+Vil feile med duplikat-feil hvis en annen AKTIV rad med samme type/kolonne/annotasjonsnavn
+allerede finnes – arkiver den aktive raden først.
+
 ### Arkivere en annotasjon
 
-Klikk **Arkiver** på en eksisterende rad i "Redigerbare annotasjoner"-panelet og bekreft.
+Klikk **Arkiver** på en AKTIV eller UTKAST-rad og bekreft.
 
 - For ANNOTATION/AKTIV: Oracle-annotasjonen droppes fra databasen (DDL kjøres)
 - For COMMENT/AKTIV: kommentaren tømmes i databasen
 - For NONE og UTKAST: ingen DDL, kun statusendring
+
+Arkiverte rader kan reaktiveres med **Publiser**-knappen.
 
 ### Gode råd for annotasjoner
 
@@ -227,8 +247,8 @@ Klikk **Arkiver** på en eksisterende rad i "Redigerbare annotasjoner"-panelet o
 **Duplikater:**
 - Systemet blokkerer opprettelse av ny annotasjon hvis en aktiv rad med samme
   type/kolonne/annotasjonsnavn allerede finnes
-- For å endre en eksisterende annotasjon: arkiver den først, og opprett ny,
-  eller bruk oppdatering (send `id`) via API
+- For å endre en eksisterende annotasjon: bruk **Arkiver** og deretter **Publiser**,
+  eller opprett en ny rad med oppdatert verdi
 
 ---
 

@@ -259,8 +259,56 @@ Forutsetter innlogging som bruker med `admin:metadata`-rettighet (f.eks. Adminis
 
 **Forventet resultat:**
 - Raden vises nå med badge `ARKIVERT` (rød)
+- **Publiser**-knapp vises på den arkiverte raden
 - **Oracle annotations (live)** oppdateres – annotasjonen er ikke lenger synlig
-- Ingen ny rad kan opprettes med samme type/navn (duplikat-blokkering er borte siden raden er arkivert)
+- Ny rad kan nå opprettes med samme type/navn siden den aktive raden er arkivert
+
+**Godkjent:** ☐
+
+---
+
+## TC-18: Publiser UTKAST
+
+**Beskrivelse:** Verifiser at en UTKAST-rad kan publiseres til databasen via Publiser-knappen.
+
+**Forutsetning:** En UTKAST-rad eksisterer (f.eks. fra TC-09).
+
+**Steg:**
+1. Velg tabellen der UTKAST-raden ligger
+2. Finn raden med `UTKAST`-badge i "Redigerbare annotasjoner"
+3. Klikk **Publiser**
+4. Bekreft i dialog
+
+**Forventet resultat:**
+- Raden skifter fra `UTKAST` (amber) til `AKTIV` (grønn)
+- Annotasjonen dukker opp i **Oracle annotations (live)**
+- `updated_at`-tidsstempelet oppdateres
+- **Arkiver**-knapp vises, **Publiser**-knapp skjules
+
+**Godkjent:** ☐
+
+---
+
+## TC-19: Publiser ARKIVERT (reaktivering)
+
+**Beskrivelse:** Verifiser at en ARKIVERT rad kan reaktiveres og legges tilbake i Oracle.
+
+**Forutsetning:** En ARKIVERT ANNOTATION-rad eksisterer (f.eks. fra TC-12).
+
+**Steg:**
+1. Velg tabellen der den arkiverte raden ligger
+2. Finn raden med `ARKIVERT`-badge i "Redigerbare annotasjoner"
+3. Klikk **Publiser**
+4. Bekreft i dialog
+
+**Forventet resultat:**
+- Raden skifter fra `ARKIVERT` (rød) til `AKTIV` (grønn)
+- Annotasjonen dukker opp i **Oracle annotations (live)** med opprinnelig verdi
+- DDL kjøres: `ALTER TABLE ... ANNOTATIONS (ADD <navn> '...')`
+- **Arkiver**-knapp vises, **Publiser**-knapp skjules
+
+**Merk:** Vil feile med duplikat-feil hvis en annen AKTIV rad med samme
+type/kolonne/annotasjonsnavn allerede finnes – da må den aktive raden arkiveres først.
 
 **Godkjent:** ☐
 

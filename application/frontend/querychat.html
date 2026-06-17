@@ -1447,15 +1447,54 @@
     }
 
     .meta-panels {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      display: flex;
+      gap: 0;
+      align-items: flex-start;
+    }
+    .meta-col-left {
+      flex: 0 0 50%;
+      min-width: 200px;
+      max-width: 80%;
+      padding-right: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
-    @media (max-width: 900px) {
-      .meta-panels {
-        grid-template-columns: 1fr;
-      }
+    .meta-col-right {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      padding-left: 8px;
+      overflow: hidden;
+    }
+
+    .meta-splitter-v {
+      width: 6px;
+      background: var(--border);
+      cursor: col-resize;
+      flex-shrink: 0;
+      border-radius: 3px;
+      transition: background 0.12s;
+    }
+
+    .meta-splitter-v:hover, .meta-splitter-v.dragging {
+      background: var(--accent);
+    }
+
+    .meta-splitter-h {
+      height: 6px;
+      background: var(--border);
+      cursor: row-resize;
+      flex-shrink: 0;
+      border-radius: 3px;
+      transition: background 0.12s;
+      margin: 4px 0;
+    }
+
+    .meta-splitter-h:hover, .meta-splitter-h.dragging {
+      background: var(--accent);
     }
 
     .meta-panel {
@@ -1463,6 +1502,8 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .meta-panel-header {
@@ -1472,6 +1513,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-shrink: 0;
     }
 
     .meta-panel-header h4 {
@@ -1484,10 +1526,10 @@
 
     .meta-panel-body {
       padding: 14px;
-      max-height: 320px;
+      max-height: 400px;
       overflow-y: auto;
     }
-
+    
     .meta-panel-body::-webkit-scrollbar {
       width: 4px;
     }
@@ -2881,16 +2923,20 @@
         : '<div class="meta-empty">Ingen qc-annotasjoner ennå</div>';
 
       content.innerHTML = `
-    <div class="meta-panels">
-      <div class="meta-panel">
-        <div class="meta-panel-header"><h4>Kolonner og kommentarer</h4></div>
-        <div class="meta-panel-body">${tableComment}${colRows}</div>
+    <div class="meta-panels" id="meta-panels">
+      <div class="meta-col-left" id="meta-col-left">
+        <div class="meta-panel" style="height:100%">
+          <div class="meta-panel-header"><h4>Kolonner og kommentarer</h4></div>
+          <div class="meta-panel-body">${tableComment}${colRows}</div>
+        </div>
       </div>
-      <div>
-        <div class="meta-panel" style="margin-bottom:16px">
+      <div class="meta-splitter-v" id="meta-splitter-v"></div>
+      <div class="meta-col-right" id="meta-col-right">
+        <div class="meta-panel">
           <div class="meta-panel-header"><h4>Oracle annotations (live)</h4></div>
           <div class="meta-panel-body">${annotRows}</div>
         </div>
+        <div class="meta-splitter-h" id="meta-splitter-h"></div>
         <div class="meta-panel">
           <div class="meta-panel-header">
             <h4>Redigerbare annotasjoner</h4>
@@ -2900,6 +2946,7 @@
         </div>
       </div>
     </div>`;
+      initMetaSplitters();
     }
 
     // ── Modal ──────────────────────────────────────────────────────
@@ -3092,6 +3139,59 @@
         alert('Nettverksfeil: ' + e.message);
       }
     }    
+
+    function initMetaSplitters() {
+      const vSplitter = document.getElementById('meta-splitter-v');
+      const colLeft   = document.getElementById('meta-col-left');
+      const panels    = document.getElementById('meta-panels');
+
+      if (vSplitter && colLeft && panels) {
+        vSplitter.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          vSplitter.classList.add('dragging');
+          const startX  = e.clientX;
+          const startW  = colLeft.getBoundingClientRect().width;
+          const totalW  = panels.getBoundingClientRect().width;
+          function onMove(e) {
+            const newPct = Math.min(80, Math.max(20, (startW + e.clientX - startX) / totalW * 100));
+            colLeft.style.flex = '0 0 ' + newPct + '%';
+          }
+          function onUp() {
+            vSplitter.classList.remove('dragging');
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onUp);
+          }
+          document.addEventListener('mousemove', onMove);
+          document.addEventListener('mouseup', onUp);
+        });
+      }
+
+      const hSplitter = document.getElementById('meta-splitter-h');
+      const colRight  = document.getElementById('meta-col-right');
+
+      if (hSplitter && colRight) {
+        hSplitter.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          hSplitter.classList.add('dragging');
+          const startY   = e.clientY;
+          const topPanel = colRight.querySelectorAll('.meta-panel')[0];
+          const startH   = topPanel.getBoundingClientRect().height;
+          const totalH   = colRight.getBoundingClientRect().height;
+          function onMove(e) {
+            const newPct = Math.min(80, Math.max(20, (startH + e.clientY - startY) / totalH * 100));
+            topPanel.style.flex = '0 0 ' + newPct + '%';
+          }
+          function onUp() {
+            hSplitter.classList.remove('dragging');
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onUp);
+          }
+          document.addEventListener('mousemove', onMove);
+          document.addEventListener('mouseup', onUp);
+        });
+      }
+    }
+
   </script>
 </body>
 
