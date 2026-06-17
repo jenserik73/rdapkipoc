@@ -18,7 +18,7 @@ resource "oci_functions_function" "sql_executor" {
   memory_in_mbs      = "256"
   timeout_in_seconds = 300
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/sql-executor:latest"
-  image_digest       = "sha256:30366d6f0f90a1354205ccb26ddcb678015498fabf5bc43526392523ed095d1a"
+  image_digest       = "sha256:8c36282a530055dc75cab2c7c7109c1f026eb0fbf103155ffe4e4f8c3b557f05"
 
   config = {
     AI_PROFILE             = "QUERYCHAT_PROFILE"
@@ -100,5 +100,43 @@ resource "oci_functions_function" "admin_handler" {
     SMTP_USER                 = "ocid1.user.oc19..aaaaaaaawkogoic3q7guo4huvji3vb5kexemlqthtql3fcc3ickff73og4pq@ocid1.tenancy.oc19..aaaaaaaadu4nynpyltw2mbzb7qhmimjldhzpasq5vzffcv7mkw67vy5fnd3a.9k.com"
     EMAIL_SENDER              = "noreply@elcarocloud.no"
     FRONTEND_URL              = "https://querychat.elcarocloud.no"
+  }
+}
+
+resource "oci_functions_function" "chat_handler" {
+  application_id     = oci_functions_application.rdap_chatbot_application.id
+  display_name       = "chat-handler"
+  memory_in_mbs      = "256"
+  timeout_in_seconds = 60
+  image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/chat-handler:latest"
+  image_digest       = "sha256:4e7b036e1331b293ec3baa3168b8c17f219a6c5224136a6cc45e313dc0b9999b"
+
+  config = {
+    DB_DSN                 = "rdapkipocdb_high"
+    DB_USER                = "querychat"
+    DBPASS_SECRET_OCID     = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yauk7ukm6zwo65vuygwr6pay4ajv3cyg3vbvixygqzfovq"
+    WALLET_SECRET_OCID     = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yaxjtwi247netyi2vuamlrspftpykh2t37miwi2m4yll2q"
+    WALLETPASS_SECRET_OCID = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yac4hzlxmaenlhwgv4lujti7jbtudp7xzexjgi6elqpmda"
+    JWT_SECRET_OCID        = oci_vault_secret.querychat_jwt_secret.id
+    LOG_LEVEL              = "INFO"
+  }
+}
+
+resource "oci_functions_function" "profile_handler" {
+  application_id     = oci_functions_application.rdap_chatbot_application.id
+  display_name       = "profile-handler"
+  memory_in_mbs      = "256"
+  timeout_in_seconds = 60
+  image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/profile-handler:latest"
+  image_digest       = "sha256:78a3853a3dfbc851f6ecf32977dd92ac5bbe438ca5d674ffe4d7a35b38b73426"
+
+  config = {
+    DB_DSN                 = "rdapkipocdb_high"
+    DB_USER                = "querychat"
+    DBPASS_SECRET_OCID     = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yauk7ukm6zwo65vuygwr6pay4ajv3cyg3vbvixygqzfovq"
+    WALLET_SECRET_OCID     = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yaxjtwi247netyi2vuamlrspftpykh2t37miwi2m4yll2q"
+    WALLETPASS_SECRET_OCID = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yac4hzlxmaenlhwgv4lujti7jbtudp7xzexjgi6elqpmda"
+    JWT_SECRET_OCID        = oci_vault_secret.querychat_jwt_secret.id
+    LOG_LEVEL              = "INFO"
   }
 }

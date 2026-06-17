@@ -23,11 +23,15 @@ terraform import oci_vault_secret.rdapkipocdb_wallet_password <OCID>
 curl -s https://api.ipify.org
 
 ## Rydd opp codespace slik at vi ikke går tom for diskplass
+Clear package cache
+Purge Python pip cache
+Prune hidden Docker data
+Remove unused Docker volumes
 ```
-Clear package cache: sudo apt-get clean
-Purge Python pip cache: pip cache purge
-Prune hidden Docker data: sudo docker system prune -f
-Remove unused Docker volumes: sudo docker volume prune -f
+sudo apt-get clean
+pip cache purge
+sudo docker system prune -f
+sudo docker volume prune -f
 ```
 
 ## Test av login handler med curl

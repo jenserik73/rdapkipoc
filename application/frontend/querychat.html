@@ -32,1775 +32,367 @@
       --sans: 'IBM Plex Sans', sans-serif;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html,
-    body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--sans);
-      font-size: 14px;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; }
 
     #login-screen {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 32px;
+      display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200;
+      align-items: center; justify-content: center; flex-direction: column; gap: 32px;
     }
+    #login-screen.show { display: flex; }
 
-    #login-screen.show {
-      display: flex;
-    }
+    .login-box { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; padding: 32px; width: 380px; max-width: 95vw; }
+    .login-logo { font-family: var(--mono); font-size: 22px; font-weight: 600; color: var(--accent); text-align: center; margin-bottom: 8px; }
+    .login-logo span { color: var(--text2); }
+    .login-subtitle { text-align: center; color: var(--text3); font-size: 13px; margin-bottom: 28px; }
+    .login-field { margin-bottom: 14px; }
+    .login-field label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+    .login-field input { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--sans); font-size: 13px; padding: 10px 12px; border-radius: 8px; outline: none; transition: border-color 0.12s; }
+    .login-field input:focus { border-color: rgba(91, 127, 255, 0.4); }
+    .login-field input::placeholder { color: var(--text3); }
+    .login-btn { width: 100%; padding: 11px; background: var(--accent); border: none; color: white; font-family: var(--sans); font-size: 14px; font-weight: 500; border-radius: 8px; cursor: pointer; margin-top: 8px; transition: background 0.12s; }
+    .login-btn:hover { background: var(--accent2); }
+    .login-btn:disabled { background: var(--bg4); cursor: not-allowed; }
+    .login-error { color: var(--red); font-size: 12.5px; text-align: center; margin-top: 10px; min-height: 18px; }
+    .forgot-link { text-align: center; margin-top: 14px; font-size: 12px; color: var(--text3); }
+    .forgot-link a { color: var(--accent); cursor: pointer; text-decoration: none; }
+    .forgot-link a:hover { text-decoration: underline; }
 
-    .login-box {
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      border-radius: 16px;
-      padding: 32px;
-      width: 380px;
-      max-width: 95vw;
-    }
+    #forgot-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 300; align-items: center; justify-content: center; }
+    #forgot-modal.show { display: flex; }
 
-    .login-logo {
-      font-family: var(--mono);
-      font-size: 22px;
-      font-weight: 600;
-      color: var(--accent);
-      text-align: center;
-      margin-bottom: 8px;
-    }
+    #app { display: grid; grid-template-columns: 260px 1fr; height: 100vh; overflow: hidden; }
+    #sidebar { background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+    #sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    #sidebar-header .logo { font-family: var(--mono); font-size: 15px; font-weight: 600; color: var(--accent); letter-spacing: -0.5px; }
+    #sidebar-header .logo span { color: var(--text2); }
 
-    .login-logo span {
-      color: var(--text2);
-    }
+    #new-chat-btn { margin: 12px; padding: 9px 14px; background: rgba(91,127,255,0.12); border: 1px solid rgba(91,127,255,0.25); border-radius: 8px; color: var(--accent); font-family: var(--sans); font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.15s; }
+    #new-chat-btn:hover { background: rgba(91,127,255,0.2); }
 
-    .login-subtitle {
-      text-align: center;
-      color: var(--text3);
-      font-size: 13px;
-      margin-bottom: 28px;
-    }
-
-    .login-field {
-      margin-bottom: 14px;
-    }
-
-    .login-field label {
-      display: block;
-      font-size: 12px;
-      color: var(--text2);
-      margin-bottom: 6px;
-      font-weight: 500;
-    }
-
-    .login-field input {
-      width: 100%;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: var(--sans);
-      font-size: 13px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      outline: none;
-      transition: border-color 0.12s;
-    }
-
-    .login-field input:focus {
-      border-color: rgba(91, 127, 255, 0.4);
-    }
-
-    .login-field input::placeholder {
-      color: var(--text3);
-    }
-
-    .login-btn {
-      width: 100%;
-      padding: 11px;
-      background: var(--accent);
-      border: none;
-      color: white;
-      font-family: var(--sans);
-      font-size: 14px;
-      font-weight: 500;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: background 0.12s;
-    }
-
-    .login-btn:hover {
-      background: var(--accent2);
-    }
-
-    .login-btn:disabled {
-      background: var(--bg4);
-      cursor: not-allowed;
-    }
-
-    .login-error {
-      color: var(--red);
-      font-size: 12.5px;
-      text-align: center;
-      margin-top: 10px;
-      min-height: 18px;
-    }
-
-    .forgot-link {
-      text-align: center;
-      margin-top: 14px;
-      font-size: 12px;
-      color: var(--text3);
-    }
-
-    .forgot-link a {
-      color: var(--accent);
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .forgot-link a:hover {
-      text-decoration: underline;
-    }
-
-    #forgot-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      z-index: 300;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #forgot-modal.show {
-      display: flex;
-    }
-
-    #app {
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    #sidebar {
-      background: var(--bg2);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    #sidebar-header {
-      padding: 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    #sidebar-header .logo {
-      font-family: var(--mono);
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--accent);
-      letter-spacing: -0.5px;
-    }
-
-    #sidebar-header .logo span {
-      color: var(--text2);
-    }
-
-    #new-chat-btn {
-      margin: 12px;
-      padding: 9px 14px;
-      background: rgba(91, 127, 255, 0.12);
-      border: 1px solid rgba(91, 127, 255, 0.25);
-      border-radius: 8px;
-      color: var(--accent);
-      font-family: var(--sans);
-      font-size: 13px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.15s;
-    }
-
-    #new-chat-btn:hover {
-      background: rgba(91, 127, 255, 0.2);
-    }
-
-    #history-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 4px 8px;
-    }
-
-    #history-list::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    #history-list::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    #history-list::-webkit-scrollbar-thumb {
-      background: var(--bg4);
-      border-radius: 2px;
-    }
+    #history-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
+    #history-list::-webkit-scrollbar { width: 4px; }
+    #history-list::-webkit-scrollbar-track { background: transparent; }
+    #history-list::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
 
     .history-item {
-      padding: 9px 10px;
-      border-radius: 7px;
-      cursor: pointer;
-      color: var(--text2);
-      font-size: 12.5px;
-      line-height: 1.4;
-      transition: all 0.12s;
-      border: 1px solid transparent;
-      margin-bottom: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      padding: 9px 10px; border-radius: 7px; cursor: pointer; color: var(--text2); font-size: 12.5px;
+      line-height: 1.4; transition: all 0.12s; border: 1px solid transparent; margin-bottom: 2px;
+      display: flex; align-items: center; gap: 4px; min-width: 0;
     }
+    .history-item:hover { background: var(--bg3); color: var(--text); }
+    .history-item.active { background: var(--bg3); color: var(--text); border-color: var(--border); }
+    .history-item-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .history-item-del {
+      flex-shrink: 0; background: none; border: none; cursor: pointer; color: var(--text3);
+      font-size: 13px; padding: 2px 4px; border-radius: 4px; opacity: 0; transition: opacity 0.12s;
+      line-height: 1; display: flex; align-items: center;
+    }
+    .history-item:hover .history-item-del { opacity: 1; }
+    .history-item-del:hover { color: var(--red); background: rgba(240,96,96,0.1); }
 
-    .history-item:hover {
-      background: var(--bg3);
-      color: var(--text);
-    }
-
-    .history-item.active {
-      background: var(--bg3);
-      color: var(--text);
-      border-color: var(--border);
-    }
-
-    .history-section-label {
-      font-size: 10.5px;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 12px 10px 5px;
-    }
+    .history-section-label { font-size: 10.5px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; padding: 12px 10px 5px; }
 
     #sidebar-footer {
-      padding: 12px 16px;
-      border-top: 1px solid var(--border);
-      font-size: 11.5px;
-      color: var(--text3);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      padding: 12px 16px; border-top: 1px solid var(--border); font-size: 11.5px;
+      color: var(--text3); display: flex; align-items: center; gap: 8px;
     }
-
-    .env-badge {
-      font-family: var(--mono);
-      font-size: 10px;
-      background: var(--bg4);
-      border: 1px solid var(--border);
-      padding: 2px 7px;
-      border-radius: 4px;
-      color: var(--text2);
-    }
-
-    #user-info {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 12px;
-      color: var(--text2);
-    }
-
-    #logout-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px 6px;
-      border-radius: 5px;
-      color: var(--text3);
-      font-size: 11px;
-      font-family: var(--sans);
-      transition: all 0.12s;
-      white-space: nowrap;
-    }
-
-    #logout-btn:hover {
-      color: var(--red);
-      background: rgba(240, 96, 96, 0.08);
-    }
-
-    #change-password-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px 6px;
-      border-radius: 5px;
-      color: var(--text3);
-      font-size: 11px;
-      font-family: var(--sans);
-      transition: all 0.12s;
-      white-space: nowrap;
-    }
-
-    #change-password-btn:hover {
-      color: var(--accent);
-      background: rgba(91, 127, 255, 0.08);
-    }
+    .env-badge { font-family: var(--mono); font-size: 10px; background: var(--bg4); border: 1px solid var(--border); padding: 2px 7px; border-radius: 4px; color: var(--text2); }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px rgba(62,207,142,0.5); flex-shrink: 0; }
+    .status-dot.disconnected { background: var(--text3); box-shadow: none; }
 
     #admin-nav {
-      display: none;
-      margin: 0 12px 8px;
-      padding: 8px 12px;
-      background: rgba(240, 162, 42, 0.08);
-      border: 1px solid rgba(240, 162, 42, 0.2);
-      border-radius: 8px;
-      color: var(--amber);
-      font-size: 12.5px;
-      cursor: pointer;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.15s;
-    }
-
-    #admin-nav:hover {
-      background: rgba(240, 162, 42, 0.15);
-    }
-
-    #admin-nav.show {
-      display: flex;
-    }
-
-    #main {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    #chat-view {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    #chat-header {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-
-    #chat-header .title {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text);
-    }
-
-    #chat-header .meta {
-      font-size: 12px;
-      color: var(--text3);
-      margin-top: 1px;
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 6px rgba(62, 207, 142, 0.5);
-      flex-shrink: 0;
-    }
-
-    .status-dot.disconnected {
-      background: var(--text3);
-      box-shadow: none;
-    }
-
-    #messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px 0;
-    }
-
-    #messages::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    #messages::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    #messages::-webkit-scrollbar-thumb {
-      background: var(--bg4);
-      border-radius: 2px;
-    }
-
-    .msg-wrapper {
-      padding: 0 24px 2px;
-      max-width: 900px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .msg-wrapper+.msg-wrapper {
-      margin-top: 4px;
-    }
-
-    .msg {
-      display: flex;
-      gap: 12px;
-      padding: 12px 14px;
-      border-radius: 10px;
-      animation: fadeIn 0.2s ease;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(4px);
-      }
-
-      to {
-        opacity: 1;
-        transform: none;
-      }
-    }
-
-    .msg.user {
-      background: rgba(91, 127, 255, 0.08);
-      border: 1px solid rgba(91, 127, 255, 0.12);
-    }
-
-    .msg.assistant {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-    }
-
-    .msg.error {
-      background: rgba(240, 96, 96, 0.07);
-      border: 1px solid rgba(240, 96, 96, 0.2);
-    }
-
-    .avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 600;
-      font-family: var(--mono);
-    }
-
-    .avatar.user {
-      background: rgba(91, 127, 255, 0.2);
-      color: var(--accent);
-    }
-
-    .avatar.ai {
-      background: rgba(62, 207, 142, 0.15);
-      color: var(--green);
-      font-size: 10px;
-    }
-
-    .msg-body {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .msg-meta {
-      font-size: 11px;
-      color: var(--text3);
-      margin-bottom: 5px;
-    }
-
-    .msg-text {
-      color: var(--text2);
-      line-height: 1.65;
-      font-size: 13.5px;
-    }
-
-    .msg.user .msg-text {
-      color: var(--text);
-    }
-
-    .msg-text p+p {
-      margin-top: 8px;
-    }
-
-    .sql-block {
-      margin-top: 10px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .sql-block-header {
-      padding: 7px 12px;
-      background: var(--bg3);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .sql-block-header span {
-      font-family: var(--mono);
-      font-size: 10.5px;
-      color: var(--text3);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .copy-btn {
-      background: none;
-      border: none;
-      color: var(--text3);
-      cursor: pointer;
-      font-size: 11px;
-      font-family: var(--sans);
-      padding: 2px 6px;
-      border-radius: 4px;
-      transition: all 0.12s;
-    }
-
-    .copy-btn:hover {
-      color: var(--text);
-      background: var(--bg4);
-    }
-
-    .sql-block pre {
-      padding: 12px;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: #9ab0d8;
-      line-height: 1.6;
-      overflow-x: auto;
-    }
-
-    .sql-keyword {
-      color: #5b7fff;
-    }
-
-    .sql-string {
-      color: #f0a22a;
-    }
-
-    .sql-num {
-      color: #3ecf8e;
-    }
-
-    .result-container {
-      margin-top: 12px;
-    }
-
-    .result-tabs {
-      display: flex;
-      gap: 2px;
-      margin-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .rtab {
-      padding: 6px 12px;
-      font-size: 12px;
-      cursor: pointer;
-      border: none;
-      background: none;
-      color: var(--text3);
-      font-family: var(--sans);
-      border-radius: 6px 6px 0 0;
-      transition: all 0.12s;
-      position: relative;
-      bottom: -1px;
-      border: 1px solid transparent;
-      border-bottom: none;
-    }
-
-    .rtab:hover {
-      color: var(--text2);
-    }
-
-    .rtab.active {
-      color: var(--accent);
-      background: var(--bg2);
-      border-color: var(--border);
-    }
-
-    .result-panel {
-      display: none;
-    }
-
-    .result-panel.active {
-      display: block;
-    }
-
-    .result-table-wrap {
-      overflow-x: auto;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-
-    .result-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-family: var(--mono);
-      font-size: 12px;
-    }
-
-    .result-table th {
-      background: var(--bg3);
-      color: var(--text2);
-      font-weight: 500;
-      padding: 8px 12px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .result-table td {
-      padding: 7px 12px;
-      color: var(--text);
-      border-bottom: 1px solid var(--border);
-      max-width: 240px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .result-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .result-table tr:hover td {
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .result-table td.num {
-      color: var(--green);
-    }
-
-    .result-count {
-      font-size: 11.5px;
-      color: var(--text3);
-      margin-top: 7px;
-      font-family: var(--mono);
-    }
-
-    .chart-wrap {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-    }
-
-    .chart-controls {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
-
-    .chart-control-btn {
-      padding: 4px 10px;
-      font-size: 11.5px;
-      cursor: pointer;
-      font-family: var(--sans);
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      color: var(--text2);
-      border-radius: 5px;
-      transition: all 0.12s;
-    }
-
-    .chart-control-btn:hover {
-      color: var(--text);
-    }
-
-    .chart-control-btn.active {
-      background: rgba(91, 127, 255, 0.15);
-      border-color: rgba(91, 127, 255, 0.3);
-      color: var(--accent);
-    }
-
-    .chart-canvas-wrap {
-      position: relative;
-      height: 260px;
-    }
-
-    .text-result {
-      color: var(--text2);
-      line-height: 1.75;
-      font-size: 13.5px;
-    }
-
-    .text-result strong {
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    .feedback-row {
-      flex-wrap: wrap;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-    }
-
-    .feedback-label {
-      font-size: 11.5px;
-      color: var(--text3);
-    }
-
-    .fb-btn {
-      padding: 4px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      font-family: var(--sans);
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      color: var(--text2);
-      border-radius: 5px;
-      transition: all 0.12s;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .fb-btn:hover {
-      border-color: var(--border2);
-      color: var(--text);
-    }
-
-    .fb-btn.positive.active {
-      background: rgba(62, 207, 142, 0.1);
-      border-color: rgba(62, 207, 142, 0.3);
-      color: var(--green);
-    }
-
-    .fb-btn.negative.active {
-      background: rgba(240, 96, 96, 0.1);
-      border-color: rgba(240, 96, 96, 0.3);
-      color: var(--red);
-    }
-
-    .fb-comment {
-      width: 100%;
-      display: none;
-      margin-top: 8px;
-    }
-
-    .fb-comment.show {
-      width: 100%;
-      display: flex;
-      gap: 8px;
-    }
-
-    .fb-comment input {
-      flex: 1;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: var(--sans);
-      font-size: 12.5px;
-      padding: 6px 10px;
-      border-radius: 6px;
-      outline: none;
-      transition: border-color 0.12s;
-    }
-
-    .fb-comment input:focus {
-      border-color: var(--border2);
-    }
-
-    .fb-comment input::placeholder {
-      color: var(--text3);
-    }
-
-    .fb-send {
-      padding: 6px 12px;
-      background: rgba(91, 127, 255, 0.15);
-      border: 1px solid rgba(91, 127, 255, 0.25);
-      color: var(--accent);
-      font-family: var(--sans);
-      font-size: 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.12s;
-    }
-
-    .fb-send:hover {
-      background: rgba(91, 127, 255, 0.25);
-    }
-
-    #empty-state {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-      text-align: center;
-      gap: 16px;
-    }
-
-    #empty-state .ql {
-      font-family: var(--mono);
-      font-size: 38px;
-      color: var(--bg4);
-      line-height: 1;
-    }
-
-    #empty-state h2 {
-      font-size: 18px;
-      font-weight: 500;
-      color: var(--text);
-    }
-
-    #empty-state p {
-      color: var(--text2);
-      font-size: 13.5px;
-      max-width: 380px;
-      line-height: 1.65;
-    }
-
-    .example-queries {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 8px;
-    }
-
-    .example-q {
-      padding: 9px 14px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text2);
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.12s;
-      text-align: left;
-      font-family: var(--sans);
-    }
-
-    .example-q:hover {
-      background: var(--bg3);
-      color: var(--text);
-      border-color: var(--border2);
-    }
-
-    #input-area {
-      padding: 16px 24px 20px;
-      border-top: 1px solid var(--border);
-      flex-shrink: 0;
-      max-width: 900px;
-      width: 100%;
-      margin: 0 auto;
-    }
-
-    #input-wrap {
-      display: flex;
-      align-items: flex-end;
-      gap: 10px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 12px;
-      transition: border-color 0.15s;
-    }
-
-    #input-wrap:focus-within {
-      border-color: rgba(91, 127, 255, 0.35);
-    }
-
-    #query-input {
-      flex: 1;
-      background: none;
-      border: none;
-      outline: none;
-      resize: none;
-      color: var(--text);
-      font-family: var(--sans);
-      font-size: 14px;
-      line-height: 1.5;
-      min-height: 22px;
-      max-height: 180px;
-      overflow-y: auto;
-      padding: 0;
-    }
-
-    #query-input::placeholder {
-      color: var(--text3);
-    }
-
-    #query-input::-webkit-scrollbar {
-      width: 3px;
-    }
-
-    #query-input::-webkit-scrollbar-thumb {
-      background: var(--bg4);
-      border-radius: 2px;
-    }
-
-    #send-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      flex-shrink: 0;
-      background: var(--accent);
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s;
-    }
-
-    #send-btn:hover {
-      background: var(--accent2);
-    }
-
-    #send-btn:disabled {
-      background: var(--bg4);
-      cursor: not-allowed;
-    }
-
-    .input-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 7px;
-      padding: 0 2px;
-    }
-
-    .input-hint {
-      font-size: 11px;
-      color: var(--text3);
-    }
-
-    .input-hint kbd {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 1px 5px;
-      font-family: var(--mono);
-      font-size: 10px;
-    }
-
-    .thinking {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      padding: 4px 0;
-    }
-
-    .thinking span {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: bounce 1.2s infinite ease-in-out;
-    }
-
-    .thinking span:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .thinking span:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes bounce {
-
-      0%,
-      80%,
-      100% {
-        transform: scale(0.6);
-        opacity: 0.4;
-      }
-
-      40% {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    .icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 6px;
-      border-radius: 6px;
-      color: var(--text3);
-      transition: all 0.12s;
-      display: flex;
-      align-items: center;
-    }
-
-    .icon-btn:hover {
-      color: var(--text);
-      background: var(--bg3);
-    }
-
-    #config-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #config-modal.show {
-      display: flex;
-    }
-
-    .modal-box {
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      border-radius: 14px;
-      padding: 24px;
-      width: 440px;
-      max-width: 95vw;
-    }
-
-    .modal-title {
-      font-size: 16px;
-      font-weight: 500;
-      margin-bottom: 20px;
-      color: var(--text);
-    }
-
-    .field-group {
-      margin-bottom: 16px;
-    }
-
-    .field-group label {
-      display: block;
-      font-size: 12px;
-      color: var(--text2);
-      margin-bottom: 6px;
-      font-weight: 500;
-    }
-
-    .field-group input,
-    .field-group select {
-      width: 100%;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: var(--sans);
-      font-size: 13px;
-      padding: 8px 10px;
-      border-radius: 7px;
-      outline: none;
-      transition: border-color 0.12s;
-    }
-
-    .field-group input:focus,
-    .field-group select:focus {
-      border-color: rgba(91, 127, 255, 0.4);
-    }
-
-    .field-group input::placeholder {
-      color: var(--text3);
-    }
-
-    .field-group select option {
-      background: var(--bg3);
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
-      justify-content: flex-end;
-    }
-
-    .btn-cancel {
-      padding: 8px 16px;
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--text2);
-      font-family: var(--sans);
-      font-size: 13px;
-      border-radius: 7px;
-      cursor: pointer;
-      transition: all 0.12s;
-    }
-
-    .btn-cancel:hover {
-      color: var(--text);
-      border-color: var(--border2);
-    }
-
-    .btn-save {
-      padding: 8px 16px;
-      background: var(--accent);
-      border: none;
-      color: white;
-      font-family: var(--sans);
-      font-size: 13px;
-      border-radius: 7px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.12s;
-    }
-
-    .btn-save:hover {
-      background: var(--accent2);
-    }
-
-    #admin-view {
-      display: none;
-      flex-direction: column;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    #admin-view.show {
-      display: flex;
-    }
-
-    #admin-header {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-
-    #admin-header .title {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text);
-    }
-
-    #admin-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px;
-    }
-
-    .admin-tabs {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 20px;
-    }
-
-    .admin-tab {
-      padding: 8px 16px;
-      font-size: 13px;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      background: var(--bg2);
-      color: var(--text2);
-      font-family: var(--sans);
-      border-radius: 7px;
-      transition: all 0.12s;
-    }
-
-    .admin-tab:hover {
-      color: var(--text);
-    }
-
-    .admin-tab.active {
-      background: rgba(91, 127, 255, 0.12);
-      border-color: rgba(91, 127, 255, 0.3);
-      color: var(--accent);
-    }
-
-    .admin-section {
-      display: none;
-    }
-
-    .admin-section.active {
-      display: block;
-    }
-
-    .admin-toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .admin-toolbar h3 {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text);
-    }
-
-    .btn-primary {
-      padding: 7px 14px;
-      background: var(--accent);
-      border: none;
-      color: white;
-      font-family: var(--sans);
-      font-size: 12.5px;
-      border-radius: 7px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.12s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn-primary:hover {
-      background: var(--accent2);
-    }
-
-    .admin-table-wrap {
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-
-    .admin-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    .admin-table th {
-      background: var(--bg3);
-      color: var(--text2);
-      font-weight: 500;
-      padding: 10px 14px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-      font-size: 11.5px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .admin-table td {
-      padding: 11px 14px;
-      color: var(--text);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .admin-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .admin-table tr:hover td {
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-family: var(--mono);
-      font-weight: 500;
-    }
-
-    .badge-green {
-      background: rgba(62, 207, 142, 0.12);
-      color: var(--green);
-      border: 1px solid rgba(62, 207, 142, 0.2);
-    }
-
-    .badge-red {
-      background: rgba(240, 96, 96, 0.12);
-      color: var(--red);
-      border: 1px solid rgba(240, 96, 96, 0.2);
-    }
-
-    .badge-accent {
-      background: rgba(91, 127, 255, 0.12);
-      color: var(--accent);
-      border: 1px solid rgba(91, 127, 255, 0.2);
-    }
-
-    .badge-amber {
-      background: rgba(240, 162, 42, 0.12);
-      color: var(--amber);
-      border: 1px solid rgba(240, 162, 42, 0.2);
-    }
-
-    .action-btn {
-      padding: 4px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      font-family: var(--sans);
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      color: var(--text2);
-      border-radius: 5px;
-      transition: all 0.12s;
-      margin-right: 4px;
-    }
-
-    .action-btn:hover {
-      color: var(--text);
-      border-color: var(--border2);
-    }
-
-    .action-btn.danger:hover {
-      color: var(--red);
-      border-color: rgba(240, 96, 96, 0.3);
-      background: rgba(240, 96, 96, 0.08);
-    }
-
-    .loading-msg {
-      text-align: center;
-      color: var(--text3);
-      padding: 40px;
-      font-size: 13px;
-    }
-
-    #user-modal,
-    #role-modal,
-    #reset-modal,
-    #roles-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      z-index: 150;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #user-modal.show,
-    #role-modal.show,
-    #reset-modal.show,
-    #roles-modal.show {
-      display: flex;
-    }
-
-    .roles-modal-item {
-      display: flex;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .roles-modal-item:last-child {
-      border-bottom: none;
-    }
-
-    #messages-inner {
-      max-width: 900px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    /* ── Metadata-fane ───────────────────────────────────────────── */
-    .meta-object-selector {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      align-items: center;
-    }
-
-    .meta-object-selector select {
-      flex: 1;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: var(--sans);
-      font-size: 13px;
-      padding: 8px 10px;
-      border-radius: 7px;
-      outline: none;
-      transition: border-color 0.12s;
-    }
-
-    .meta-object-selector select:focus {
-      border-color: rgba(91, 127, 255, 0.4);
-    }
-
-    .meta-object-selector select option {
-      background: var(--bg3);
-    }
-
-    .meta-panels {
-      display: flex;
-      gap: 0;
-      height: calc(100vh - 250px);
-      min-height: 300px;
-    }
-    .meta-col-left {
-      flex: 0 0 calc(50% - 7px);
-      min-width: 200px;
-      max-width: 80%;
-      padding-right: 8px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .meta-col-right {
-      flex: 1;
-      min-width: 200px;
-      display: flex;
-      flex-direction: column;
-      padding-left: 8px;
-      overflow: hidden;
-    }
-
-    .meta-col-right .meta-panel {
-      flex: 1;
-    }
-
-    .meta-splitter-v {
-      width: 6px;
-      background: var(--border);
-      cursor: col-resize;
-      flex-shrink: 0;
-      border-radius: 3px;
-      transition: background 0.12s;
-    }
-
-    .meta-splitter-v:hover, .meta-splitter-v.dragging {
-      background: var(--accent);
-    }
-
-    .meta-splitter-h {
-      height: 6px;
-      background: var(--border);
-      cursor: row-resize;
-      flex-shrink: 0;
-      border-radius: 3px;
-      transition: background 0.12s;
-      margin: 4px 0;
-    }
-
-    .meta-splitter-h:hover, .meta-splitter-h.dragging {
-      background: var(--accent);
-    }
-
-    .meta-panel {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: auto;
-      display: flex;
-      flex-direction: column;
-      resize: both;
-      min-width: 150px;
-      min-height: 80px;
-    }
-
-    .meta-panel-header {
-      padding: 10px 14px;
-      background: var(--bg3);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-
-    .meta-panel-header h4 {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text2);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .meta-panel-body {
-      padding: 14px;
-      flex: 1;
-      overflow-y: auto;
-      min-height: 0;
-    }
-    
-    .meta-panel-body::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .meta-panel-body::-webkit-scrollbar-thumb {
-      background: var(--bg4);
-      border-radius: 2px;
-    }
-
-    .meta-col-item {
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-    }
-
-    .meta-col-item:last-child {
-      border-bottom: none;
-    }
-
-    .meta-col-name {
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--accent);
-      min-width: 180px;
-    }
-
-    .meta-col-type {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text3);
-    }
-
-    .meta-col-comment {
-      font-size: 12px;
-      color: var(--text2);
-      line-height: 1.5;
-      margin-top: 2px;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .meta-annotation-item {
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .meta-annotation-item:last-child {
-      border-bottom: none;
-    }
-
-    .meta-annotation-header {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 4px;
-    }
-
-    .meta-annotation-col {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--accent);
-    }
-
-    .meta-annotation-name {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--amber);
-    }
-
-    .meta-annotation-value {
-      font-size: 12px;
-      color: var(--text2);
-      line-height: 1.5;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .meta-qc-item {
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .meta-qc-item:last-child {
-      border-bottom: none;
-    }
-
-    .meta-qc-header {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 4px;
-      flex-wrap: wrap;
-    }
-
-    .meta-qc-value {
-      font-size: 12px;
-      color: var(--text2);
-      line-height: 1.5;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .meta-qc-footer {
-      font-size: 11px;
-      color: var(--text3);
-      margin-top: 4px;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .meta-empty {
-      color: var(--text3);
-      font-size: 12.5px;
-      text-align: center;
-      padding: 20px 0;
-    }
-
-    /* Ny annotasjonsmodal */
-    #meta-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.65);
-      z-index: 150;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #meta-modal.show {
-      display: flex;
-    }
-
-    .meta-modal-box {
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      border-radius: 14px;
-      padding: 24px;
-      width: 520px;
-      max-width: 95vw;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .meta-modal-box::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    .meta-modal-box::-webkit-scrollbar-thumb {
-      background: var(--bg4);
-      border-radius: 2px;
-    }
-
-    .meta-field-hint {
-      font-size: 11.5px;
-      color: var(--text3);
-      margin-top: 4px;
-      line-height: 1.5;
-    }
-
-    .meta-field-group {
-      margin-bottom: 14px;
-    }
-
-    .meta-field-group label {
-      display: block;
-      font-size: 12px;
-      color: var(--text2);
-      margin-bottom: 6px;
-      font-weight: 500;
-    }
-
-    .meta-field-group input,
-    .meta-field-group select,
-    .meta-field-group textarea {
-      width: 100%;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: var(--sans);
-      font-size: 13px;
-      padding: 8px 10px;
-      border-radius: 7px;
-      outline: none;
-      transition: border-color 0.12s;
-    }
-
-    .meta-field-group textarea {
-      resize: vertical;
-      min-height: 80px;
-      font-family: var(--mono);
-      font-size: 12px;
-    }
-
-    .meta-field-group input:focus,
-    .meta-field-group select:focus,
-    .meta-field-group textarea:focus {
-      border-color: rgba(91, 127, 255, 0.4);
-    }
-
-    .meta-field-group input::placeholder,
-    .meta-field-group textarea::placeholder {
-      color: var(--text3);
-    }
-
-    .meta-field-group select option {
-      background: var(--bg3);
-    }
-
-    .meta-field-group.hidden {
-      display: none;
-    }
-
-    #meta-modal-error {
-      color: var(--red);
-      font-size: 12.5px;
-      min-height: 18px;
-      margin-bottom: 8px;
-    }
-
-    #meta-modal-success {
-      color: var(--green);
-      font-size: 12.5px;
-      min-height: 18px;
-      margin-bottom: 8px;
-    }
-
-    .meta-ddl-preview {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 10px 12px;
-      font-family: var(--mono);
-      font-size: 11.5px;
-      color: #9ab0d8;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: break-word;
-      margin-top: 8px;
-    }
+      display: none; margin: 0 12px 8px; padding: 8px 12px; background: rgba(240,162,42,0.08);
+      border: 1px solid rgba(240,162,42,0.2); border-radius: 8px; color: var(--amber); font-size: 12.5px;
+      cursor: pointer; align-items: center; gap: 8px; transition: all 0.15s;
+    }
+    #admin-nav:hover { background: rgba(240,162,42,0.15); }
+    #admin-nav.show { display: flex; }
+
+    #main { display: flex; flex-direction: column; overflow: hidden; }
+    #chat-view { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+    #chat-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    #chat-header .title { font-size: 14px; font-weight: 500; color: var(--text); }
+    #chat-header .meta { font-size: 12px; color: var(--text3); margin-top: 1px; }
+
+    #messages { flex: 1; overflow-y: auto; padding: 24px 0; }
+    #messages::-webkit-scrollbar { width: 4px; }
+    #messages::-webkit-scrollbar-track { background: transparent; }
+    #messages::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+    .msg-wrapper { padding: 0 24px 2px; max-width: 900px; margin: 0 auto; width: 100%; }
+    .msg-wrapper + .msg-wrapper { margin-top: 4px; }
+    .msg { display: flex; gap: 12px; padding: 12px 14px; border-radius: 10px; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .msg.user { background: rgba(91,127,255,0.08); border: 1px solid rgba(91,127,255,0.12); }
+    .msg.assistant { background: var(--bg2); border: 1px solid var(--border); }
+    .msg.error { background: rgba(240,96,96,0.07); border: 1px solid rgba(240,96,96,0.2); }
+
+    .avatar { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; font-family: var(--mono); }
+    .avatar.user { background: rgba(91,127,255,0.2); color: var(--accent); }
+    .avatar.ai { background: rgba(62,207,142,0.15); color: var(--green); font-size: 10px; }
+
+    .msg-body { flex: 1; min-width: 0; }
+    .msg-meta { font-size: 11px; color: var(--text3); margin-bottom: 5px; }
+    .msg-text { color: var(--text2); line-height: 1.65; font-size: 13.5px; }
+    .msg.user .msg-text { color: var(--text); }
+    .msg-text p + p { margin-top: 8px; }
+
+    .sql-block { margin-top: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .sql-block-header { padding: 7px 12px; background: var(--bg3); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .sql-block-header span { font-family: var(--mono); font-size: 10.5px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
+    .copy-btn { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 11px; font-family: var(--sans); padding: 2px 6px; border-radius: 4px; transition: all 0.12s; }
+    .copy-btn:hover { color: var(--text); background: var(--bg4); }
+    .sql-block pre { padding: 12px; font-family: var(--mono); font-size: 12px; color: #9ab0d8; line-height: 1.6; overflow-x: auto; }
+    .sql-keyword { color: #5b7fff; }
+    .sql-string { color: #f0a22a; }
+    .sql-num { color: #3ecf8e; }
+
+    .result-container { margin-top: 12px; }
+    .result-tabs { display: flex; gap: 2px; margin-bottom: 10px; border-bottom: 1px solid var(--border); }
+    .rtab { padding: 6px 12px; font-size: 12px; cursor: pointer; border: none; background: none; color: var(--text3); font-family: var(--sans); border-radius: 6px 6px 0 0; transition: all 0.12s; position: relative; bottom: -1px; border: 1px solid transparent; border-bottom: none; }
+    .rtab:hover { color: var(--text2); }
+    .rtab.active { color: var(--accent); background: var(--bg2); border-color: var(--border); }
+    .result-panel { display: none; }
+    .result-panel.active { display: block; }
+    .result-table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+    .result-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }
+    .result-table th { background: var(--bg3); color: var(--text2); font-weight: 500; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .result-table td { padding: 7px 12px; color: var(--text); border-bottom: 1px solid var(--border); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .result-table tr:last-child td { border-bottom: none; }
+    .result-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .result-table td.num { color: var(--green); }
+    .result-count { font-size: 11.5px; color: var(--text3); margin-top: 7px; font-family: var(--mono); }
+
+    .chart-wrap { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+    .chart-controls { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .chart-control-btn { padding: 4px 10px; font-size: 11.5px; cursor: pointer; font-family: var(--sans); background: var(--bg3); border: 1px solid var(--border); color: var(--text2); border-radius: 5px; transition: all 0.12s; }
+    .chart-control-btn:hover { color: var(--text); }
+    .chart-control-btn.active { background: rgba(91,127,255,0.15); border-color: rgba(91,127,255,0.3); color: var(--accent); }
+    .chart-canvas-wrap { position: relative; height: 260px; }
+    .text-result { color: var(--text2); line-height: 1.75; font-size: 13.5px; }
+    .text-result strong { color: var(--text); font-weight: 500; }
+
+    .feedback-row { flex-wrap: wrap; display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .feedback-label { font-size: 11.5px; color: var(--text3); }
+    .fb-btn { padding: 4px 10px; font-size: 12px; cursor: pointer; font-family: var(--sans); background: var(--bg3); border: 1px solid var(--border); color: var(--text2); border-radius: 5px; transition: all 0.12s; display: flex; align-items: center; gap: 5px; }
+    .fb-btn:hover { border-color: var(--border2); color: var(--text); }
+    .fb-btn.positive.active { background: rgba(62,207,142,0.1); border-color: rgba(62,207,142,0.3); color: var(--green); }
+    .fb-btn.negative.active { background: rgba(240,96,96,0.1); border-color: rgba(240,96,96,0.3); color: var(--red); }
+    .fb-comment { width: 100%; display: none; margin-top: 8px; }
+    .fb-comment.show { width: 100%; display: flex; gap: 8px; }
+    .fb-comment input { flex: 1; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--sans); font-size: 12.5px; padding: 6px 10px; border-radius: 6px; outline: none; transition: border-color 0.12s; }
+    .fb-comment input:focus { border-color: var(--border2); }
+    .fb-comment input::placeholder { color: var(--text3); }
+    .fb-send { padding: 6px 12px; background: rgba(91,127,255,0.15); border: 1px solid rgba(91,127,255,0.25); color: var(--accent); font-family: var(--sans); font-size: 12px; border-radius: 6px; cursor: pointer; transition: all 0.12s; }
+    .fb-send:hover { background: rgba(91,127,255,0.25); }
+
+    #empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; gap: 16px; }
+    #empty-state .ql { font-family: var(--mono); font-size: 38px; color: var(--bg4); line-height: 1; }
+    #empty-state h2 { font-size: 18px; font-weight: 500; color: var(--text); }
+    #empty-state p { color: var(--text2); font-size: 13.5px; max-width: 380px; line-height: 1.65; }
+    .example-queries { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+    .example-q { padding: 9px 14px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; color: var(--text2); font-size: 13px; cursor: pointer; transition: all 0.12s; text-align: left; font-family: var(--sans); }
+    .example-q:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+
+    #input-area { padding: 16px 24px 20px; border-top: 1px solid var(--border); flex-shrink: 0; max-width: 900px; width: 100%; margin: 0 auto; }
+    #input-wrap { display: flex; align-items: flex-end; gap: 10px; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; transition: border-color 0.15s; }
+    #input-wrap:focus-within { border-color: rgba(91,127,255,0.35); }
+    #query-input { flex: 1; background: none; border: none; outline: none; resize: none; color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.5; min-height: 22px; max-height: 180px; overflow-y: auto; padding: 0; }
+    #query-input::placeholder { color: var(--text3); }
+    #query-input::-webkit-scrollbar { width: 3px; }
+    #query-input::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+    #send-btn { width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0; background: var(--accent); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+    #send-btn:hover { background: var(--accent2); }
+    #send-btn:disabled { background: var(--bg4); cursor: not-allowed; }
+    .input-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 7px; padding: 0 2px; }
+    .input-hint { font-size: 11px; color: var(--text3); }
+    .input-hint kbd { background: var(--bg3); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: var(--mono); font-size: 10px; }
+
+    .thinking { display: flex; gap: 5px; align-items: center; padding: 4px 0; }
+    .thinking span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: bounce 1.2s infinite ease-in-out; }
+    .thinking span:nth-child(2) { animation-delay: 0.2s; }
+    .thinking span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+
+    .icon-btn { background: none; border: none; cursor: pointer; padding: 6px; border-radius: 6px; color: var(--text3); transition: all 0.12s; display: flex; align-items: center; }
+    .icon-btn:hover { color: var(--text); background: var(--bg3); }
+
+    #config-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 100; align-items: center; justify-content: center; }
+    #config-modal.show { display: flex; }
+    .modal-box { background: var(--bg2); border: 1px solid var(--border2); border-radius: 14px; padding: 24px; width: 440px; max-width: 95vw; }
+    .modal-title { font-size: 16px; font-weight: 500; margin-bottom: 20px; color: var(--text); }
+    .field-group { margin-bottom: 16px; }
+    .field-group label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+    .field-group input, .field-group select { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--sans); font-size: 13px; padding: 8px 10px; border-radius: 7px; outline: none; transition: border-color 0.12s; }
+    .field-group input:focus, .field-group select:focus { border-color: rgba(91,127,255,0.4); }
+    .field-group input::placeholder { color: var(--text3); }
+    .field-group select option { background: var(--bg3); }
+    .modal-actions { display: flex; gap: 8px; margin-top: 4px; justify-content: flex-end; }
+    .btn-cancel { padding: 8px 16px; background: none; border: 1px solid var(--border); color: var(--text2); font-family: var(--sans); font-size: 13px; border-radius: 7px; cursor: pointer; transition: all 0.12s; }
+    .btn-cancel:hover { color: var(--text); border-color: var(--border2); }
+    .btn-save { padding: 8px 16px; background: var(--accent); border: none; color: white; font-family: var(--sans); font-size: 13px; border-radius: 7px; cursor: pointer; font-weight: 500; transition: all 0.12s; }
+    .btn-save:hover { background: var(--accent2); }
+
+    #admin-view { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+    #admin-view.show { display: flex; }
+    #admin-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    #admin-header .title { font-size: 14px; font-weight: 500; color: var(--text); }
+    #admin-content { flex: 1; overflow-y: auto; padding: 24px; }
+    .admin-tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+    .admin-tab { padding: 8px 16px; font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); font-family: var(--sans); border-radius: 7px; transition: all 0.12s; }
+    .admin-tab:hover { color: var(--text); }
+    .admin-tab.active { background: rgba(91,127,255,0.12); border-color: rgba(91,127,255,0.3); color: var(--accent); }
+    .admin-section { display: none; }
+    .admin-section.active { display: block; }
+    .admin-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .admin-toolbar h3 { font-size: 14px; font-weight: 500; color: var(--text); }
+    .btn-primary { padding: 7px 14px; background: var(--accent); border: none; color: white; font-family: var(--sans); font-size: 12.5px; border-radius: 7px; cursor: pointer; font-weight: 500; transition: all 0.12s; display: flex; align-items: center; gap: 6px; }
+    .btn-primary:hover { background: var(--accent2); }
+    .admin-table-wrap { border-radius: 10px; border: 1px solid var(--border); overflow: hidden; }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .admin-table th { background: var(--bg3); color: var(--text2); font-weight: 500; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .admin-table td { padding: 11px 14px; color: var(--text); border-bottom: 1px solid var(--border); }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: var(--mono); font-weight: 500; }
+    .badge-green { background: rgba(62,207,142,0.12); color: var(--green); border: 1px solid rgba(62,207,142,0.2); }
+    .badge-red { background: rgba(240,96,96,0.12); color: var(--red); border: 1px solid rgba(240,96,96,0.2); }
+    .badge-accent { background: rgba(91,127,255,0.12); color: var(--accent); border: 1px solid rgba(91,127,255,0.2); }
+    .badge-amber { background: rgba(240,162,42,0.12); color: var(--amber); border: 1px solid rgba(240,162,42,0.2); }
+    .action-btn { padding: 4px 10px; font-size: 12px; cursor: pointer; font-family: var(--sans); background: var(--bg3); border: 1px solid var(--border); color: var(--text2); border-radius: 5px; transition: all 0.12s; margin-right: 4px; }
+    .action-btn:hover { color: var(--text); border-color: var(--border2); }
+    .action-btn.danger:hover { color: var(--red); border-color: rgba(240,96,96,0.3); background: rgba(240,96,96,0.08); }
+    .loading-msg { text-align: center; color: var(--text3); padding: 40px; font-size: 13px; }
+
+    #user-modal, #role-modal, #reset-modal, #roles-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 150; align-items: center; justify-content: center; }
+    #user-modal.show, #role-modal.show, #reset-modal.show, #roles-modal.show { display: flex; }
+    .roles-modal-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .roles-modal-item:last-child { border-bottom: none; }
+    #messages-inner { max-width: 900px; margin: 0 auto; width: 100%; }
+
+    /* ── Profiles-fane ─────────────────────────────────────── */
+    .profiles-layout { display: grid; grid-template-columns: 210px 1fr; height: calc(100vh - 200px); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .profiles-user-list { border-right: 1px solid var(--border); background: var(--bg2); display: flex; flex-direction: column; overflow: hidden; }
+    .profiles-user-list-header { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    .profiles-user-list-header input { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--sans); font-size: 12px; padding: 6px 10px; border-radius: 6px; outline: none; }
+    .profiles-user-list-header input::placeholder { color: var(--text3); }
+    .profiles-user-list-header input:focus { border-color: rgba(91,127,255,0.4); }
+    #profiles-user-ul { flex: 1; overflow-y: auto; list-style: none; padding: 4px; margin: 0; }
+    #profiles-user-ul::-webkit-scrollbar { width: 3px; }
+    #profiles-user-ul::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+    #profiles-user-ul li { padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 12.5px; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transition: all 0.1s; }
+    #profiles-user-ul li:hover { background: var(--bg3); color: var(--text); }
+    #profiles-user-ul li.active { background: rgba(91,127,255,0.12); color: var(--accent); }
+    .profiles-settings-panel { padding: 0; overflow-y: auto; display: flex; flex-direction: column; }
+    .profiles-settings-panel::-webkit-scrollbar { width: 4px; }
+    .profiles-settings-panel::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+    .profiles-empty { display: flex; align-items: center; justify-content: center; flex: 1; color: var(--text3); font-size: 13px; }
+    .profiles-editor-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--bg2); flex-shrink: 0; }
+    .profiles-editor-header strong { display: block; font-size: 13.5px; color: var(--text); }
+    .profiles-editor-header small { color: var(--text3); font-size: 11.5px; }
+    .profiles-settings-body { padding: 16px 18px; flex: 1; }
+    .profiles-category { margin-bottom: 20px; }
+    .profiles-category-title { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    .profiles-setting-row { display: grid; grid-template-columns: 185px 1fr 80px 28px; align-items: center; gap: 8px; padding: 5px 0; }
+    .profiles-setting-key { font-family: var(--mono); font-size: 11.5px; color: var(--text2); }
+    .profiles-setting-key small { display: block; font-family: var(--sans); font-size: 10.5px; color: var(--text3); margin-top: 1px; }
+    .profiles-setting-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--sans); font-size: 12.5px; padding: 5px 8px; border-radius: 6px; outline: none; transition: border-color 0.12s; width: 100%; }
+    .profiles-setting-input:focus { border-color: rgba(91,127,255,0.4); }
+    .profiles-setting-input.overridden { border-color: rgba(91,127,255,0.35); background: rgba(91,127,255,0.05); }
+    .profiles-setting-default { font-size: 10.5px; color: var(--text3); font-family: var(--mono); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .profiles-reset-btn { background: none; border: 1px solid transparent; cursor: pointer; color: var(--text3); border-radius: 4px; padding: 3px 6px; font-size: 12px; transition: all 0.12s; }
+    .profiles-reset-btn:hover:not(:disabled) { color: var(--amber); border-color: rgba(240,162,42,0.3); background: rgba(240,162,42,0.08); }
+    .profiles-reset-btn:disabled { opacity: 0.3; cursor: default; }
+
+    /* ── Metadata-fane ─────────────────────────────────────── */
+    .meta-object-selector { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
+    .meta-object-selector select { flex: 1; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--sans); font-size: 13px; padding: 8px 10px; border-radius: 7px; outline: none; transition: border-color 0.12s; }
+    .meta-object-selector select:focus { border-color: rgba(91,127,255,0.4); }
+    .meta-object-selector select option { background: var(--bg3); }
+    .meta-panels { display: flex; gap: 0; height: calc(100vh - 250px); min-height: 300px; }
+    .meta-col-left { flex: 0 0 calc(50% - 7px); min-width: 200px; max-width: 80%; padding-right: 8px; overflow: hidden; display: flex; flex-direction: column; }
+    .meta-col-right { flex: 1; min-width: 200px; display: flex; flex-direction: column; padding-left: 8px; overflow: hidden; }
+    .meta-col-right .meta-panel { flex: 1; }
+    .meta-splitter-v { width: 6px; background: var(--border); cursor: col-resize; flex-shrink: 0; border-radius: 3px; transition: background 0.12s; }
+    .meta-splitter-v:hover, .meta-splitter-v.dragging { background: var(--accent); }
+    .meta-splitter-h { height: 6px; background: var(--border); cursor: row-resize; flex-shrink: 0; border-radius: 3px; transition: background 0.12s; margin: 4px 0; }
+    .meta-splitter-h:hover, .meta-splitter-h.dragging { background: var(--accent); }
+    .meta-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: auto; display: flex; flex-direction: column; resize: both; min-width: 150px; min-height: 80px; }
+    .meta-panel-header { padding: 10px 14px; background: var(--bg3); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .meta-panel-header h4 { font-size: 12px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; }
+    .meta-panel-body { padding: 14px; flex: 1; overflow-y: auto; min-height: 0; }
+    .meta-panel-body::-webkit-scrollbar { width: 4px; }
+    .meta-panel-body::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+    .meta-col-item { padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 8px; }
+    .meta-col-item:last-child { border-bottom: none; }
+    .meta-col-name { font-family: var(--mono); font-size: 12px; color: var(--accent); min-width: 180px; }
+    .meta-col-type { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+    .meta-col-comment { font-size: 12px; color: var(--text2); line-height: 1.5; margin-top: 2px; white-space: pre-wrap; word-break: break-word; }
+    .meta-annotation-item { padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .meta-annotation-item:last-child { border-bottom: none; }
+    .meta-annotation-header { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .meta-annotation-col { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+    .meta-annotation-name { font-family: var(--mono); font-size: 11px; color: var(--amber); }
+    .meta-annotation-value { font-size: 12px; color: var(--text2); line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+    .meta-qc-item { padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .meta-qc-item:last-child { border-bottom: none; }
+    .meta-qc-header { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; flex-wrap: wrap; }
+    .meta-qc-value { font-size: 12px; color: var(--text2); line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+    .meta-qc-footer { font-size: 11px; color: var(--text3); margin-top: 4px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .meta-empty { color: var(--text3); font-size: 12.5px; text-align: center; padding: 20px 0; }
+
+    #meta-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 150; align-items: center; justify-content: center; }
+    #meta-modal.show { display: flex; }
+    .meta-modal-box { background: var(--bg2); border: 1px solid var(--border2); border-radius: 14px; padding: 24px; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
+    .meta-modal-box::-webkit-scrollbar { width: 4px; }
+    .meta-modal-box::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+    .meta-field-hint { font-size: 11.5px; color: var(--text3); margin-top: 4px; line-height: 1.5; }
+    .meta-field-group { margin-bottom: 14px; }
+    .meta-field-group label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+    .meta-field-group input, .meta-field-group select, .meta-field-group textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--sans); font-size: 13px; padding: 8px 10px; border-radius: 7px; outline: none; transition: border-color 0.12s; }
+    .meta-field-group textarea { resize: vertical; min-height: 80px; font-family: var(--mono); font-size: 12px; }
+    .meta-field-group input:focus, .meta-field-group select:focus, .meta-field-group textarea:focus { border-color: rgba(91,127,255,0.4); }
+    .meta-field-group input::placeholder, .meta-field-group textarea::placeholder { color: var(--text3); }
+    .meta-field-group select option { background: var(--bg3); }
+    .meta-field-group.hidden { display: none; }
+    #meta-modal-error { color: var(--red); font-size: 12.5px; min-height: 18px; margin-bottom: 8px; }
+    #meta-modal-success { color: var(--green); font-size: 12.5px; min-height: 18px; margin-bottom: 8px; }
+    .meta-ddl-preview { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px; font-family: var(--mono); font-size: 11.5px; color: #9ab0d8; line-height: 1.6; white-space: pre-wrap; word-break: break-word; margin-top: 8px; }
+
+    /* ── Header dropdowns ──────────────────────────────────── */
+    .hdr-dropdown { position: relative; }
+    .hdr-dropdown-menu {
+      display: none; position: absolute; top: calc(100% + 6px); left: 0;
+      min-width: 190px; background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.45); z-index: 500; padding: 4px 0;
+    }
+    .hdr-dropdown-menu--right { left: auto; right: 0; }
+    .hdr-dropdown-menu.open { display: block; }
+    .hdr-dd-user { padding: 10px 14px 8px; }
+    .hdr-dd-user strong { display: block; font-size: 13px; color: var(--text); font-weight: 500; }
+    .hdr-dd-user span { font-size: 11.5px; color: var(--text3); }
+    .hdr-dd-divider { height: 1px; background: var(--border); margin: 3px 0; }
+    .hdr-dd-item {
+      display: block; width: 100%; text-align: left; padding: 8px 14px;
+      border: none; background: none; cursor: pointer; font-size: 13px;
+      color: var(--text2); font-family: var(--sans); transition: all 0.1s;
+    }
+    .hdr-dd-item:hover { background: var(--bg3); color: var(--text); }
+    .hdr-dd-item--danger { color: var(--red); }
+    .hdr-dd-item--danger:hover { background: rgba(240,96,96,0.08); color: var(--red); }
   </style>
 </head>
 
 <body>
 
   <!-- Reset password screen (lenke fra e-post) -->
-  <div id="reset-screen"
-    style="display:none;position:fixed;inset:0;background:var(--bg);z-index:250;align-items:center;justify-content:center;flex-direction:column;gap:32px;">
+  <div id="reset-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:250;align-items:center;justify-content:center;flex-direction:column;gap:32px;">
     <div class="login-box">
       <div class="login-logo">query<span>chat</span></div>
       <div class="login-subtitle">Sett nytt passord</div>
-      <div class="login-field">
-        <label>Nytt passord</label>
-        <input type="password" id="reset-new-password" placeholder="Minst 8 tegn" />
-      </div>
-      <div class="login-field">
-        <label>Bekreft passord</label>
-        <input type="password" id="reset-confirm-password" placeholder="Gjenta passord" />
-      </div>
+      <div class="login-field"><label>Nytt passord</label><input type="password" id="reset-new-password" placeholder="Minst 8 tegn" /></div>
+      <div class="login-field"><label>Bekreft passord</label><input type="password" id="reset-confirm-password" placeholder="Gjenta passord" /></div>
       <button class="login-btn" id="reset-screen-btn" onclick="doResetFromUrl()">Sett nytt passord</button>
       <div class="login-error" id="reset-screen-error"></div>
     </div>
@@ -1811,14 +403,8 @@
     <div class="login-box">
       <div class="login-logo">query<span>chat</span></div>
       <div class="login-subtitle">Logg inn for å fortsette</div>
-      <div class="login-field">
-        <label>E-post</label>
-        <input type="email" id="login-email" placeholder="bruker@domene.no" autocomplete="email" />
-      </div>
-      <div class="login-field">
-        <label>Passord</label>
-        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
-      </div>
+      <div class="login-field"><label>E-post</label><input type="email" id="login-email" placeholder="bruker@domene.no" autocomplete="email" /></div>
+      <div class="login-field"><label>Passord</label><input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" /></div>
       <button class="login-btn" id="login-btn" onclick="doLogin()">Logg inn</button>
       <div class="login-error" id="login-error"></div>
       <div class="forgot-link"><a onclick="showForgot()">Glemt passord?</a></div>
@@ -1829,10 +415,7 @@
   <div id="forgot-modal">
     <div class="modal-box">
       <div class="modal-title">Tilbakestill passord</div>
-      <div class="field-group">
-        <label>E-postadresse</label>
-        <input type="email" id="forgot-email" placeholder="bruker@domene.no" />
-      </div>
+      <div class="field-group"><label>E-postadresse</label><input type="email" id="forgot-email" placeholder="bruker@domene.no" /></div>
       <div id="forgot-msg" style="font-size:12.5px;min-height:18px;margin-bottom:8px;color:var(--green)"></div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeForgot()">Avbryt</button>
@@ -1848,71 +431,69 @@
         <div class="logo">query<span>chat</span></div>
       </div>
       <button id="new-chat-btn" onclick="newChat()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Ny samtale
       </button>
       <div id="admin-nav" onclick="showAdmin()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-        </svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         Administrasjon
       </div>
       <div id="history-list"></div>
       <div id="sidebar-footer">
         <div class="status-dot" id="status-dot"></div>
         <span class="env-badge">eu-frankfurt-2</span>
-        <span id="user-info">–</span>
-        <button id="change-password-btn" onclick="openChangePasswordModal(false)">Bytt passord</button>
-        <button id="logout-btn" onclick="doLogout()">Logg ut</button>
+        <span id="user-info" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--text2)">–</span>
       </div>
     </div>
 
     <div id="main">
+      <!-- Permanent topplinje -->
+      <div id="global-header" style="padding:0 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:4px;height:48px;flex-shrink:0;background:var(--bg2);">
+        <button class="icon-btn" title="Eksporter historikk" onclick="exportHistory()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+        <div class="hdr-dropdown" id="settings-dropdown">
+          <button class="icon-btn" id="settings-dd-btn" title="Innstillinger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+          <div class="hdr-dropdown-menu hdr-dropdown-menu--right" id="settings-dd-menu">
+            <button class="hdr-dd-item" onclick="openConfig();closeAllDropdowns()">Konfigurasjon</button>
+          </div>
+        </div>
+        <div class="hdr-dropdown" id="profile-dropdown">
+          <button class="icon-btn" id="profile-dd-btn" title="Brukerprofil">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </button>
+          <div class="hdr-dropdown-menu hdr-dropdown-menu--right" id="profile-dd-menu">
+            <div class="hdr-dd-user">
+              <strong id="hdr-display-name">–</strong>
+              <span id="hdr-email">–</span>
+            </div>
+            <div class="hdr-dd-divider"></div>
+            <button class="hdr-dd-item" onclick="openChangePasswordModal(false);closeAllDropdowns()">Bytt passord</button>
+            <div class="hdr-dd-divider"></div>
+            <button class="hdr-dd-item hdr-dd-item--danger" onclick="doLogout()">Logg ut</button>
+          </div>
+        </div>
+      </div>
       <div id="chat-view">
         <div id="chat-header">
           <div>
-            <nav style="display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:4px">
-              <a onclick="showChat()" style="color:var(--accent);cursor:pointer;text-decoration:none;transition:opacity 0.12s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">Home</a>
-            </nav>
             <div class="title" id="chat-title">Ny samtale</div>
             <div class="meta">sql-executor · API Gateway</div>
           </div>
-          <div style="display:flex;gap:6px;align-items:center">
-            <button class="icon-btn" title="Innstillinger" onclick="openConfig()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <circle cx="12" cy="12" r="3" />
-                <path
-                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-            </button>
-            <button class="icon-btn" title="Eksporter historikk" onclick="exportHistory()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-            </button>
-          </div>
+
         </div>
         <div id="messages">
           <div id="messages-inner">
             <div id="empty-state">
               <img src="/logo_emptystate.png" style="max-width:240px;width:100%" alt="QueryChat" />
               <h2>QueryChat</h2>
-              <p>Hei! Hva kan jeg hjelpe deg med? Du kan stille spørsmål på naturlig norsk eller engelsk, og resultatene
-                vises som tabell, tekst eller graf.</p>
+              <p>Hei! Hva kan jeg hjelpe deg med? Du kan stille spørsmål på naturlig norsk eller engelsk, og resultatene vises som tabell, tekst eller graf.</p>
               <div class="example-queries">
                 <button class="example-q" onclick="useExample(this)">Vis de 10 siste meldingene fra loggene</button>
-                <button class="example-q" onclick="useExample(this)">Hva er gjennomsnittlig responstid per tjeneste
-                  siste uke?</button>
-                <button class="example-q" onclick="useExample(this)">Tell antall feil per dag de siste 30
-                  dagene</button>
+                <button class="example-q" onclick="useExample(this)">Hva er gjennomsnittlig responstid per tjeneste siste uke?</button>
+                <button class="example-q" onclick="useExample(this)">Tell antall feil per dag de siste 30 dagene</button>
                 <button class="example-q" onclick="useExample(this)">Vis alle tabeller i databasen</button>
               </div>
             </div>
@@ -1922,10 +503,7 @@
           <div id="input-wrap">
             <textarea id="query-input" placeholder="Spør om dataene dine..." rows="1"></textarea>
             <button id="send-btn" onclick="sendQuery()" title="Send (Enter)">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
-                <line x1="12" y1="19" x2="12" y2="5" />
-                <polyline points="5 12 12 5 19 12" />
-              </svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
             </button>
           </div>
           <div class="input-footer">
@@ -1939,7 +517,7 @@
         <div id="admin-header">
           <nav style="display:flex;align-items:center;gap:6px;font-size:13px">
             <a onclick="showChat()" style="color:var(--accent);cursor:pointer;text-decoration:none;transition:opacity 0.12s" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">Home</a>
-            <span style="color:var(--text3)">&#8250;</span>
+            <span style="color:var(--text3)">›</span>
             <span id="admin-breadcrumb-tab" style="color:var(--text2)">Administrasjon</span>
           </nav>
         </div>
@@ -1947,65 +525,57 @@
           <div class="admin-tabs">
             <button class="admin-tab active" onclick="switchAdminTab('users', this)">Brukere</button>
             <button class="admin-tab" onclick="switchAdminTab('roles', this)">Roller</button>
-            <button class="admin-tab" id="meta-tab-btn" onclick="switchAdminTab('metadata', this)"
-              style="display:none">Metadata</button>
+            <button class="admin-tab" id="meta-tab-btn" onclick="switchAdminTab('metadata', this)" style="display:none">Metadata</button>
+            <button class="admin-tab" id="profiles-tab-btn" onclick="switchAdminTab('profiles', this)" style="display:none">Brukerprofiler</button>
           </div>
           <div class="admin-section active" id="admin-users">
-            <div class="admin-toolbar">
-              <h3>Brukere</h3>
-              <button class="btn-primary" onclick="openUserModal()">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                Ny bruker
-              </button>
-            </div>
-            <div id="users-table-wrap" class="admin-table-wrap">
-              <div class="loading-msg">Laster brukere…</div>
-            </div>
+            <div class="admin-toolbar"><h3>Brukere</h3><button class="btn-primary" onclick="openUserModal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ny bruker</button></div>
+            <div id="users-table-wrap" class="admin-table-wrap"><div class="loading-msg">Laster brukere…</div></div>
           </div>
           <div class="admin-section" id="admin-roles">
-            <div class="admin-toolbar">
-              <h3>Roller</h3>
-              <button class="btn-primary" onclick="openRoleModal()">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                Ny rolle
-              </button>
-            </div>
-            <div id="roles-table-wrap" class="admin-table-wrap">
-              <div class="loading-msg">Laster roller…</div>
-            </div>
+            <div class="admin-toolbar"><h3>Roller</h3><button class="btn-primary" onclick="openRoleModal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ny rolle</button></div>
+            <div id="roles-table-wrap" class="admin-table-wrap"><div class="loading-msg">Laster roller…</div></div>
           </div>
           <div class="admin-section" id="admin-metadata">
-            <div class="admin-toolbar">
-              <h3>Metadata - NL2SQL-annotasjoner</h3>
-              <button class="btn-primary" onclick="openMetaModal()">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                Ny annotasjon
-              </button>
-            </div>
-            <!-- Objektvelger -->
+            <div class="admin-toolbar"><h3>Metadata - NL2SQL-annotasjoner</h3><button class="btn-primary" onclick="openMetaModal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ny annotasjon</button></div>
             <div class="meta-object-selector">
               <select id="meta-object-select" onchange="loadMetaObject()" style="max-width:420px">
                 <option value="">- Velg tabell -</option>
                 <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK">KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK</option>
                 <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER">KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER</option>
                 <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_BEMANNING">KI_GRUNNLAG_ORACLE_RDAP_BEMANNING</option>
-                <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA">KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA
-                </option>
+                <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA">KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA</option>
               </select>
             </div>
-
-            <!-- Paneler -->
-            <div id="meta-content">
-              <div class="meta-empty" style="padding:40px">Velg en tabell for å se annotasjoner og kommentarer</div>
+            <div id="meta-content"><div class="meta-empty" style="padding:40px">Velg en tabell for å se annotasjoner og kommentarer</div></div>
+          </div>
+          <!-- ── Brukerprofiler-fane ── -->
+          <div class="admin-section" id="admin-profiles">
+            <div class="admin-toolbar">
+              <h3>Brukerprofiler</h3>
+              <button class="btn-primary" id="profiles-reset-all-btn" onclick="profilesResetAll()" style="display:none">
+                ↺ Tilbakestill alle for valgt bruker
+              </button>
+            </div>
+            <div class="profiles-layout">
+              <div class="profiles-user-list">
+                <div class="profiles-user-list-header">
+                  <input type="search" id="profiles-user-search" placeholder="Filtrer brukere…" oninput="profilesFilterUsers()" />
+                </div>
+                <ul id="profiles-user-ul"></ul>
+              </div>
+              <div class="profiles-settings-panel" id="profiles-settings-panel">
+                <div class="profiles-empty" id="profiles-placeholder">← Velg en bruker</div>
+                <div id="profiles-editor" style="display:none;flex-direction:column;flex:1">
+                  <div class="profiles-editor-header">
+                    <div>
+                      <strong id="profiles-editor-name"></strong>
+                      <small id="profiles-editor-email"></small>
+                    </div>
+                  </div>
+                  <div class="profiles-settings-body" id="profiles-settings-body"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2017,10 +587,8 @@
   <div id="config-modal">
     <div class="modal-box">
       <div class="modal-title">Konfigurasjon</div>
-      <div class="field-group"><label>API Gateway URL</label><input type="text" id="cfg-url"
-          placeholder="https://api.elcarocloud.no/v1/ask" /></div>
-      <div class="field-group"><label>Feedback endpoint</label><input type="text" id="cfg-fb"
-          placeholder="https://api.elcarocloud.no/v1/feedback" /></div>
+      <div class="field-group"><label>API Gateway URL</label><input type="text" id="cfg-url" placeholder="https://api.elcarocloud.no/v1/ask" /></div>
+      <div class="field-group"><label>Feedback endpoint</label><input type="text" id="cfg-fb" placeholder="https://api.elcarocloud.no/v1/feedback" /></div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeConfig()">Avbryt</button>
         <button class="btn-save" onclick="saveConfig()">Lagre</button>
@@ -2032,17 +600,11 @@
   <div id="user-modal">
     <div class="modal-box">
       <div class="modal-title">Ny bruker</div>
-      <div class="field-group"><label>E-post</label><input type="email" id="um-email" placeholder="bruker@domene.no" />
-      </div>
-      <div class="field-group"><label>Navn</label><input type="text" id="um-name" placeholder="Fornavn Etternavn" />
-      </div>
-      <div class="field-group"><label>Midlertidig passord</label><input type="text" id="um-pass"
-          placeholder="La stå tomt for autogenerert" /></div>
+      <div class="field-group"><label>E-post</label><input type="email" id="um-email" placeholder="bruker@domene.no" /></div>
+      <div class="field-group"><label>Navn</label><input type="text" id="um-name" placeholder="Fornavn Etternavn" /></div>
+      <div class="field-group"><label>Midlertidig passord</label><input type="text" id="um-pass" placeholder="La stå tomt for autogenerert" /></div>
       <div id="um-error" style="color:var(--red);font-size:12.5px;min-height:18px;margin-bottom:8px"></div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeUserModal()">Avbryt</button>
-        <button class="btn-save" onclick="saveUser()">Opprett</button>
-      </div>
+      <div class="modal-actions"><button class="btn-cancel" onclick="closeUserModal()">Avbryt</button><button class="btn-save" onclick="saveUser()">Opprett</button></div>
     </div>
   </div>
 
@@ -2051,13 +613,9 @@
     <div class="modal-box">
       <div class="modal-title">Ny rolle</div>
       <div class="field-group"><label>Navn</label><input type="text" id="rm-name" placeholder="f.eks. analyst" /></div>
-      <div class="field-group"><label>Beskrivelse</label><input type="text" id="rm-desc"
-          placeholder="Kort beskrivelse av rollen" /></div>
+      <div class="field-group"><label>Beskrivelse</label><input type="text" id="rm-desc" placeholder="Kort beskrivelse av rollen" /></div>
       <div id="rm-error" style="color:var(--red);font-size:12.5px;min-height:18px;margin-bottom:8px"></div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeRoleModal()">Avbryt</button>
-        <button class="btn-save" onclick="saveRole()">Opprett</button>
-      </div>
+      <div class="modal-actions"><button class="btn-cancel" onclick="closeRoleModal()">Avbryt</button><button class="btn-save" onclick="saveRole()">Opprett</button></div>
     </div>
   </div>
 
@@ -2070,80 +628,26 @@
         <label>Nytt passord (la stå tomt for autogenerert)</label>
         <div style="position:relative">
           <input type="password" id="reset-pass" style="padding-right:36px" />
-          <button onclick="toggleResetPassVisibility()" type="button"
-            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
-            <svg id="reset-pass-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
+          <button onclick="toggleResetPassVisibility()" type="button" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
+            <svg id="reset-pass-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
         </div>
       </div>
       <div id="reset-result" style="font-size:12.5px;min-height:18px;margin-bottom:8px;color:var(--green)"></div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeResetModal()">Lukk</button>
-        <button class="btn-save" onclick="doResetPassword()">Sett passord</button>
-      </div>
+      <div class="modal-actions"><button class="btn-cancel" onclick="closeResetModal()">Lukk</button><button class="btn-save" onclick="doResetPassword()">Sett passord</button></div>
     </div>
   </div>
 
-  <!-- Change password modal (bytt eget passord) -->
-  <div id="change-password-modal"
-    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:300;align-items:center;justify-content:center;">
+  <!-- Change password modal -->
+  <div id="change-password-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:300;align-items:center;justify-content:center;">
     <div class="modal-box">
       <div class="modal-title" id="change-password-title">Bytt passord</div>
-      <div id="change-password-required-msg"
-        style="display:none;font-size:12.5px;color:var(--amber);margin-bottom:14px;padding:8px 12px;background:rgba(240,162,42,0.08);border:1px solid rgba(240,162,42,0.2);border-radius:7px;">
-        Du må bytte passord før du kan fortsette.
-      </div>
-      <div class="field-group">
-        <label>Gammelt passord</label>
-        <div style="position:relative">
-          <input type="password" id="cp-old" placeholder="Ditt nåværende passord" style="padding-right:36px" />
-          <button onclick="toggleCpVisibility('cp-old','cp-old-eye')" type="button"
-            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
-            <svg id="cp-old-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      <div class="field-group">
-        <label>Nytt passord</label>
-        <div style="position:relative">
-          <input type="password" id="cp-new" placeholder="Minst 8 tegn" style="padding-right:36px" />
-          <button onclick="toggleCpVisibility('cp-new','cp-new-eye')" type="button"
-            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
-            <svg id="cp-new-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      <div class="field-group">
-        <label>Bekreft nytt passord</label>
-        <div style="position:relative">
-          <input type="password" id="cp-confirm" placeholder="Gjenta nytt passord" style="padding-right:36px" />
-          <button onclick="toggleCpVisibility('cp-confirm','cp-confirm-eye')" type="button"
-            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
-            <svg id="cp-confirm-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-          </button>
-        </div>
-      </div>
+      <div id="change-password-required-msg" style="display:none;font-size:12.5px;color:var(--amber);margin-bottom:14px;padding:8px 12px;background:rgba(240,162,42,0.08);border:1px solid rgba(240,162,42,0.2);border-radius:7px;">Du må bytte passord før du kan fortsette.</div>
+      <div class="field-group"><label>Gammelt passord</label><div style="position:relative"><input type="password" id="cp-old" placeholder="Ditt nåværende passord" style="padding-right:36px" /><button onclick="toggleCpVisibility('cp-old','cp-old-eye')" type="button" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;"><svg id="cp-old-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+      <div class="field-group"><label>Nytt passord</label><div style="position:relative"><input type="password" id="cp-new" placeholder="Minst 8 tegn" style="padding-right:36px" /><button onclick="toggleCpVisibility('cp-new','cp-new-eye')" type="button" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;"><svg id="cp-new-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+      <div class="field-group"><label>Bekreft nytt passord</label><div style="position:relative"><input type="password" id="cp-confirm" placeholder="Gjenta nytt passord" style="padding-right:36px" /><button onclick="toggleCpVisibility('cp-confirm','cp-confirm-eye')" type="button" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;"><svg id="cp-confirm-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
       <div id="cp-error" style="color:var(--red);font-size:12.5px;min-height:18px;margin-bottom:8px"></div>
-      <div class="modal-actions">
-        <button class="btn-cancel" id="cp-cancel-btn" onclick="closeChangePasswordModal()">Avbryt</button>
-        <button class="btn-save" onclick="doChangePassword()">Bytt passord</button>
-      </div>
+      <div class="modal-actions"><button class="btn-cancel" id="cp-cancel-btn" onclick="closeChangePasswordModal()">Avbryt</button><button class="btn-save" onclick="doChangePassword()">Bytt passord</button></div>
     </div>
   </div>
 
@@ -2154,84 +658,24 @@
       <input type="hidden" id="roles-user-id" />
       <div id="roles-modal-content" style="margin-bottom:16px;min-height:60px;max-height:300px;overflow-y:auto"></div>
       <div id="roles-modal-msg" style="font-size:12.5px;min-height:18px;margin-bottom:8px;color:var(--green)"></div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeRolesModal()">Lukk</button>
-      </div>
+      <div class="modal-actions"><button class="btn-cancel" onclick="closeRolesModal()">Lukk</button></div>
     </div>
   </div>
+
+  <!-- Meta annotasjon modal -->
   <div id="meta-modal">
     <div class="meta-modal-box">
       <div class="modal-title">Annotasjon</div>
-
-      <div class="meta-field-group">
-        <label>Tabell</label>
-        <select id="mm-object" onchange="onMetaObjectChange()">
-          <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK">KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK</option>
-          <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER">KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER</option>
-          <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_BEMANNING">KI_GRUNNLAG_ORACLE_RDAP_BEMANNING</option>
-          <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA">KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA</option>
-        </select>
-      </div>
-
-      <div class="meta-field-group">
-        <label>Kolonne <span style="color:var(--text3);font-weight:400">(la stå tomt for tabellnivå)</span></label>
-        <select id="mm-column">
-          <option value="">(tabellnivå)</option>
-        </select>
-      </div>
-
-      <div class="meta-field-group">
-        <label>Type</label>
-        <select id="mm-sync-target" onchange="onMetaSyncTargetChange()">
-          <option value="ANNOTATION">ANNOTATION – Oracle 23ai annotations (direktiv til LLM)</option>
-          <option value="COMMENT">COMMENT – COMMENT ON (kontekstuell forklaring)</option>
-          <option value="NONE">NONE – Internt notat (ikke synket til DB)</option>
-        </select>
-      </div>
-
-      <div class="meta-field-group" id="mm-annotation-name-group">
-        <label>Annotasjonsnavn</label>
-        <select id="mm-annotation-name">
-          <option value="DESCRIPTION">DESCRIPTION</option>
-          <option value="ALIASES">ALIASES</option>
-          <option value="UNITS">UNITS</option>
-          <option value="JOIN COLUMN">JOIN COLUMN</option>
-        </select>
-        <div class="meta-field-hint">DESCRIPTION = direktiv/formel til LLM. ALIASES = alternative navn. UNITS = enhet.
-          JOIN COLUMN = kolonner for JOIN.</div>
-      </div>
-
-      <div class="meta-field-group" id="mm-notat-type-group" style="display:none">
-        <label>Notattype</label>
-        <select id="mm-notat-type">
-          <option value="DATAKVALITET">DATAKVALITET</option>
-          <option value="VIEW_KANDIDAT">VIEW_KANDIDAT</option>
-          <option value="TODO">TODO</option>
-        </select>
-      </div>
-
-      <div class="meta-field-group">
-        <label>Verdi / innhold</label>
-        <textarea id="mm-value" placeholder="Skriv inn annotasjonsverdi, kommentar eller notat…" rows="4"></textarea>
-        <div class="meta-field-hint" id="mm-value-hint">For DESCRIPTION med ANNOTATION: skriv direktivet som SQL-syntaks
-          der det er mulig, f.eks. &quot;Bruk IN ('A','B') for X totalt&quot;.</div>
-      </div>
-
-      <div class="meta-field-group">
-        <label>Status</label>
-        <select id="mm-status">
-          <option value="AKTIV">AKTIV – synk til databasen nå</option>
-          <option value="UTKAST">UTKAST – lagre uten å synke</option>
-        </select>
-      </div>
-
+      <div class="meta-field-group"><label>Tabell</label><select id="mm-object" onchange="onMetaObjectChange()"><option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK">KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK</option><option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER">KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER</option><option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_BEMANNING">KI_GRUNNLAG_ORACLE_RDAP_BEMANNING</option><option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA">KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA</option></select></div>
+      <div class="meta-field-group"><label>Kolonne <span style="color:var(--text3);font-weight:400">(la stå tomt for tabellnivå)</span></label><select id="mm-column"><option value="">(tabellnivå)</option></select></div>
+      <div class="meta-field-group"><label>Type</label><select id="mm-sync-target" onchange="onMetaSyncTargetChange()"><option value="ANNOTATION">ANNOTATION – Oracle 23ai annotations (direktiv til LLM)</option><option value="COMMENT">COMMENT – COMMENT ON (kontekstuell forklaring)</option><option value="NONE">NONE – Internt notat (ikke synket til DB)</option></select></div>
+      <div class="meta-field-group" id="mm-annotation-name-group"><label>Annotasjonsnavn</label><select id="mm-annotation-name"><option value="DESCRIPTION">DESCRIPTION</option><option value="ALIASES">ALIASES</option><option value="UNITS">UNITS</option><option value="JOIN COLUMN">JOIN COLUMN</option></select><div class="meta-field-hint">DESCRIPTION = direktiv/formel til LLM. ALIASES = alternative navn. UNITS = enhet. JOIN COLUMN = kolonner for JOIN.</div></div>
+      <div class="meta-field-group" id="mm-notat-type-group" style="display:none"><label>Notattype</label><select id="mm-notat-type"><option value="DATAKVALITET">DATAKVALITET</option><option value="VIEW_KANDIDAT">VIEW_KANDIDAT</option><option value="TODO">TODO</option></select></div>
+      <div class="meta-field-group"><label>Verdi / innhold</label><textarea id="mm-value" placeholder="Skriv inn annotasjonsverdi, kommentar eller notat…" rows="4"></textarea><div class="meta-field-hint" id="mm-value-hint">For DESCRIPTION med ANNOTATION: skriv direktivet som SQL-syntaks der det er mulig.</div></div>
+      <div class="meta-field-group"><label>Status</label><select id="mm-status"><option value="AKTIV">AKTIV – synk til databasen nå</option><option value="UTKAST">UTKAST – lagre uten å synke</option></select></div>
       <div id="meta-modal-error"></div>
       <div id="meta-modal-success"></div>
-
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeMetaModal()">Avbryt</button>
-        <button class="btn-save" onclick="saveMetaAnnotation()">Lagre</button>
-      </div>
+      <div class="modal-actions"><button class="btn-cancel" onclick="closeMetaModal()">Avbryt</button><button class="btn-save" onclick="saveMetaAnnotation()">Lagre</button></div>
     </div>
   </div>
 
@@ -2267,7 +711,6 @@
 
     function showLoginScreen() { document.getElementById('login-screen').classList.add('show'); document.getElementById('login-error').textContent = ''; document.getElementById('login-email').value = ''; document.getElementById('login-password').value = ''; }
     function hideLoginScreen() { document.getElementById('login-screen').classList.remove('show'); }
-
     document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
     async function doLogin() {
@@ -2312,18 +755,50 @@
 
     function onLoggedIn() {
       if (!authState.user && authState.accessToken) {
-        try { const p = JSON.parse(atob(authState.accessToken.split('.')[1])); authState.user = { email: p.email, display_name: p.name, roles: p.roles, permissions: p.permissions }; } catch { }
+        try { const p = JSON.parse(atob(authState.accessToken.split('.')[1])); authState.user = { email: p.email, display_name: p.name, roles: p.roles, permissions: p.permissions, sub: p.sub }; } catch { }
       }
       updateUserInfo(); updateAdminNav(); updateStatusDot(); showChat(); init();
+      // Oppdater header-brukerinfo
+      if (authState.user) {
+        const dn = document.getElementById('hdr-display-name');
+        const em = document.getElementById('hdr-email');
+        if (dn) dn.textContent = authState.user.display_name || authState.user.email || '–';
+        if (em) em.textContent = authState.user.email || '–';
+      }
     }
+
+    // ── Header dropdown-logikk ─────────────────────────────────
+    function closeAllDropdowns() {
+      document.querySelectorAll('.hdr-dropdown-menu').forEach(m => m.classList.remove('open'));
+    }
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.hdr-dropdown')) closeAllDropdowns();
+    });
+    function initHeaderDropdowns() {
+      ['settings-dd-btn','profile-dd-btn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        const menu = btn.closest('.hdr-dropdown').querySelector('.hdr-dropdown-menu');
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const isOpen = menu.classList.contains('open');
+          closeAllDropdowns();
+          if (!isOpen) menu.classList.add('open');
+        });
+      });
+    }
+    // Kjør etter at DOM er ferdig (script er nederst i body, så dette er trygt)
+    initHeaderDropdowns();
+
     function updateUserInfo() { const el = document.getElementById('user-info'); if (authState.user) el.textContent = authState.user.display_name || authState.user.email; }
     function updateAdminNav() {
       const perms = authState.user?.permissions || [];
       const hasAdmin = perms.includes('admin:users') || perms.includes('admin:roles');
       document.getElementById('admin-nav').classList.toggle('show', hasAdmin);
-      // Vis Metadata-fane kun for brukere med admin:metadata
-      const metaTabBtn = document.getElementById('meta-tab-btn');
-      if (metaTabBtn) metaTabBtn.style.display = perms.includes('admin:metadata') ? '' : 'none';
+      const metaBtn = document.getElementById('meta-tab-btn');
+      if (metaBtn) metaBtn.style.display = perms.includes('admin:metadata') ? '' : 'none';
+      const profBtn = document.getElementById('profiles-tab-btn');
+      if (profBtn) profBtn.style.display = perms.includes('admin:profiles') ? '' : 'none';
     }
     function updateStatusDot() { document.getElementById('status-dot').className = config.url ? 'status-dot' : 'status-dot disconnected'; }
 
@@ -2333,21 +808,23 @@
     function openConfig() { document.getElementById('cfg-url').value = config.url; document.getElementById('cfg-fb').value = config.fbUrl; document.getElementById('config-modal').classList.add('show'); }
     function closeConfig() { document.getElementById('config-modal').classList.remove('show'); }
     function saveConfig() { config.url = document.getElementById('cfg-url').value.trim(); config.fbUrl = document.getElementById('cfg-fb').value.trim(); localStorage.setItem('qc_url', config.url); localStorage.setItem('qc_fb', config.fbUrl); updateStatusDot(); closeConfig(); }
-    document.getElementById('config-modal').addEventListener('click', function (e) { if (e.target === this) closeConfig(); });
+    document.getElementById('config-modal').addEventListener('click', function(e) { if (e.target === this) closeConfig(); });
 
     function switchAdminTab(tab, btn) {
       document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('admin-' + tab).classList.add('active');
-      const labels = { users: 'Brukere', roles: 'Roller', metadata: 'Metadata' };
+      const labels = { users: 'Brukere', roles: 'Roller', metadata: 'Metadata', profiles: 'Brukerprofiler' };
       const bc = document.getElementById('admin-breadcrumb-tab');
       if (bc) bc.textContent = 'Administrasjon › ' + (labels[tab] || tab);
       if (tab === 'users') loadAdminUsers();
       if (tab === 'roles') loadAdminRoles();
       if (tab === 'metadata') initMetadataTab();
+      if (tab === 'profiles') initProfilesTab();
     }
 
+    // ── Admin: Users ───────────────────────────────────────────
     async function loadAdminUsers() {
       const wrap = document.getElementById('users-table-wrap');
       wrap.innerHTML = '<div class="loading-msg">Laster brukere…</div>';
@@ -2362,27 +839,22 @@
     function renderUsersTable(users) {
       const wrap = document.getElementById('users-table-wrap');
       if (!users.length) { wrap.innerHTML = '<div class="loading-msg">Ingen brukere</div>'; return; }
-      const rows = users.map(u => `
-        <tr>
-          <td>${escHtml(u.display_name)}</td>
-          <td>${escHtml(u.email)}</td>
-          <td>${u.roles.map(r => `<span class="badge badge-accent">${escHtml(r.name)}</span>`).join(' ') || '<span style="color:var(--text3);font-size:12px">Ingen</span>'}</td>
-          <td><span class="badge ${u.active ? 'badge-green' : 'badge-red'}">${u.active ? 'Aktiv' : 'Inaktiv'}</span></td>
-          <td>
-            <button class="action-btn" onclick="openRolesModal('${escAttr(u.id)}','${escAttr(u.display_name)}')">Roller</button>
-            <button class="action-btn" onclick="openResetModal('${escAttr(u.id)}','${escAttr(u.display_name)}')">Passord</button>
-            <button class="action-btn" onclick="toggleUserActive('${escAttr(u.id)}',${u.active})">${u.active ? 'Deaktiver' : 'Aktiver'}</button>
-          </td>
-        </tr>`).join('');
+      const rows = users.map(u => `<tr>
+        <td>${escHtml(u.display_name)}</td><td>${escHtml(u.email)}</td>
+        <td>${u.roles.map(r => `<span class="badge badge-accent">${escHtml(r.name)}</span>`).join(' ') || '<span style="color:var(--text3);font-size:12px">Ingen</span>'}</td>
+        <td><span class="badge ${u.active ? 'badge-green' : 'badge-red'}">${u.active ? 'Aktiv' : 'Inaktiv'}</span></td>
+        <td>
+          <button class="action-btn" onclick="openRolesModal('${escAttr(u.id)}','${escAttr(u.display_name)}')">Roller</button>
+          <button class="action-btn" onclick="openResetModal('${escAttr(u.id)}','${escAttr(u.display_name)}')">Passord</button>
+          <button class="action-btn" onclick="toggleUserActive('${escAttr(u.id)}',${u.active})">${u.active ? 'Deaktiver' : 'Aktiver'}</button>
+        </td></tr>`).join('');
       wrap.innerHTML = `<table class="admin-table"><thead><tr><th>Navn</th><th>E-post</th><th>Roller</th><th>Status</th><th>Handlinger</th></tr></thead><tbody>${rows}</tbody></table>`;
     }
 
     function openUserModal() { document.getElementById('um-email').value = ''; document.getElementById('um-name').value = ''; document.getElementById('um-pass').value = ''; document.getElementById('um-error').textContent = ''; document.getElementById('user-modal').classList.add('show'); }
     function closeUserModal() { document.getElementById('user-modal').classList.remove('show'); }
     async function saveUser() {
-      const email = document.getElementById('um-email').value.trim();
-      const name = document.getElementById('um-name').value.trim();
-      const pass = document.getElementById('um-pass').value.trim();
+      const email = document.getElementById('um-email').value.trim(), name = document.getElementById('um-name').value.trim(), pass = document.getElementById('um-pass').value.trim();
       const errEl = document.getElementById('um-error');
       if (!email || !name) { errEl.textContent = 'Fyll inn e-post og navn'; return; }
       try {
@@ -2392,72 +864,50 @@
         if (data.ok) { closeUserModal(); loadAdminUsers(); } else errEl.textContent = data.error || 'Feil ved opprettelse';
       } catch (e) { errEl.textContent = e.message; }
     }
-
     async function toggleUserActive(userId, currentActive) {
       try { await apiFetch(API_BASE + '/admin/users/' + userId, { method: 'PUT', body: JSON.stringify({ active: !currentActive }) }); loadAdminUsers(); }
       catch (e) { alert('Feil: ' + e.message); }
     }
 
     function openResetModal(userId, name) {
-      document.getElementById('reset-user-id').value = userId;
-      document.getElementById('reset-pass').value = '';
-      document.getElementById('reset-result').textContent = '';
+      document.getElementById('reset-user-id').value = userId; document.getElementById('reset-pass').value = ''; document.getElementById('reset-result').textContent = '';
       document.getElementById('reset-modal').querySelector('.modal-title').textContent = 'Sett nytt passord – ' + name;
       document.getElementById('reset-modal').classList.add('show');
     }
     function closeResetModal() { document.getElementById('reset-modal').classList.remove('show'); }
-
     function toggleResetPassVisibility() {
-      const input = document.getElementById('reset-pass');
-      const eye = document.getElementById('reset-pass-eye');
+      const input = document.getElementById('reset-pass'), eye = document.getElementById('reset-pass-eye');
       if (input.type === 'password') { input.type = 'text'; eye.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'; }
       else { input.type = 'password'; eye.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'; }
     }
-
     async function doResetPassword() {
-      const userId = document.getElementById('reset-user-id').value;
-      const pass = document.getElementById('reset-pass').value.trim();
+      const userId = document.getElementById('reset-user-id').value, pass = document.getElementById('reset-pass').value.trim();
       const resEl = document.getElementById('reset-result');
       try {
         const body = {}; if (pass) body.password = pass;
         const res = await apiFetch(API_BASE + '/admin/users/' + userId + '/reset-password', { method: 'POST', body: JSON.stringify(body) });
         const data = await res.json();
-        if (data.ok) { resEl.style.color = 'var(--green)'; resEl.textContent = pass ? 'Passord satt' : 'Passord tilbakestilt – informer brukeren om nytt passord via annen kanal'; }
+        if (data.ok) { resEl.style.color = 'var(--green)'; resEl.textContent = pass ? 'Passord satt' : 'Passord tilbakestilt'; }
         else { resEl.style.color = 'var(--red)'; resEl.textContent = data.error || 'Feil'; }
       } catch (e) { resEl.style.color = 'var(--red)'; resEl.textContent = e.message; }
     }
 
-    // ── Change password modal ──────────────────────────────────
     function openChangePasswordModal(required) {
-      document.getElementById('cp-old').value = '';
-      document.getElementById('cp-new').value = '';
-      document.getElementById('cp-confirm').value = '';
-      document.getElementById('cp-error').textContent = '';
-      const reqMsg = document.getElementById('change-password-required-msg');
-      const cancelBtn = document.getElementById('cp-cancel-btn');
-      const title = document.getElementById('change-password-title');
+      document.getElementById('cp-old').value = ''; document.getElementById('cp-new').value = ''; document.getElementById('cp-confirm').value = ''; document.getElementById('cp-error').textContent = '';
+      const reqMsg = document.getElementById('change-password-required-msg'), cancelBtn = document.getElementById('cp-cancel-btn'), title = document.getElementById('change-password-title');
       if (required) { reqMsg.style.display = 'block'; cancelBtn.style.display = 'none'; title.textContent = 'Passordbytte påkrevd'; }
       else { reqMsg.style.display = 'none'; cancelBtn.style.display = ''; title.textContent = 'Bytt passord'; }
       document.getElementById('change-password-modal').style.display = 'flex';
       document.getElementById('change-password-modal').dataset.required = required ? '1' : '0';
     }
-
-    function closeChangePasswordModal() {
-      if (document.getElementById('change-password-modal').dataset.required === '1') return;
-      document.getElementById('change-password-modal').style.display = 'none';
-    }
-
+    function closeChangePasswordModal() { if (document.getElementById('change-password-modal').dataset.required === '1') return; document.getElementById('change-password-modal').style.display = 'none'; }
     function toggleCpVisibility(inputId, eyeId) {
-      const input = document.getElementById(inputId);
-      const eye = document.getElementById(eyeId);
+      const input = document.getElementById(inputId), eye = document.getElementById(eyeId);
       if (input.type === 'password') { input.type = 'text'; eye.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'; }
       else { input.type = 'password'; eye.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'; }
     }
-
     async function doChangePassword() {
-      const oldPass = document.getElementById('cp-old').value;
-      const newPass = document.getElementById('cp-new').value;
-      const confirm = document.getElementById('cp-confirm').value;
+      const oldPass = document.getElementById('cp-old').value, newPass = document.getElementById('cp-new').value, confirm = document.getElementById('cp-confirm').value;
       const errEl = document.getElementById('cp-error');
       if (!oldPass || !newPass || !confirm) { errEl.textContent = 'Fyll inn alle feltene'; return; }
       if (newPass.length < 8) { errEl.textContent = 'Nytt passord må være minst 8 tegn'; return; }
@@ -2471,25 +921,18 @@
       } catch { errEl.textContent = 'Kunne ikke nå serveren'; }
     }
 
-    // ── Roles modal med checkboxer ─────────────────────────────
     async function openRolesModal(userId, name) {
-      document.getElementById('roles-user-id').value = userId;
-      document.getElementById('roles-modal-title').textContent = 'Roller – ' + name;
-      document.getElementById('roles-modal-msg').textContent = '';
-      document.getElementById('roles-modal').classList.add('show');
+      document.getElementById('roles-user-id').value = userId; document.getElementById('roles-modal-title').textContent = 'Roller – ' + name; document.getElementById('roles-modal-msg').textContent = ''; document.getElementById('roles-modal').classList.add('show');
       await renderRolesModal(userId);
     }
     function closeRolesModal() { document.getElementById('roles-modal').classList.remove('show'); }
-
     async function renderRolesModal(userId) {
       const content = document.getElementById('roles-modal-content');
       content.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:16px 0">Laster…</div>';
       try {
         const [userRes, rolesRes] = await Promise.all([apiFetch(API_BASE + '/admin/users/' + userId), apiFetch(API_BASE + '/admin/roles')]);
-        const userData = await userRes.json();
-        const rolesData = await rolesRes.json();
-        const allRoles = rolesData.roles || [];
-        const userRoleIds = (userData.user?.roles || []).map(r => r.id);
+        const userData = await userRes.json(), rolesData = await rolesRes.json();
+        const allRoles = rolesData.roles || [], userRoleIds = (userData.user?.roles || []).map(r => r.id);
         if (!allRoles.length) { content.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:16px 0">Ingen roller definert</div>'; return; }
         content.innerHTML = allRoles.map(role => {
           const checked = userRoleIds.includes(role.id);
@@ -2500,7 +943,6 @@
         }).join('');
       } catch (e) { content.innerHTML = `<div style="color:var(--red);font-size:13px">${escHtml(e.message)}</div>`; }
     }
-
     async function toggleUserRole(userId, roleId, roleName, checkbox) {
       const msg = document.getElementById('roles-modal-msg');
       msg.textContent = ''; checkbox.disabled = true;
@@ -2509,13 +951,11 @@
         if (checkbox.checked) {
           res = await apiFetch(API_BASE + '/admin/users/' + userId + '/roles', { method: 'POST', body: JSON.stringify({ role_id: roleId }) });
           data = await res.json();
-          if (data.ok) { msg.style.color = 'var(--green)'; msg.textContent = `Rolle "${roleName}" tildelt`; }
-          else { msg.style.color = 'var(--red)'; msg.textContent = data.error || 'Feil'; checkbox.checked = false; }
+          if (data.ok) { msg.style.color = 'var(--green)'; msg.textContent = `Rolle "${roleName}" tildelt`; } else { msg.style.color = 'var(--red)'; msg.textContent = data.error || 'Feil'; checkbox.checked = false; }
         } else {
           res = await apiFetch(API_BASE + '/admin/users/' + userId + '/roles/' + roleId, { method: 'DELETE' });
           data = await res.json();
-          if (data.ok) { msg.style.color = 'var(--green)'; msg.textContent = `Rolle "${roleName}" fjernet`; }
-          else { msg.style.color = 'var(--red)'; msg.textContent = data.error || 'Feil'; checkbox.checked = true; }
+          if (data.ok) { msg.style.color = 'var(--green)'; msg.textContent = `Rolle "${roleName}" fjernet`; } else { msg.style.color = 'var(--red)'; msg.textContent = data.error || 'Feil'; checkbox.checked = true; }
         }
         loadAdminUsers();
       } catch (e) { msg.style.color = 'var(--red)'; msg.textContent = e.message; checkbox.checked = !checkbox.checked; }
@@ -2533,25 +973,20 @@
         renderRolesTable(data.roles);
       } catch (e) { wrap.innerHTML = `<div class="loading-msg" style="color:var(--red)">Feil: ${escHtml(e.message)}</div>`; }
     }
-
     function renderRolesTable(roles) {
       const wrap = document.getElementById('roles-table-wrap');
       if (!roles.length) { wrap.innerHTML = '<div class="loading-msg">Ingen roller</div>'; return; }
-      const rows = roles.map(r => `
-        <tr>
-          <td><span class="badge badge-accent">${escHtml(r.name)}</span></td>
-          <td>${escHtml(r.description || '–')}</td>
-          <td>${r.permissions.map(p => `<span class="badge badge-amber" style="margin-right:3px">${escHtml(p.resource + ':' + p.action)}</span>`).join('')}</td>
-          <td><button class="action-btn danger" onclick="deleteRole('${escAttr(r.id)}','${escAttr(r.name)}')">Slett</button></td>
-        </tr>`).join('');
+      const rows = roles.map(r => `<tr>
+        <td><span class="badge badge-accent">${escHtml(r.name)}</span></td>
+        <td>${escHtml(r.description || '–')}</td>
+        <td>${r.permissions.map(p => `<span class="badge badge-amber" style="margin-right:3px">${escHtml(p.resource + ':' + p.action)}</span>`).join('')}</td>
+        <td><button class="action-btn danger" onclick="deleteRole('${escAttr(r.id)}','${escAttr(r.name)}')">Slett</button></td></tr>`).join('');
       wrap.innerHTML = `<table class="admin-table"><thead><tr><th>Rolle</th><th>Beskrivelse</th><th>Rettigheter</th><th>Handlinger</th></tr></thead><tbody>${rows}</tbody></table>`;
     }
-
     function openRoleModal() { document.getElementById('rm-name').value = ''; document.getElementById('rm-desc').value = ''; document.getElementById('rm-error').textContent = ''; document.getElementById('role-modal').classList.add('show'); }
     function closeRoleModal() { document.getElementById('role-modal').classList.remove('show'); }
     async function saveRole() {
-      const name = document.getElementById('rm-name').value.trim();
-      const desc = document.getElementById('rm-desc').value.trim();
+      const name = document.getElementById('rm-name').value.trim(), desc = document.getElementById('rm-desc').value.trim();
       const errEl = document.getElementById('rm-error');
       if (!name) { errEl.textContent = 'Fyll inn rollenavn'; return; }
       try {
@@ -2566,14 +1001,78 @@
       catch (e) { alert('Feil: ' + e.message); }
     }
 
-    // ── Chat ───────────────────────────────────────────────────
-    let sessions = JSON.parse(localStorage.getItem('qc_sessions') || '[]');
-    let currentSession = null;
+    // ── Chat – API-basert historikk ────────────────────────────
+    let _sessions    = [];          // [{id, title, updated_at}]
+    let _msgCache    = {};          // sessionId → [messages]
+    let currentSessionId = null;
     let isLoading = false;
     let chartInstances = {};
     let messageCounter = 0;
 
-    function init() { renderHistory(); if (sessions.length > 0) loadSession(sessions[0].id); setupInput(); }
+    async function chatApi(method, path, body = null) {
+      const opts = { method, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAccessToken() } };
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(API_BASE + path, opts);
+      if (res.status === 401 && authState.refreshToken) {
+        const ok = await tryRefresh();
+        if (ok) { opts.headers['Authorization'] = 'Bearer ' + getAccessToken(); return fetch(API_BASE + path, opts); }
+        else { showLoginScreen(); throw new Error('Session utløpt'); }
+      }
+      return res;
+    }
+
+    async function loadSessions() {
+      try {
+        const res = await chatApi('GET', '/chats');
+        const data = await res.json();
+        if (data.ok) { _sessions = data.sessions || []; renderHistory(); }
+      } catch (e) { console.error('loadSessions:', e); }
+    }
+
+    async function createSession(title) {
+      const res = await chatApi('POST', '/chats', { title: title || 'Ny samtale' });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+      _sessions.unshift(data);
+      renderHistory();
+      return data.id;
+    }
+
+    async function deleteSessionApi(sessionId) {
+      await chatApi('DELETE', '/chats/' + sessionId);
+      _sessions = _sessions.filter(s => s.id !== sessionId);
+      delete _msgCache[sessionId];
+      renderHistory();
+      if (currentSessionId === sessionId) { currentSessionId = null; clearMessages(); document.getElementById('chat-title').textContent = 'Ny samtale'; }
+    }
+
+    async function loadMessages(sessionId) {
+      if (_msgCache[sessionId]) return _msgCache[sessionId];
+      const res = await chatApi('GET', '/chats/' + sessionId + '/messages');
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+      _msgCache[sessionId] = data.messages || [];
+      return _msgCache[sessionId];
+    }
+
+    async function postMessage(sessionId, role, content) {
+      const res = await chatApi('POST', '/chats/' + sessionId + '/messages', { role, content });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+      if (!_msgCache[sessionId]) _msgCache[sessionId] = [];
+      _msgCache[sessionId].push(data);
+      // Oppdater updated_at og tittel lokalt
+      const s = _sessions.find(s => s.id === sessionId);
+      if (s) {
+        s.updated_at = new Date().toISOString();
+        if (role === 'user' && s.title === 'Ny samtale') { s.title = content.substring(0, 80); }
+        _sessions.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+        renderHistory();
+      }
+      return data;
+    }
+
+    function init() { loadSessions(); setupInput(); }
 
     function setupInput() {
       const ta = document.getElementById('query-input');
@@ -2583,61 +1082,140 @@
 
     function useExample(btn) { document.getElementById('query-input').value = btn.textContent; document.getElementById('empty-state').style.display = 'none'; sendQuery(); }
 
-    function newChat() { showChat(); const s = { id: Date.now(), title: 'Ny samtale', messages: [], created: new Date().toISOString() }; sessions.unshift(s); saveSessions(); loadSession(s.id); }
-    function loadSession(id) { currentSession = sessions.find(s => s.id === id); if (!currentSession) return; renderMessages(); renderHistory(); document.getElementById('chat-title').textContent = currentSession.title; }
-    function saveSessions() { localStorage.setItem('qc_sessions', JSON.stringify(sessions.slice(0, 50))); }
+    async function newChat() {
+      showChat();
+      currentSessionId = null;
+      clearMessages();
+      document.getElementById('chat-title').textContent = 'Ny samtale';
+      renderHistory();
+    }
+
+    function clearMessages() {
+      const inner = document.getElementById('messages-inner');
+      inner.innerHTML = '';
+      const es = document.createElement('div'); es.id = 'empty-state';
+      es.innerHTML = `<img src="/logo_emptystate.png" style="max-width:240px;width:100%" alt="QueryChat" /><h2>QueryChat</h2><p>Hei! Hva kan jeg hjelpe deg med? Du kan stille spørsmål på naturlig norsk eller engelsk.</p>`;
+      inner.appendChild(es);
+    }
+
+    async function openSession(sessionId) {
+      showChat();
+      currentSessionId = sessionId;
+      renderHistory();
+      clearMessages();
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('chat-title').textContent = _sessions.find(s => s.id === sessionId)?.title || 'Samtale';
+      try {
+        const messages = await loadMessages(sessionId);
+        messages.forEach(m => {
+          if (m.role === 'user') appendUserMessage({ id: ++messageCounter, role: 'user', text: m.content, ts: m.created_at });
+          else appendAssistantMessage({ id: ++messageCounter, role: m.role, text: m.content, ts: m.created_at });
+        });
+        scrollToBottom();
+      } catch (e) {
+        const inner = document.getElementById('messages-inner');
+        inner.insertAdjacentHTML('beforeend', `<div class="msg-wrapper"><div class="msg error"><div class="avatar ai">AI</div><div class="msg-body"><div class="msg-text" style="color:var(--red)">Kunne ikke laste meldinger: ${escHtml(e.message)}</div></div></div></div>`);
+      }
+    }
 
     function renderHistory() {
       const el = document.getElementById('history-list');
-      if (!sessions.length) { el.innerHTML = '<div class="history-section-label">Ingen historikk</div>'; return; }
+      if (!_sessions.length) { el.innerHTML = '<div class="history-section-label">Ingen historikk</div>'; return; }
       const today = [], older = [], now = new Date();
-      sessions.forEach(s => { const d = (now - new Date(s.created)) / 86400000; if (d < 1) today.push(s); else older.push(s); });
+      _sessions.forEach(s => { const d = (now - new Date(s.updated_at)) / 86400000; if (d < 1) today.push(s); else older.push(s); });
       let html = '';
       if (today.length) { html += '<div class="history-section-label">I dag</div>'; today.forEach(s => { html += historyItem(s); }); }
       if (older.length) { html += '<div class="history-section-label">Tidligere</div>'; older.forEach(s => { html += historyItem(s); }); }
       el.innerHTML = html;
-      el.querySelectorAll('.history-item').forEach(item => { item.addEventListener('click', () => { showChat(); loadSession(+item.dataset.id); }); });
+      el.querySelectorAll('.history-item').forEach(item => {
+        item.querySelector('.history-item-title').addEventListener('click', () => openSession(item.dataset.id));
+        item.querySelector('.history-item-del').addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const s = _sessions.find(s => s.id === item.dataset.id);
+          if (confirm(`Slett samtalen «${s?.title || 'Samtale'}»?`)) await deleteSessionApi(item.dataset.id);
+        });
+      });
     }
-    function historyItem(s) { const active = currentSession && currentSession.id === s.id ? ' active' : ''; return `<div class="history-item${active}" data-id="${s.id}">${escHtml(s.title)}</div>`; }
+
+    function historyItem(s) {
+      const active = s.id === currentSessionId ? ' active' : '';
+      return `<div class="history-item${active}" data-id="${s.id}">
+        <span class="history-item-title">${escHtml(s.title)}</span>
+        <button class="history-item-del" title="Slett samtale">✕</button>
+      </div>`;
+    }
 
     async function sendQuery() {
       const ta = document.getElementById('query-input');
       const q = ta.value.trim();
       if (!q || isLoading) return;
       ta.value = ''; ta.style.height = 'auto'; document.getElementById('char-count').textContent = '';
-      if (!currentSession) newChat();
-      if (currentSession.messages.length === 0) { currentSession.title = q.length > 48 ? q.substring(0, 48) + '…' : q; document.getElementById('chat-title').textContent = currentSession.title; }
+
+      // Opprett session ved første melding i ny chat
+      if (!currentSessionId) {
+        try {
+          currentSessionId = await createSession(q.length > 80 ? q.substring(0, 80) : q);
+        } catch (e) {
+          // Vis feilen i chat istedenfor å returnere stille
+          console.error('Kunne ikke opprette session:', e);
+          document.getElementById('empty-state').style.display = 'none';
+          appendUserMessage({ id: ++messageCounter, role: 'user', text: q, ts: new Date().toISOString() });
+          appendAssistantMessage({ id: ++messageCounter, role: 'error', text: null, error: 'Kunne ikke opprette samtale: ' + e.message, ts: new Date().toISOString() });
+          isLoading = false; document.getElementById('send-btn').disabled = false;
+          return;
+        }
+      }
+      const session = _sessions.find(s => s.id === currentSessionId);
+      if (session && session.title === 'Ny samtale') {
+        session.title = q.length > 48 ? q.substring(0, 48) + '…' : q;
+        document.getElementById('chat-title').textContent = session.title;
+        renderHistory();
+      }
+
       document.getElementById('empty-state').style.display = 'none';
-      const userMsg = { id: ++messageCounter, role: 'user', text: q, ts: new Date().toISOString() };
-      currentSession.messages.push(userMsg); appendUserMessage(userMsg); saveSessions(); renderHistory();
+      const userMsgId = ++messageCounter;
+      appendUserMessage({ id: userMsgId, role: 'user', text: q, ts: new Date().toISOString() });
+
+      // Lagre brukermelding i API (fire-and-forget, ikke blokkerende for UX)
+      postMessage(currentSessionId, 'user', q).catch(e => console.warn('postMessage user:', e));
+
       const thinkId = ++messageCounter; appendThinking(thinkId); isLoading = true; document.getElementById('send-btn').disabled = true;
+
+      // Hent kontekst-meldinger fra cache
+      const contextMsgs = (_msgCache[currentSessionId] || []).slice(-10).map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }));
+
       let result;
       try {
-        const headers = { 'Content-Type': 'application/json' };
-        const token = getAccessToken(); if (token) headers['Authorization'] = 'Bearer ' + token;
-        const body = { question: q, history: currentSession.messages.slice(-10).map(m => ({ role: m.role, content: m.text })) };
-        const res = await apiFetch(config.url, { method: 'POST', headers, body: JSON.stringify(body) });
+        const res = await apiFetch(config.url, { method: 'POST', body: JSON.stringify({ question: q, history: contextMsgs }) });
         if (!res.ok) { const err = await res.text(); result = { data: { error: `HTTP ${res.status}: ${err.substring(0, 200)}` } }; }
         else { const json = await res.json(); result = { data: normalizeResponse(json) }; }
       } catch (e) { result = { data: { error: 'Kunne ikke nå API: ' + e.message } }; }
+
       removeThinking(thinkId); isLoading = false; document.getElementById('send-btn').disabled = false;
+
+      const aiText = result.data.text || result.data.error || '';
       const aiMsg = { id: ++messageCounter, role: 'assistant', text: result.data.text || '', sql: result.data.sql || null, logId: result.data.logId || null, rows: result.data.rows || null, columns: result.data.columns || null, error: result.data.error || null, ts: new Date().toISOString() };
-      currentSession.messages.push(aiMsg); saveSessions(); appendAssistantMessage(aiMsg); scrollToBottom();
+
+      // Lagre AI-svar i API
+      const saveContent = result.data.error
+        ? `[FEIL] ${result.data.error}`
+        : (result.data.text || '') + (result.data.sql ? '\n\nSQL:\n' + result.data.sql : '');
+      postMessage(currentSessionId, result.data.error ? 'error' : 'assistant', saveContent).catch(e => console.warn('postMessage assistant:', e));
+
+      appendAssistantMessage(aiMsg); scrollToBottom();
     }
 
     function normalizeResponse(json) {
       const columns = json.columns || json.fields || [];
       let rows = json.rows || json.data || json.results || null;
       if (rows && Array.isArray(rows[0]) && columns.length > 0) { rows = rows.map(row => { const obj = {}; columns.forEach((col, i) => { obj[col] = row[i]; }); return obj; }); }
-      return { text: json.text || json.answer || json.response || json.message || '', sql: json.sql || json.query || json.generated_sql || null, logId: json.logId || null, rows, columns, error: json.error || null };
-    }
-
-    function renderMessages() {
-      const el = document.getElementById('messages-inner'); el.innerHTML = '';
-      const es = document.createElement('div'); es.id = 'empty-state'; es.style.display = currentSession && currentSession.messages.length ? 'none' : '';
-      es.innerHTML = `<img src="/logo_emptystate.png" style="max-width:240px;width:100%" alt="QueryChat" /><h2>QueryChat</h2><p>Hei! Hva kan jeg hjelpe deg med? Du kan stille spørsmål på naturlig norsk eller engelsk.</p>`; el.appendChild(es);
-      if (currentSession) { currentSession.messages.forEach(m => { if (m.role === 'user') appendUserMessage(m, false); else appendAssistantMessage(m, false); }); }
-      scrollToBottom();
+      let text = json.text || json.answer || json.response || json.message || '';
+      if (!text && rows) {
+        const count = json.rowCount || rows.length;
+        const truncated = json.truncated ? ` (begrenset til ${count} rader)` : '';
+        text = count === 0 ? 'Ingen resultater funnet.' : `Fant ${count} rad${count !== 1 ? 'er' : ''}${truncated}.`;
+      }
+      return { text, sql: json.sql || json.query || json.generated_sql || null, logId: json.logId || null, rows, columns, error: json.error || null };
     }
 
     function appendUserMessage(msg, animate = true) {
@@ -2645,7 +1223,6 @@
       wrap.innerHTML = `<div class="msg user"><div class="avatar user">U</div><div class="msg-body"><div class="msg-meta">${fmtTime(msg.ts)}</div><div class="msg-text">${escHtml(msg.text)}</div></div></div>`;
       document.getElementById('messages-inner').appendChild(wrap); if (animate) scrollToBottom();
     }
-
     function appendThinking(id) {
       const wrap = document.createElement('div'); wrap.className = 'msg-wrapper'; wrap.dataset.thinkId = id;
       wrap.innerHTML = `<div class="msg assistant"><div class="avatar ai">AI</div><div class="msg-body"><div class="thinking"><span></span><span></span><span></span></div></div></div>`;
@@ -2660,26 +1237,23 @@
         inner = `<div class="msg error"><div class="avatar ai">AI</div><div class="msg-body"><div class="msg-meta">${fmtTime(msg.ts)}</div><div class="msg-text" style="color:var(--red)">${escHtml(msg.error)}</div></div></div>`;
       } else {
         const mid = 'msg_' + msg.id;
+        const displayText = msg.text || '(Tomt svar fra AI)';
         let sqlBlock = msg.sql ? `<div class="sql-block"><div class="sql-block-header"><span>SQL</span><button class="copy-btn" onclick="copySql(this,'${escAttr(msg.sql)}')">kopier</button></div><pre>${highlightSql(escHtml(msg.sql))}</pre></div>` : '';
         let resultBlock = (msg.rows && msg.rows.length > 0 && msg.columns) ? buildResultBlock(mid, msg.columns, msg.rows) : '';
         inner = `<div class="msg assistant"><div class="avatar ai">AI</div><div class="msg-body">
           <div class="msg-meta">${fmtTime(msg.ts)}</div>
-          <div class="msg-text text-result">${formatText(msg.text)}</div>
+          <div class="msg-text text-result">${formatText(displayText)}</div>
           ${sqlBlock}${resultBlock}
           <div class="feedback-row">
             <span class="feedback-label">Var dette nyttig?</span>
-            <button class="fb-btn positive" onclick="feedback(this,'positive','${mid}')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>Ja
-            </button>
-            <button class="fb-btn negative" onclick="feedback(this,'negative','${mid}')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>Nei
-            </button>
+            <button class="fb-btn positive" onclick="feedback(this,'positive','${mid}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>Ja</button>
+            <button class="fb-btn negative" onclick="feedback(this,'negative','${mid}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>Nei</button>
             <div class="fb-comment" id="fbc_${mid}">
               <div style="display:flex;flex-direction:column;gap:6px;flex:1">
                 <input type="text" placeholder="Kommentar (valgfritt)…" id="fbtext_${mid}" />
                 <input type="text" placeholder="Korrigert SQL (valgfritt)…" id="fbsql_${mid}" style="font-family:var(--mono);font-size:11px" />
               </div>
-              <button class="fb-send" onclick="sendFeedback('${mid}')">Send</button>
+              <button class="fb-send" onclick="sendFeedback('${mid}','${escAttr(msg.logId || '')}')">Send</button>
             </div>
           </div>
         </div></div>`;
@@ -2695,19 +1269,16 @@
       const chartHtml = hasNumeric ? `<div class="chart-wrap"><div class="chart-controls" id="chart-ctrl-${mid}"><button class="chart-control-btn active" onclick="setChartType('${mid}','bar',this)">Søyle</button><button class="chart-control-btn" onclick="setChartType('${mid}','line',this)">Linje</button><button class="chart-control-btn" onclick="setChartType('${mid}','pie',this)">Kake</button></div><div class="chart-canvas-wrap"><canvas id="chart_${mid}"></canvas></div></div>` : '';
       return `<div class="result-container">${tabs}<div class="result-panel active" id="panel_table_${mid}">${buildTable(columns, rows)}</div><div class="result-panel" id="panel_text_${mid}">${buildTextView(columns, rows)}</div>${hasNumeric ? `<div class="result-panel" id="panel_chart_${mid}">${chartHtml}</div>` : ''}</div>`;
     }
-
     function buildTable(columns, rows) {
       const headers = columns.map(c => `<th>${escHtml(c)}</th>`).join('');
       const bodyRows = rows.map(r => `<tr>${columns.map(c => { const v = r[c]; return `<td class="${typeof v === 'number' ? 'num' : ''}">${escHtml(String(v ?? ''))}</td>`; }).join('')}</tr>`).join('');
       return `<div class="result-table-wrap"><table class="result-table"><thead><tr>${headers}</tr></thead><tbody>${bodyRows}</tbody></table></div><div class="result-count">${rows.length} rad${rows.length !== 1 ? 'er' : ''} returnert</div>`;
     }
-
     function buildTextView(columns, rows) {
       let html = '';
       rows.forEach((r, i) => { html += `<p><strong>${i + 1}.</strong> ` + columns.map(c => `<strong>${c}:</strong> ${escHtml(String(r[c] ?? ''))}`).join(' · ') + '</p>'; });
       return `<div class="text-result" style="max-height:280px;overflow-y:auto">${html}</div>`;
     }
-
     function initChart(mid, columns, rows) {
       const canvas = document.getElementById('chart_' + mid); if (!canvas) return;
       const numCols = columns.filter(c => typeof rows[0][c] === 'number');
@@ -2719,7 +1290,6 @@
       chartInstances[mid] = new Chart(canvas, { type: 'bar', data: { labels, datasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#9a9ba3', font: { family: "'IBM Plex Sans'", size: 12 } } } }, scales: { x: { ticks: { color: '#9a9ba3', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#9a9ba3', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } } } } });
       canvas._chartMid = mid; canvas._chartData = { columns, rows, labelCol, numCols, labels, datasets };
     }
-
     function setChartType(mid, type, btn) {
       document.querySelectorAll(`#chart-ctrl-${mid} .chart-control-btn`).forEach(b => b.classList.remove('active')); btn.classList.add('active');
       const canvas = document.getElementById('chart_' + mid); const d = canvas._chartData;
@@ -2730,7 +1300,6 @@
       else { cfg = { type, data: { labels: d.labels, datasets: d.datasets.map(ds => ({ ...ds, type: undefined })) }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#9a9ba3', font: { size: 12 } } } }, scales: { x: { ticks: { color: '#9a9ba3', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#9a9ba3', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' } } } } }; }
       chartInstances[mid] = new Chart(canvas, cfg); canvas._chartData = d;
     }
-
     function switchTab(mid, panel, btn) {
       ['table', 'text', 'chart'].forEach(p => { const el = document.getElementById(`panel_${p}_${mid}`); if (el) el.classList.remove('active'); });
       const active = document.getElementById(`panel_${panel}_${mid}`); if (active) active.classList.add('active');
@@ -2742,38 +1311,318 @@
       const row = btn.closest('.feedback-row');
       row.querySelectorAll('.fb-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
       const fbc = document.getElementById('fbc_' + mid); if (fbc) fbc.classList.add('show');
-      const msgEl = btn.closest('.msg-wrapper');
-      if (msgEl && currentSession) { const m = currentSession.messages.find(m => m.id == msgEl.dataset.msgId); if (m) { m.feedback = type; saveSessions(); } }
       setTimeout(scrollToBottom, 50);
     }
-
-    async function sendFeedback(mid) {
+    async function sendFeedback(mid, logId) {
       const fbc = document.getElementById('fbc_' + mid);
-      const msgEl = document.querySelector(`[data-msg-id="${mid.replace('msg_', '')}"]`);
-      const msg = currentSession?.messages.find(m => m.id == msgEl?.dataset.msgId);
       const activeBtn = fbc?.closest('.feedback-row')?.querySelector('.fb-btn.active');
       const vote = activeBtn?.classList.contains('positive') ? 1 : -1;
-      if (!msg?.logId) { console.warn('Mangler logId'); return; }
+      if (!logId) { console.warn('Mangler logId'); return; }
       const inputs = fbc.querySelectorAll('input'); const sendBtn = fbc.querySelector('.fb-send');
       inputs.forEach(i => i.disabled = true); if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Sender…'; }
-      const payload = { logId: msg.logId, vote, feedbackText: document.getElementById('fbtext_' + mid)?.value.trim() || null, correctedSql: document.getElementById('fbsql_' + mid)?.value.trim() || null };
+      const payload = { logId, vote, feedbackText: document.getElementById('fbtext_' + mid)?.value.trim() || null, correctedSql: document.getElementById('fbsql_' + mid)?.value.trim() || null };
       if (config.fbUrl) { try { await apiFetch(config.fbUrl, { method: 'POST', body: JSON.stringify(payload) }); } catch (e) { console.warn('Feedback failed:', e); } }
       fbc.innerHTML = '<span style="font-size:12px;color:var(--green)">✓ Tilbakemelding sendt – takk!</span>';
     }
 
     function exportHistory() {
-      if (!currentSession) return;
-      const lines = currentSession.messages.map(m => `[${fmtTime(m.ts)}] ${m.role.toUpperCase()}: ${m.text || ''}${m.sql ? '\nSQL: ' + m.sql : ''}`);
+      if (!currentSessionId) return;
+      const msgs = _msgCache[currentSessionId] || [];
+      const lines = msgs.map(m => `[${fmtTime(m.created_at)}] ${m.role.toUpperCase()}: ${m.content}`);
+      const s = _sessions.find(s => s.id === currentSessionId);
       const blob = new Blob([lines.join('\n\n')], { type: 'text/plain' }); const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob); a.download = `querychat-${currentSession.id}.txt`; a.click();
+      a.href = URL.createObjectURL(blob); a.download = `querychat-${(s?.title || currentSessionId).substring(0, 40)}.txt`; a.click();
     }
 
+    // ── Admin: Brukerprofiler ──────────────────────────────────
+    let _profilesSchema = [];
+    let _profilesUsers  = [];
+    let _selectedUserId = null;
+    let _userSettings   = {};
+
+    async function initProfilesTab() {
+      const ul = document.getElementById('profiles-user-ul');
+      ul.innerHTML = '<li style="color:var(--text3);font-size:12px;padding:8px 10px">Laster…</li>';
+      try {
+        const [schemaRes, usersRes] = await Promise.all([
+          apiFetch(API_BASE + '/admin/profiles/settings'),
+          apiFetch(API_BASE + '/admin/users'),
+        ]);
+        const schemaData = await schemaRes.json();
+        const usersData  = await usersRes.json();
+        _profilesSchema = schemaData.settings || [];
+        _profilesUsers  = usersData.users  || [];
+        profilesRenderUserList(_profilesUsers);
+      } catch (e) {
+        ul.innerHTML = `<li style="color:var(--red);font-size:12px;padding:8px 10px">${escHtml(e.message)}</li>`;
+      }
+    }
+
+    function profilesFilterUsers() {
+      const q = document.getElementById('profiles-user-search').value.toLowerCase();
+      const filtered = _profilesUsers.filter(u => u.display_name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
+      profilesRenderUserList(filtered);
+    }
+
+    function profilesRenderUserList(users) {
+      const ul = document.getElementById('profiles-user-ul');
+      ul.innerHTML = '';
+      users.forEach(u => {
+        const li = document.createElement('li');
+        li.textContent = u.display_name;
+        li.title = u.email;
+        li.dataset.id = u.id;
+        if (u.id === _selectedUserId) li.classList.add('active');
+        li.addEventListener('click', () => profilesSelectUser(u.id));
+        ul.appendChild(li);
+      });
+    }
+
+    async function profilesSelectUser(userId) {
+      _selectedUserId = userId;
+      profilesFilterUsers();
+      document.getElementById('profiles-placeholder').style.display = 'none';
+      document.getElementById('profiles-editor').style.display = 'flex';
+      document.getElementById('profiles-reset-all-btn').style.display = '';
+      document.getElementById('profiles-settings-body').innerHTML = '<div style="color:var(--text3);font-size:13px;padding:20px">Laster…</div>';
+      try {
+        const res = await apiFetch(API_BASE + '/admin/profiles/' + userId);
+        const data = await res.json();
+        if (!data.ok) { document.getElementById('profiles-settings-body').innerHTML = `<div style="color:var(--red);font-size:13px;padding:20px">${escHtml(data.error)}</div>`; return; }
+        document.getElementById('profiles-editor-name').textContent = data.display_name || '';
+        document.getElementById('profiles-editor-email').textContent = data.email || '';
+        _userSettings = {};
+        (data.settings || []).forEach(s => { _userSettings[s.key] = { value: s.value, overridden: s.overridden }; });
+        profilesRenderSettings(data.settings || []);
+      } catch (e) {
+        document.getElementById('profiles-settings-body').innerHTML = `<div style="color:var(--red);font-size:13px;padding:20px">${escHtml(e.message)}</div>`;
+      }
+    }
+
+    function profilesRenderSettings(settings) {
+      const body = document.getElementById('profiles-settings-body');
+      const byCategory = {};
+      settings.forEach(s => { if (!byCategory[s.category]) byCategory[s.category] = []; byCategory[s.category].push(s); });
+      let html = '';
+      Object.entries(byCategory).forEach(([cat, items]) => {
+        html += `<div class="profiles-category"><div class="profiles-category-title">${escHtml(cat)}</div>`;
+        items.forEach(s => {
+          html += `<div class="profiles-setting-row">
+            <div class="profiles-setting-key">${escHtml(s.key)}<small>${escHtml(s.description || '')}</small></div>
+            <input class="profiles-setting-input${s.overridden ? ' overridden' : ''}" type="text"
+              data-key="${escAttr(s.key)}" value="${escHtml(s.value)}" placeholder="${escHtml(s.default)}"
+              onchange="profilesSaveSetting('${escAttr(s.key)}', this)" />
+            <span class="profiles-setting-default" title="Standard: ${escHtml(s.default)}">${escHtml(s.default)}</span>
+            <button class="profiles-reset-btn" data-key="${escAttr(s.key)}"
+              onclick="profilesResetSetting('${escAttr(s.key)}', this)"
+              ${!s.overridden ? 'disabled' : ''} title="Tilbakestill">↺</button>
+          </div>`;
+        });
+        html += '</div>';
+      });
+      body.innerHTML = html;
+    }
+
+    async function profilesSaveSetting(key, input) {
+      try {
+        const res = await apiFetch(API_BASE + '/admin/profiles/' + _selectedUserId + '/' + encodeURIComponent(key), { method: 'PUT', body: JSON.stringify({ value: input.value }) });
+        const data = await res.json();
+        if (data.ok) {
+          input.classList.add('overridden');
+          const resetBtn = input.closest('.profiles-setting-row').querySelector('.profiles-reset-btn');
+          if (resetBtn) resetBtn.disabled = false;
+          _userSettings[key] = { value: input.value, overridden: true };
+        } else {
+          alert('Feil ved lagring: ' + (data.error || 'Ukjent'));
+          input.value = _userSettings[key]?.value || '';
+        }
+      } catch (e) { alert('Feil: ' + e.message); }
+    }
+
+    async function profilesResetSetting(key, btn) {
+      try {
+        const res = await apiFetch(API_BASE + '/admin/profiles/' + _selectedUserId + '/' + encodeURIComponent(key), { method: 'DELETE' });
+        const data = await res.json();
+        if (data.ok) {
+          const row = btn.closest('.profiles-setting-row');
+          const input = row.querySelector('input');
+          const defaultVal = _profilesSchema.find(s => s.key === key)?.default || '';
+          input.value = defaultVal;
+          input.classList.remove('overridden');
+          btn.disabled = true;
+          _userSettings[key] = { value: defaultVal, overridden: false };
+        } else { alert('Feil: ' + (data.error || 'Ukjent')); }
+      } catch (e) { alert('Feil: ' + e.message); }
+    }
+
+    async function profilesResetAll() {
+      if (!_selectedUserId) return;
+      const overridden = Object.entries(_userSettings).filter(([, v]) => v.overridden).map(([k]) => k);
+      if (!overridden.length) { alert('Ingen overstyringer å tilbakestille.'); return; }
+      if (!confirm(`Tilbakestill alle ${overridden.length} overstyringer for denne brukeren?`)) return;
+      try {
+        await Promise.all(overridden.map(key =>
+          apiFetch(API_BASE + '/admin/profiles/' + _selectedUserId + '/' + encodeURIComponent(key), { method: 'DELETE' })
+        ));
+        await profilesSelectUser(_selectedUserId);
+      } catch (e) { alert('Feil: ' + e.message); }
+    }
+
+    // ── Metadata ───────────────────────────────────────────────
+    const _metaColumnsCache = {};
+    let _metaCurrentData = null;
+
+    function initMetadataTab() { /* bruker velger objekt */ }
+
+    async function loadMetaObject() {
+      const val = document.getElementById('meta-object-select').value;
+      const content = document.getElementById('meta-content');
+      if (!val) { content.innerHTML = '<div class="meta-empty" style="padding:40px">Velg en tabell for å se annotasjoner og kommentarer</div>'; _metaCurrentData = null; return; }
+      content.innerHTML = '<div class="loading-msg">Laster…</div>';
+      try {
+        const res = await apiFetch(API_BASE + '/admin/metadata/objects/' + val);
+        const data = await res.json();
+        if (!data.ok) { content.innerHTML = `<div class="loading-msg" style="color:var(--red)">${escHtml(data.error)}</div>`; return; }
+        _metaCurrentData = data;
+        _metaColumnsCache[val] = data.columns.map(c => c.column_name);
+        renderMetaContent(data);
+      } catch (e) { content.innerHTML = `<div class="loading-msg" style="color:var(--red)">Feil: ${escHtml(e.message)}</div>`; }
+    }
+
+    function renderMetaContent(data) {
+      const content = document.getElementById('meta-content');
+      const colRows = data.columns.map(col => {
+        const comment = data.existing_comments?.columns?.[col.column_name];
+        return `<div class="meta-col-item"><div style="flex:1;min-width:0"><div style="display:flex;align-items:baseline;gap:8px"><span class="meta-col-name">${escHtml(col.column_name)}</span><span class="meta-col-type">${escHtml(col.data_type)}${col.data_length && col.data_type.includes('CHAR') ? '(' + col.data_length + ')' : ''}</span></div>${comment ? `<div class="meta-col-comment">${escHtml(comment)}</div>` : ''}</div></div>`;
+      }).join('');
+      const tableComment = data.existing_comments?.table ? `<div style="margin-bottom:10px;padding:8px 10px;background:var(--bg3);border-radius:7px;border:1px solid var(--border)"><span style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em">Tabell</span><div class="meta-col-comment" style="margin-top:4px">${escHtml(data.existing_comments.table)}</div></div>` : '';
+      const annotRows = data.existing_annotations?.length ? data.existing_annotations.map(a => `<div class="meta-annotation-item"><div class="meta-annotation-header">${a.column_name ? `<span class="meta-annotation-col">${escHtml(a.column_name)}</span><span style="color:var(--text3)">·</span>` : '<span style="color:var(--text3);font-size:11px">tabellnivå</span><span style="color:var(--text3)">·</span>'}<span class="meta-annotation-name">${escHtml(a.annotation_name)}</span></div><div class="meta-annotation-value">${escHtml(a.annotation_value)}</div></div>`).join('') : '<div class="meta-empty">Ingen annotations</div>';
+      const qcRows = data.qc_annotations?.length ? data.qc_annotations.map(a => {
+        const syncBadge = a.sync_target === 'ANNOTATION' ? 'badge-accent' : a.sync_target === 'COMMENT' ? 'badge-green' : 'badge-amber';
+        const statusBadge = a.status === 'AKTIV' ? 'badge-green' : a.status === 'UTKAST' ? 'badge-amber' : 'badge-red';
+        return `<div class="meta-qc-item"><div class="meta-qc-header">${a.column_name ? `<span class="badge badge-accent" style="font-size:10px">${escHtml(a.column_name)}</span>` : '<span class="badge" style="font-size:10px;background:var(--bg4);color:var(--text3);border:1px solid var(--border)">tabellnivå</span>'}<span class="badge ${syncBadge}" style="font-size:10px">${escHtml(a.sync_target)}</span>${a.annotation_name ? `<span class="badge badge-amber" style="font-size:10px">${escHtml(a.annotation_name)}</span>` : ''}${a.notat_type ? `<span class="badge badge-amber" style="font-size:10px">${escHtml(a.notat_type)}</span>` : ''}<span class="badge ${statusBadge}" style="font-size:10px">${escHtml(a.status)}</span></div><div class="meta-qc-value">${escHtml(a.annotation_value)}</div><div class="meta-qc-footer"><span>oppdatert: ${escHtml(a.updated_at?.substring(0, 16) || '–')}</span>${a.status !== 'AKTIV' ? `<button class="action-btn" onclick="publishMetaAnnotation('${escAttr(a.id)}')">Publiser</button>` : ''}${a.status !== 'ARKIVERT' ? `<button class="action-btn danger" onclick="archiveMetaAnnotation('${escAttr(a.id)}')">Arkiver</button>` : ''}</div></div>`;
+      }).join('') : '<div class="meta-empty">Ingen qc-annotasjoner ennå</div>';
+
+      content.innerHTML = `<div class="meta-panels" id="meta-panels">
+        <div class="meta-col-left" id="meta-col-left"><div class="meta-panel" style="height:100%"><div class="meta-panel-header"><h4>Kolonner og kommentarer</h4></div><div class="meta-panel-body">${tableComment}${colRows}</div></div></div>
+        <div class="meta-splitter-v" id="meta-splitter-v"></div>
+        <div class="meta-col-right" id="meta-col-right">
+          <div class="meta-panel"><div class="meta-panel-header"><h4>Oracle annotations (live)</h4></div><div class="meta-panel-body">${annotRows}</div></div>
+          <div class="meta-splitter-h" id="meta-splitter-h"></div>
+          <div class="meta-panel"><div class="meta-panel-header"><h4>Redigerbare annotasjoner</h4><button class="action-btn" onclick="openMetaModal()" style="margin-right:0">+ Ny</button></div><div class="meta-panel-body">${qcRows}</div></div>
+        </div>
+      </div>`;
+      initMetaSplitters();
+    }
+
+    function openMetaModal(id) {
+      document.getElementById('meta-modal-error').textContent = ''; document.getElementById('meta-modal-success').textContent = '';
+      document.getElementById('mm-value').value = ''; document.getElementById('mm-status').value = 'AKTIV';
+      document.getElementById('mm-sync-target').value = 'ANNOTATION'; document.getElementById('mm-annotation-name').value = 'DESCRIPTION';
+      onMetaSyncTargetChange();
+      const currentObj = document.getElementById('meta-object-select').value;
+      if (currentObj) { document.getElementById('mm-object').value = currentObj; onMetaObjectChange(); }
+      document.getElementById('meta-modal').classList.add('show');
+    }
+    function closeMetaModal() { document.getElementById('meta-modal').classList.remove('show'); }
+    function onMetaSyncTargetChange() {
+      const target = document.getElementById('mm-sync-target').value;
+      document.getElementById('mm-annotation-name-group').style.display = target === 'ANNOTATION' ? '' : 'none';
+      document.getElementById('mm-notat-type-group').style.display = target === 'NONE' ? '' : 'none';
+      const hint = document.getElementById('mm-value-hint');
+      if (target === 'ANNOTATION') hint.textContent = 'For DESCRIPTION: skriv direktivet som SQL-syntaks der det er mulig. Enkle fnutter escapes automatisk.';
+      else if (target === 'COMMENT') hint.textContent = 'COMMENT ON overskriver eksisterende kommentar for dette objektet/kolonnen.';
+      else hint.textContent = 'Internt notat – vises kun i admin-panelet, påvirker ikke databasen.';
+    }
+    async function onMetaObjectChange() {
+      const val = document.getElementById('mm-object').value;
+      const colSelect = document.getElementById('mm-column');
+      colSelect.innerHTML = '<option value="">(tabellnivå)</option>';
+      if (!val) return;
+      if (_metaColumnsCache[val]) { _metaColumnsCache[val].forEach(col => { const opt = document.createElement('option'); opt.value = col; opt.textContent = col; colSelect.appendChild(opt); }); return; }
+      colSelect.innerHTML = '<option value="">Laster kolonner…</option>';
+      try {
+        const res = await apiFetch(API_BASE + '/admin/metadata/objects/' + val);
+        const data = await res.json();
+        colSelect.innerHTML = '<option value="">(tabellnivå)</option>';
+        if (data.ok && data.columns) { _metaColumnsCache[val] = data.columns.map(c => c.column_name); data.columns.forEach(col => { const opt = document.createElement('option'); opt.value = col.column_name; opt.textContent = col.column_name; colSelect.appendChild(opt); }); }
+      } catch { colSelect.innerHTML = '<option value="">Feil ved lasting</option>'; }
+    }
+    async function saveMetaAnnotation() {
+      const errEl = document.getElementById('meta-modal-error'), okEl = document.getElementById('meta-modal-success');
+      errEl.textContent = ''; okEl.textContent = '';
+      const objVal = document.getElementById('mm-object').value;
+      if (!objVal) { errEl.textContent = 'Velg en tabell'; return; }
+      const [owner, name] = objVal.split('/');
+      const column_name = document.getElementById('mm-column').value || null;
+      const sync_target = document.getElementById('mm-sync-target').value;
+      const annotation_name = sync_target === 'ANNOTATION' ? document.getElementById('mm-annotation-name').value : null;
+      const notat_type = sync_target === 'NONE' ? document.getElementById('mm-notat-type').value : null;
+      const annotation_value = document.getElementById('mm-value').value.trim();
+      const status = document.getElementById('mm-status').value;
+      if (!annotation_value) { errEl.textContent = 'Fyll inn verdi/innhold'; return; }
+      const body = { object_owner: owner, object_name: name, column_name, sync_target, annotation_name, annotation_value, notat_type, status };
+      const saveBtn = document.querySelector('#meta-modal .btn-save');
+      saveBtn.disabled = true; saveBtn.textContent = 'Lagrer…';
+      try {
+        const res = await apiFetch(API_BASE + '/admin/metadata/annotations', { method: 'POST', body: JSON.stringify(body) });
+        const data = await res.json();
+        if (data.ok) {
+          okEl.textContent = status === 'AKTIV' && data.ddl?.length ? `Lagret og synket (${data.ddl.length} DDL-setning${data.ddl.length !== 1 ? 'er' : ''} kjørt)` : 'Lagret';
+          const currentObj = document.getElementById('meta-object-select').value;
+          if (currentObj === objVal) setTimeout(() => loadMetaObject(), 800);
+          setTimeout(() => closeMetaModal(), 1400);
+        } else { errEl.textContent = data.error || 'Noe gikk galt'; if (data.detail) errEl.textContent += ': ' + data.detail; }
+      } catch (e) { errEl.textContent = 'Kunne ikke nå serveren: ' + e.message; }
+      saveBtn.disabled = false; saveBtn.textContent = 'Lagre';
+    }
+    async function archiveMetaAnnotation(id) {
+      if (!confirm('Arkiver denne annotasjonen?')) return;
+      const row = _metaCurrentData?.qc_annotations?.find(a => a.id === id);
+      if (!row) { alert('Finner ikke annotasjonen – last siden på nytt'); return; }
+      const body = { id, object_owner: _metaCurrentData.object_owner, object_name: _metaCurrentData.object_name, column_name: row.column_name || null, sync_target: row.sync_target, annotation_name: row.annotation_name || null, annotation_value: row.annotation_value, notat_type: row.notat_type || null, status: 'ARKIVERT' };
+      try { const res = await apiFetch(API_BASE + '/admin/metadata/annotations', { method: 'POST', body: JSON.stringify(body) }); const data = await res.json(); if (data.ok) loadMetaObject(); else alert('Feil: ' + (data.error || 'Ukjent')); }
+      catch (e) { alert('Nettverksfeil: ' + e.message); }
+    }
+    async function publishMetaAnnotation(id) {
+      if (!confirm('Publiser denne annotasjonen til databasen?')) return;
+      const row = _metaCurrentData?.qc_annotations?.find(a => a.id === id);
+      if (!row) { alert('Finner ikke annotasjonen – last siden på nytt'); return; }
+      const body = { id, object_owner: _metaCurrentData.object_owner, object_name: _metaCurrentData.object_name, column_name: row.column_name || null, sync_target: row.sync_target, annotation_name: row.annotation_name || null, annotation_value: row.annotation_value, notat_type: row.notat_type || null, status: 'AKTIV' };
+      try { const res = await apiFetch(API_BASE + '/admin/metadata/annotations', { method: 'POST', body: JSON.stringify(body) }); const data = await res.json(); if (data.ok) loadMetaObject(); else alert('Feil: ' + (data.error || 'Ukjent')); }
+      catch (e) { alert('Nettverksfeil: ' + e.message); }
+    }
+
+    function initMetaSplitters() {
+      const vSplitter = document.getElementById('meta-splitter-v'), colLeft = document.getElementById('meta-col-left'), panels = document.getElementById('meta-panels');
+      if (vSplitter && colLeft && panels) {
+        vSplitter.addEventListener('mousedown', function(e) {
+          e.preventDefault(); vSplitter.classList.add('dragging');
+          const startX = e.clientX, startW = colLeft.getBoundingClientRect().width, totalW = panels.getBoundingClientRect().width;
+          function onMove(e) { const newPct = Math.min(80, Math.max(20, (startW + e.clientX - startX) / totalW * 100)); colLeft.style.flex = '0 0 ' + newPct + '%'; }
+          function onUp() { vSplitter.classList.remove('dragging'); document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); }
+          document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+        });
+      }
+      const hSplitter = document.getElementById('meta-splitter-h'), colRight = document.getElementById('meta-col-right');
+      if (hSplitter && colRight) {
+        hSplitter.addEventListener('mousedown', function(e) {
+          e.preventDefault(); hSplitter.classList.add('dragging');
+          const startY = e.clientY, topPanel = colRight.querySelectorAll('.meta-panel')[0], startH = topPanel.getBoundingClientRect().height, totalH = colRight.getBoundingClientRect().height;
+          function onMove(e) { const newPct = Math.min(80, Math.max(20, (startH + e.clientY - startY) / totalH * 100)); topPanel.style.flex = '0 0 ' + newPct + '%'; }
+          function onUp() { hSplitter.classList.remove('dragging'); document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); }
+          document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+        });
+      }
+    }
+
+    // ── Hjelpefunksjoner ───────────────────────────────────────
     function scrollToBottom() { const el = document.getElementById('messages'); requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; }); }
     function fmtTime(ts) { if (!ts) return ''; return new Date(ts).toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' }); }
     function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
     function escAttr(s) { return String(s).replace(/'/g, "\\'").replace(/\n/g, '\\n'); }
     function highlightSql(s) {
-      const kws = ['SELECT', 'FROM', 'WHERE', 'ORDER', 'BY', 'GROUP', 'HAVING', 'JOIN', 'LEFT', 'RIGHT', 'INNER', 'ON', 'AS', 'AND', 'OR', 'NOT', 'IN', 'LIKE', 'IS', 'NULL', 'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'ROUND', 'TRUNC', 'DISTINCT', 'LIMIT', 'OFFSET', 'FETCH', 'FIRST', 'ROWS', 'ONLY', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'TABLE', 'INDEX', 'WITH'];
+      const kws = ['SELECT','FROM','WHERE','ORDER','BY','GROUP','HAVING','JOIN','LEFT','RIGHT','INNER','ON','AS','AND','OR','NOT','IN','LIKE','IS','NULL','COUNT','SUM','AVG','MIN','MAX','ROUND','TRUNC','DISTINCT','LIMIT','OFFSET','FETCH','FIRST','ROWS','ONLY','INSERT','UPDATE','DELETE','CREATE','DROP','TABLE','INDEX','WITH'];
       let out = s;
       kws.forEach(k => { out = out.replace(new RegExp('\\b' + k + '\\b', 'g'), `<span class="sql-keyword">${k}</span>`); });
       out = out.replace(/'[^']*'/g, m => `<span class="sql-string">${m}</span>`);
@@ -2788,10 +1637,8 @@
 
     async function doResetFromUrl() {
       const token = document.getElementById('reset-screen').dataset.token;
-      const pass = document.getElementById('reset-new-password').value;
-      const confirm = document.getElementById('reset-confirm-password').value;
-      const errEl = document.getElementById('reset-screen-error');
-      const btn = document.getElementById('reset-screen-btn');
+      const pass = document.getElementById('reset-new-password').value, confirm = document.getElementById('reset-confirm-password').value;
+      const errEl = document.getElementById('reset-screen-error'), btn = document.getElementById('reset-screen-btn');
       if (!pass || !confirm) { errEl.textContent = 'Fyll inn begge feltene'; return; }
       if (pass.length < 8) { errEl.textContent = 'Passordet må være minst 8 tegn'; return; }
       if (pass !== confirm) { errEl.textContent = 'Passordene er ikke like'; return; }
@@ -2799,24 +1646,19 @@
       try {
         const res = await fetch(API_BASE + '/auth/reset-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, password: pass }) });
         const data = await res.json();
-        if (data.ok) {
-          document.getElementById('reset-screen').style.display = 'none';
-          showLoginScreen();
-          document.getElementById('login-error').style.color = 'var(--green)';
-          document.getElementById('login-error').textContent = 'Passord oppdatert – logg inn med nytt passord';
-        } else { errEl.textContent = data.error || 'Noe gikk galt'; }
+        if (data.ok) { document.getElementById('reset-screen').style.display = 'none'; showLoginScreen(); document.getElementById('login-error').style.color = 'var(--green)'; document.getElementById('login-error').textContent = 'Passord oppdatert – logg inn med nytt passord'; }
+        else { errEl.textContent = data.error || 'Noe gikk galt'; }
       } catch { errEl.textContent = 'Kunne ikke nå serveren'; }
       btn.disabled = false; btn.textContent = 'Sett nytt passord';
     }
 
+    // ── Oppstart ───────────────────────────────────────────────
     (async () => {
       const hash = window.location.hash;
       const resetMatch = hash.match(/\/reset\?token=([a-f0-9]+)/);
       if (resetMatch) {
-        const token = resetMatch[1];
         const el = document.getElementById('reset-screen');
-        el.style.display = 'flex';
-        el.dataset.token = token;
+        el.style.display = 'flex'; el.dataset.token = resetMatch[1];
         history.replaceState(null, '', window.location.pathname);
         return;
       }
@@ -2824,7 +1666,7 @@
         try {
           const payload = JSON.parse(atob(authState.accessToken.split('.')[1]));
           if (payload.exp * 1000 > Date.now()) {
-            authState.user = { email: payload.email, display_name: payload.name, roles: payload.roles, permissions: payload.permissions };
+            authState.user = { email: payload.email, display_name: payload.name, roles: payload.roles, permissions: payload.permissions, sub: payload.sub };
             hideLoginScreen(); onLoggedIn(); return;
           }
         } catch { }
@@ -2832,380 +1674,6 @@
       if (authState.refreshToken) { const ok = await tryRefresh(); if (ok) { hideLoginScreen(); onLoggedIn(); return; } }
       showLoginScreen();
     })();
-    // ── Metadata-fane ─────────────────────────────────────────────
-
-    // Kolonner per tabell, lastet én gang og cachet
-    const _metaColumnsCache = {};
-    // Siste lastede objekt-data
-    let _metaCurrentData = null;
-
-    // Kjente tabeller (hardkodet for v1 – kan erstattes med GET /objects-liste når det er implementert)
-    const META_OBJECTS = [
-      { label: 'KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK', value: 'QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK' },
-      { label: 'KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER', value: 'QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER' },
-      { label: 'KI_GRUNNLAG_ORACLE_RDAP_BEMANNING', value: 'QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_BEMANNING' },
-      { label: 'KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA', value: 'QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA' },
-    ];
-
-    function initMetadataTab() {
-      // Ingenting å laste ved init – bruker velger objekt selv
-    }
-
-    async function loadMetaObject() {
-      const val = document.getElementById('meta-object-select').value;
-      const content = document.getElementById('meta-content');
-      if (!val) {
-        content.innerHTML = '<div class="meta-empty" style="padding:40px">Velg en tabell for å se annotasjoner og kommentarer</div>';
-        _metaCurrentData = null;
-        return;
-      }
-      content.innerHTML = '<div class="loading-msg">Laster…</div>';
-      try {
-        const res = await apiFetch(API_BASE + '/admin/metadata/objects/' + val);
-        const data = await res.json();
-        if (!data.ok) {
-          content.innerHTML = `<div class="loading-msg" style="color:var(--red)">${escHtml(data.error)}</div>`;
-          return;
-        }
-        _metaCurrentData = data;
-        // Cache kolonnene for modal-dropdown
-        const key = val;
-        _metaColumnsCache[key] = data.columns.map(c => c.column_name);
-        renderMetaContent(data);
-      } catch (e) {
-        content.innerHTML = `<div class="loading-msg" style="color:var(--red)">Feil: ${escHtml(e.message)}</div>`;
-      }
-    }
-
-    function renderMetaContent(data) {
-      const content = document.getElementById('meta-content');
-
-      // Panel 1: Kolonner + eksisterende kommentarer
-      const colRows = data.columns.map(col => {
-        const comment = data.existing_comments?.columns?.[col.column_name];
-        return `<div class="meta-col-item">
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:baseline;gap:8px">
-          <span class="meta-col-name">${escHtml(col.column_name)}</span>
-          <span class="meta-col-type">${escHtml(col.data_type)}${col.data_length && col.data_type.includes('CHAR') ? '(' + col.data_length + ')' : ''}</span>
-        </div>
-        ${comment ? `<div class="meta-col-comment">${escHtml(comment)}</div>` : ''}
-      </div>
-    </div>`;
-      }).join('');
-
-      const tableComment = data.existing_comments?.table
-        ? `<div style="margin-bottom:10px;padding:8px 10px;background:var(--bg3);border-radius:7px;border:1px solid var(--border)"><span style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em">Tabell</span><div class="meta-col-comment" style="margin-top:4px">${escHtml(data.existing_comments.table)}</div></div>`
-        : '';
-
-      // Panel 2: Eksisterende Oracle-annotasjoner
-      const annotRows = data.existing_annotations?.length
-        ? data.existing_annotations.map(a => `
-        <div class="meta-annotation-item">
-          <div class="meta-annotation-header">
-            ${a.column_name ? `<span class="meta-annotation-col">${escHtml(a.column_name)}</span><span style="color:var(--text3)">·</span>` : '<span style="color:var(--text3);font-size:11px">tabellnivå</span><span style="color:var(--text3)">·</span>'}
-            <span class="meta-annotation-name">${escHtml(a.annotation_name)}</span>
-          </div>
-          <div class="meta-annotation-value">${escHtml(a.annotation_value)}</div>
-        </div>`).join('')
-        : '<div class="meta-empty">Ingen annotations</div>';
-
-      // Panel 3: qc_object_annotations-rader
-      const qcRows = data.qc_annotations?.length
-        ? data.qc_annotations.map(a => {
-          const syncBadge = a.sync_target === 'ANNOTATION' ? 'badge-accent'
-            : a.sync_target === 'COMMENT' ? 'badge-green'
-              : 'badge-amber';
-          const statusBadge = a.status === 'AKTIV' ? 'badge-green'
-            : a.status === 'UTKAST' ? 'badge-amber'
-              : 'badge-red';
-          return `<div class="meta-qc-item">
-          <div class="meta-qc-header">
-            ${a.column_name ? `<span class="badge badge-accent" style="font-size:10px">${escHtml(a.column_name)}</span>` : '<span class="badge" style="font-size:10px;background:var(--bg4);color:var(--text3);border:1px solid var(--border)">tabellnivå</span>'}
-            <span class="badge ${syncBadge}" style="font-size:10px">${escHtml(a.sync_target)}</span>
-            ${a.annotation_name ? `<span class="badge badge-amber" style="font-size:10px">${escHtml(a.annotation_name)}</span>` : ''}
-            ${a.notat_type ? `<span class="badge badge-amber" style="font-size:10px">${escHtml(a.notat_type)}</span>` : ''}
-            <span class="badge ${statusBadge}" style="font-size:10px">${escHtml(a.status)}</span>
-          </div>
-          <div class="meta-qc-value">${escHtml(a.annotation_value)}</div>
-          <div class="meta-qc-footer">
-            <span>oppdatert: ${escHtml(a.updated_at?.substring(0, 16) || '–')}</span>
-            ${a.status !== 'AKTIV' ? `<button class="action-btn" onclick="publishMetaAnnotation('${escAttr(a.id)}')">Publiser</button>` : ''}
-            ${a.status !== 'ARKIVERT' ? `<button class="action-btn danger" onclick="archiveMetaAnnotation('${escAttr(a.id)}')">Arkiver</button>` : ''}        </div>`;
-        }).join('')
-        : '<div class="meta-empty">Ingen qc-annotasjoner ennå</div>';
-
-      content.innerHTML = `
-    <div class="meta-panels" id="meta-panels">
-      <div class="meta-col-left" id="meta-col-left">
-        <div class="meta-panel" style="height:100%">
-          <div class="meta-panel-header"><h4>Kolonner og kommentarer</h4></div>
-          <div class="meta-panel-body">${tableComment}${colRows}</div>
-        </div>
-      </div>
-      <div class="meta-splitter-v" id="meta-splitter-v"></div>
-      <div class="meta-col-right" id="meta-col-right">
-        <div class="meta-panel">
-          <div class="meta-panel-header"><h4>Oracle annotations (live)</h4></div>
-          <div class="meta-panel-body">${annotRows}</div>
-        </div>
-        <div class="meta-splitter-h" id="meta-splitter-h"></div>
-        <div class="meta-panel">
-          <div class="meta-panel-header">
-            <h4>Redigerbare annotasjoner</h4>
-            <button class="action-btn" onclick="openMetaModal()" style="margin-right:0">+ Ny</button>
-          </div>
-          <div class="meta-panel-body">${qcRows}</div>
-        </div>
-      </div>
-    </div>`;
-      initMetaSplitters();
-    }
-
-    // ── Modal ──────────────────────────────────────────────────────
-
-    function openMetaModal(id) {
-      document.getElementById('meta-modal-error').textContent = '';
-      document.getElementById('meta-modal-success').textContent = '';
-      document.getElementById('mm-value').value = '';
-      document.getElementById('mm-status').value = 'AKTIV';
-      document.getElementById('mm-sync-target').value = 'ANNOTATION';
-      document.getElementById('mm-annotation-name').value = 'DESCRIPTION';
-      onMetaSyncTargetChange();
-
-      // Sett objekt-dropdown til nåværende valg i fanen
-      const currentObj = document.getElementById('meta-object-select').value;
-      if (currentObj) {
-        document.getElementById('mm-object').value = currentObj;
-        onMetaObjectChange();
-      }
-
-      document.getElementById('meta-modal').classList.add('show');
-    }
-
-    function closeMetaModal() {
-      document.getElementById('meta-modal').classList.remove('show');
-    }
-
-    function onMetaSyncTargetChange() {
-      const target = document.getElementById('mm-sync-target').value;
-      document.getElementById('mm-annotation-name-group').style.display = target === 'ANNOTATION' ? '' : 'none';
-      document.getElementById('mm-notat-type-group').style.display = target === 'NONE' ? '' : 'none';
-      // Oppdater hint-tekst basert på valg
-      const hint = document.getElementById('mm-value-hint');
-      if (target === 'ANNOTATION') hint.textContent = 'For DESCRIPTION: skriv direktivet som SQL-syntaks der det er mulig. Enkle fnutter escapes automatisk.';
-      else if (target === 'COMMENT') hint.textContent = 'COMMENT ON overskriver eksisterende kommentar for dette objektet/kolonnen.';
-      else hint.textContent = 'Internt notat – vises kun i admin-panelet, påvirker ikke databasen.';
-    }
-
-    async function onMetaObjectChange() {
-      const val = document.getElementById('mm-object').value;
-      const colSelect = document.getElementById('mm-column');
-      colSelect.innerHTML = '<option value="">(tabellnivå)</option>';
-      if (!val) return;
-
-      // Bruk cache hvis tilgjengelig
-      if (_metaColumnsCache[val]) {
-        _metaColumnsCache[val].forEach(col => {
-          const opt = document.createElement('option');
-          opt.value = col; opt.textContent = col;
-          colSelect.appendChild(opt);
-        });
-        return;
-      }
-
-      // Ellers hent fra API
-      colSelect.innerHTML = '<option value="">Laster kolonner…</option>';
-      try {
-        const res = await apiFetch(API_BASE + '/admin/metadata/objects/' + val);
-        const data = await res.json();
-        colSelect.innerHTML = '<option value="">(tabellnivå)</option>';
-        if (data.ok && data.columns) {
-          _metaColumnsCache[val] = data.columns.map(c => c.column_name);
-          data.columns.forEach(col => {
-            const opt = document.createElement('option');
-            opt.value = col.column_name; opt.textContent = col.column_name;
-            colSelect.appendChild(opt);
-          });
-        }
-      } catch {
-        colSelect.innerHTML = '<option value="">Feil ved lasting</option>';
-      }
-    }
-
-    async function saveMetaAnnotation() {
-      const errEl = document.getElementById('meta-modal-error');
-      const okEl = document.getElementById('meta-modal-success');
-      errEl.textContent = ''; okEl.textContent = '';
-
-      const objVal = document.getElementById('mm-object').value;
-      if (!objVal) { errEl.textContent = 'Velg en tabell'; return; }
-      const [owner, name] = objVal.split('/');
-      const column_name = document.getElementById('mm-column').value || null;
-      const sync_target = document.getElementById('mm-sync-target').value;
-      const annotation_name = sync_target === 'ANNOTATION'
-        ? document.getElementById('mm-annotation-name').value
-        : null;
-      const notat_type = sync_target === 'NONE'
-        ? document.getElementById('mm-notat-type').value
-        : null;
-      const annotation_value = document.getElementById('mm-value').value.trim();
-      const status = document.getElementById('mm-status').value;
-
-      if (!annotation_value) { errEl.textContent = 'Fyll inn verdi/innhold'; return; }
-
-      const body = { object_owner: owner, object_name: name, column_name, sync_target, annotation_name, annotation_value, notat_type, status };
-
-      const saveBtn = document.querySelector('#meta-modal .btn-save');
-      saveBtn.disabled = true; saveBtn.textContent = 'Lagrer…';
-
-      try {
-        const res = await apiFetch(API_BASE + '/admin/metadata/annotations', {
-          method: 'POST',
-          body: JSON.stringify(body),
-        });
-        const data = await res.json();
-        if (data.ok) {
-          okEl.textContent = status === 'AKTIV' && data.ddl?.length
-            ? `Lagret og synket til databasen (${data.ddl.length} DDL-setning${data.ddl.length !== 1 ? 'er' : ''} kjørt)`
-            : 'Lagret';
-          // Oppdater panelet hvis vi ser på samme objekt
-          const currentObj = document.getElementById('meta-object-select').value;
-          if (currentObj === objVal) setTimeout(() => loadMetaObject(), 800);
-          setTimeout(() => closeMetaModal(), 1400);
-        } else {
-          errEl.textContent = data.error || 'Noe gikk galt';
-          if (data.detail) errEl.textContent += ': ' + data.detail;
-        }
-      } catch (e) {
-        errEl.textContent = 'Kunne ikke nå serveren: ' + e.message;
-      }
-
-      saveBtn.disabled = false; saveBtn.textContent = 'Lagre';
-    }
-
-    async function archiveMetaAnnotation(id) {
-      if (!confirm('Arkiver denne annotasjonen? Den vil bli merket ARKIVERT og DDL vil bli rullet tilbake (DROP) hvis den var AKTIV.')) return;
-
-      // Vi trenger old_row-data – finn raden i _metaCurrentData
-      const row = _metaCurrentData?.qc_annotations?.find(a => a.id === id);
-      if (!row) { alert('Finner ikke annotasjonen – last siden på nytt'); return; }
-
-      const body = {
-        id,
-        object_owner: _metaCurrentData.object_owner,
-        object_name: _metaCurrentData.object_name,
-        column_name: row.column_name || null,
-        sync_target: row.sync_target,
-        annotation_name: row.annotation_name || null,
-        annotation_value: row.annotation_value,
-        notat_type: row.notat_type || null,
-        status: 'ARKIVERT',
-      };
-
-      try {
-        const res = await apiFetch(API_BASE + '/admin/metadata/annotations', {
-          method: 'POST',
-          body: JSON.stringify(body),
-        });
-        const data = await res.json();
-        if (data.ok) {
-          loadMetaObject(); // Refresh panelet
-        } else {
-          alert('Feil: ' + (data.error || 'Ukjent feil'));
-        }
-      } catch (e) {
-        alert('Nettverksfeil: ' + e.message);
-      }
-    }
-   
-    async function publishMetaAnnotation(id) {
-      if (!confirm('Publiser denne annotasjonen til databasen?')) return;
-
-      const row = _metaCurrentData?.qc_annotations?.find(a => a.id === id);
-      if (!row) { alert('Finner ikke annotasjonen – last siden på nytt'); return; }
-
-      const body = {
-        id,
-        object_owner: _metaCurrentData.object_owner,
-        object_name: _metaCurrentData.object_name,
-        column_name: row.column_name || null,
-        sync_target: row.sync_target,
-        annotation_name: row.annotation_name || null,
-        annotation_value: row.annotation_value,
-        notat_type: row.notat_type || null,
-        status: 'AKTIV',
-      };
-
-      try {
-        const res = await apiFetch(API_BASE + '/admin/metadata/annotations', {
-          method: 'POST',
-          body: JSON.stringify(body),
-        });
-        const data = await res.json();
-        if (data.ok) {
-          loadMetaObject();
-        } else {
-          alert('Feil: ' + (data.error || 'Ukjent feil'));
-        }
-      } catch (e) {
-        alert('Nettverksfeil: ' + e.message);
-      }
-    }    
-
-    function initMetaSplitters() {
-      const vSplitter = document.getElementById('meta-splitter-v');
-      const colLeft   = document.getElementById('meta-col-left');
-      const panels    = document.getElementById('meta-panels');
-
-      if (vSplitter && colLeft && panels) {
-        vSplitter.addEventListener('mousedown', function(e) {
-          e.preventDefault();
-          vSplitter.classList.add('dragging');
-          const startX  = e.clientX;
-          const startW  = colLeft.getBoundingClientRect().width;
-          const totalW  = panels.getBoundingClientRect().width;
-          function onMove(e) {
-            const newPct = Math.min(80, Math.max(20, (startW + e.clientX - startX) / totalW * 100));
-            colLeft.style.flex = '0 0 ' + newPct + '%';
-          }
-          function onUp() {
-            vSplitter.classList.remove('dragging');
-            document.removeEventListener('mousemove', onMove);
-            document.removeEventListener('mouseup', onUp);
-          }
-          document.addEventListener('mousemove', onMove);
-          document.addEventListener('mouseup', onUp);
-        });
-      }
-
-      const hSplitter = document.getElementById('meta-splitter-h');
-      const colRight  = document.getElementById('meta-col-right');
-
-      if (hSplitter && colRight) {
-        hSplitter.addEventListener('mousedown', function(e) {
-          e.preventDefault();
-          hSplitter.classList.add('dragging');
-          const startY   = e.clientY;
-          const topPanel = colRight.querySelectorAll('.meta-panel')[0];
-          const startH   = topPanel.getBoundingClientRect().height;
-          const totalH   = colRight.getBoundingClientRect().height;
-          function onMove(e) {
-            const newPct = Math.min(80, Math.max(20, (startH + e.clientY - startY) / totalH * 100));
-            topPanel.style.flex = '0 0 ' + newPct + '%';
-          }
-          function onUp() {
-            hSplitter.classList.remove('dragging');
-            document.removeEventListener('mousemove', onMove);
-            document.removeEventListener('mouseup', onUp);
-          }
-          document.addEventListener('mousemove', onMove);
-          document.addEventListener('mouseup', onUp);
-        });
-      }
-    }
-
   </script>
 </body>
-
 </html>

@@ -416,6 +416,142 @@ resource "oci_apigateway_deployment" "v1" {
       }
     }
 
+    routes {
+      path    = "/chats"
+      methods = ["GET", "POST", "OPTIONS"]
+
+      backend {
+        type        = "ORACLE_FUNCTIONS_BACKEND"
+        function_id = oci_functions_function.chat_handler.id
+      }
+
+      response_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Strict-Transport-Security"
+              values    = ["max-age=31536000; includeSubDomains"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+    }
+
+    # ── Route: /v1/chats/{id} ─────────────────────────────────
+    routes {
+      path    = "/chats/{id}"
+      methods = ["DELETE", "OPTIONS"]
+
+      backend {
+        type        = "ORACLE_FUNCTIONS_BACKEND"
+        function_id = oci_functions_function.chat_handler.id
+      }
+
+      response_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Strict-Transport-Security"
+              values    = ["max-age=31536000; includeSubDomains"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+    }
+
+    # ── Route: /v1/chats/{id}/messages ────────────────────────
+    routes {
+      path    = "/chats/{id}/messages"
+      methods = ["GET", "POST", "OPTIONS"]
+
+      backend {
+        type        = "ORACLE_FUNCTIONS_BACKEND"
+        function_id = oci_functions_function.chat_handler.id
+      }
+
+      response_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Strict-Transport-Security"
+              values    = ["max-age=31536000; includeSubDomains"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+    }
+
+    # ── Route: /v1/chats/{id}/title ───────────────────────────
+    routes {
+      path    = "/chats/{id}/title"
+      methods = ["PUT", "OPTIONS"]
+
+      backend {
+        type        = "ORACLE_FUNCTIONS_BACKEND"
+        function_id = oci_functions_function.chat_handler.id
+      }
+
+      response_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Strict-Transport-Security"
+              values    = ["max-age=31536000; includeSubDomains"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+    }
+    # ── Route: /v1/admin/profiles/{path*} ─────────────────────
+    routes {
+      path    = "/admin/profiles/{path*}"
+      methods = ["GET", "PUT", "DELETE", "OPTIONS"]
+
+      backend {
+        type        = "ORACLE_FUNCTIONS_BACKEND"
+        function_id = oci_functions_function.profile_handler.id
+      }
+      response_policies {
+        header_transformations {
+          set_headers {
+            items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Strict-Transport-Security"
+              values    = ["max-age=31536000; includeSubDomains"]
+              if_exists = "OVERWRITE"
+            }
+          }
+        }
+      }
+    }
     # ── Route: /v1/admin ─────────────────────────────────────
     routes {
       path    = "/admin/{path*}"

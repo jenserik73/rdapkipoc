@@ -156,9 +156,12 @@ def _ask_nl(question: str) -> dict:
                 max_rows=MAX_ROWS,
             )
             clob_val = result_clob.getvalue()
-            clob_content = clob_val.read(1, clob_val.size()) if clob_val else None
+            clob_content = clob_val.read() if clob_val else None
             logger.debug("CLOB innhold: %s", clob_content)
-            return json.loads(clob_content or '{"ok":false,"error":"Tom respons"}')
+            try:
+                return json.loads(clob_content or '{"ok":false,"error":"Tom respons"}')
+            except Exception:
+                return {"ok": False, "error": clob_content or "Tom respons fra ADB"}
 
 
 def _save_feedback(question: str, sql: str, vote: int, corrected: str = None):
