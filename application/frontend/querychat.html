@@ -8,217 +8,1737 @@
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg: #0e0f11; --bg2: #161719; --bg3: #1e1f23; --bg4: #26272d;
-      --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
-      --text: #e8e9ec; --text2: #9a9ba3; --text3: #5a5b63;
-      --accent: #5b7fff; --accent2: #3d5ce8;
-      --green: #3ecf8e; --amber: #f0a22a; --red: #f06060;
-      --mono: 'JetBrains Mono', monospace; --sans: 'IBM Plex Sans', sans-serif;
+      --bg: #0e0f11;
+      --bg2: #161719;
+      --bg3: #1e1f23;
+      --bg4: #26272d;
+      --border: rgba(255, 255, 255, 0.07);
+      --border2: rgba(255, 255, 255, 0.12);
+      --text: #e8e9ec;
+      --text2: #9a9ba3;
+      --text3: #5a5b63;
+      --accent: #5b7fff;
+      --accent2: #3d5ce8;
+      --green: #3ecf8e;
+      --amber: #f0a22a;
+      --red: #f06060;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; }
-    #login-screen { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; align-items: center; justify-content: center; flex-direction: column; gap: 32px; }
-    #login-screen.show { display: flex; }
-    .login-box { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; padding: 32px; width: 380px; max-width: 95vw; }
-    .login-logo { font-family: var(--mono); font-size: 22px; font-weight: 600; color: var(--accent); text-align: center; margin-bottom: 8px; }
-    .login-logo span { color: var(--text2); }
-    .login-subtitle { text-align: center; color: var(--text3); font-size: 13px; margin-bottom: 28px; }
-    .login-field { margin-bottom: 14px; }
-    .login-field label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
-    .login-field input { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--sans); font-size: 13px; padding: 10px 12px; border-radius: 8px; outline: none; transition: border-color 0.12s; }
-    .login-field input:focus { border-color: rgba(91,127,255,0.4); }
-    .login-field input::placeholder { color: var(--text3); }
-    .login-btn { width: 100%; padding: 11px; background: var(--accent); border: none; color: white; font-family: var(--sans); font-size: 14px; font-weight: 500; border-radius: 8px; cursor: pointer; margin-top: 8px; transition: background 0.12s; }
-    .login-btn:hover { background: var(--accent2); }
-    .login-btn:disabled { background: var(--bg4); cursor: not-allowed; }
-    .login-error { color: var(--red); font-size: 12.5px; text-align: center; margin-top: 10px; min-height: 18px; }
-    .forgot-link { text-align: center; margin-top: 14px; font-size: 12px; color: var(--text3); }
-    .forgot-link a { color: var(--accent); cursor: pointer; text-decoration: none; }
-    .forgot-link a:hover { text-decoration: underline; }
-    #forgot-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 300; align-items: center; justify-content: center; }
-    #forgot-modal.show { display: flex; }
-    #app { display: grid; grid-template-columns: 260px 1fr; height: 100vh; overflow: hidden; }
-    #sidebar { background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-    #sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
-    #sidebar-header .logo { font-family: var(--mono); font-size: 15px; font-weight: 600; color: var(--accent); letter-spacing: -0.5px; }
-    #sidebar-header .logo span { color: var(--text2); }
-    #new-chat-btn { margin: 12px; padding: 9px 14px; background: rgba(91,127,255,0.12); border: 1px solid rgba(91,127,255,0.25); border-radius: 8px; color: var(--accent); font-family: var(--sans); font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.15s; }
-    #new-chat-btn:hover { background: rgba(91,127,255,0.2); }
-    #history-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
-    #history-list::-webkit-scrollbar { width: 4px; }
-    #history-list::-webkit-scrollbar-track { background: transparent; }
-    #history-list::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
-    .history-item { padding: 9px 10px; border-radius: 7px; cursor: pointer; color: var(--text2); font-size: 12.5px; line-height: 1.4; transition: all 0.12s; border: 1px solid transparent; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .history-item:hover { background: var(--bg3); color: var(--text); }
-    .history-item.active { background: var(--bg3); color: var(--text); border-color: var(--border); }
-    .history-section-label { font-size: 10.5px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; padding: 12px 10px 5px; }
-    #sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--border); font-size: 11.5px; color: var(--text3); display: flex; align-items: center; gap: 8px; }
-    .env-badge { font-family: var(--mono); font-size: 10px; background: var(--bg4); border: 1px solid var(--border); padding: 2px 7px; border-radius: 4px; color: var(--text2); }
-    #user-info { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--text2); }
-    #logout-btn { background: none; border: none; cursor: pointer; padding: 4px 6px; border-radius: 5px; color: var(--text3); font-size: 11px; font-family: var(--sans); transition: all 0.12s; white-space: nowrap; }
-    #logout-btn:hover { color: var(--red); background: rgba(240,96,96,0.08); }
-    #change-password-btn { background: none; border: none; cursor: pointer; padding: 4px 6px; border-radius: 5px; color: var(--text3); font-size: 11px; font-family: var(--sans); transition: all 0.12s; white-space: nowrap; }
-    #change-password-btn:hover { color: var(--accent); background: rgba(91,127,255,0.08); }
-    #admin-nav { display: none; margin: 0 12px 8px; padding: 8px 12px; background: rgba(240,162,42,0.08); border: 1px solid rgba(240,162,42,0.2); border-radius: 8px; color: var(--amber); font-size: 12.5px; cursor: pointer; align-items: center; gap: 8px; transition: all 0.15s; }
-    #admin-nav:hover { background: rgba(240,162,42,0.15); }
-    #admin-nav.show { display: flex; }
-    #main { display: flex; flex-direction: column; overflow: hidden; }
-    #chat-view { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-    #chat-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-    #chat-header .title { font-size: 14px; font-weight: 500; color: var(--text); }
-    #chat-header .meta { font-size: 12px; color: var(--text3); margin-top: 1px; }
-    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px rgba(62,207,142,0.5); flex-shrink: 0; }
-    .status-dot.disconnected { background: var(--text3); box-shadow: none; }
-    #messages { flex: 1; overflow-y: auto; padding: 24px 0; }
-    #messages::-webkit-scrollbar { width: 4px; }
-    #messages::-webkit-scrollbar-track { background: transparent; }
-    #messages::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
-    .msg-wrapper { padding: 0 24px 2px; max-width: 900px; margin: 0 auto; width: 100%; }
-    .msg-wrapper+.msg-wrapper { margin-top: 4px; }
-    .msg { display: flex; gap: 12px; padding: 12px 14px; border-radius: 10px; animation: fadeIn 0.2s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-    .msg.user { background: rgba(91,127,255,0.08); border: 1px solid rgba(91,127,255,0.12); }
-    .msg.assistant { background: var(--bg2); border: 1px solid var(--border); }
-    .msg.error { background: rgba(240,96,96,0.07); border: 1px solid rgba(240,96,96,0.2); }
-    .avatar { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; font-family: var(--mono); }
-    .avatar.user { background: rgba(91,127,255,0.2); color: var(--accent); }
-    .avatar.ai { background: rgba(62,207,142,0.15); color: var(--green); font-size: 10px; }
-    .msg-body { flex: 1; min-width: 0; }
-    .msg-meta { font-size: 11px; color: var(--text3); margin-bottom: 5px; }
-    .msg-text { color: var(--text2); line-height: 1.65; font-size: 13.5px; }
-    .msg.user .msg-text { color: var(--text); }
-    .msg-text p+p { margin-top: 8px; }
-    .sql-block { margin-top: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-    .sql-block-header { padding: 7px 12px; background: var(--bg3); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-    .sql-block-header span { font-family: var(--mono); font-size: 10.5px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
-    .copy-btn { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 11px; font-family: var(--sans); padding: 2px 6px; border-radius: 4px; transition: all 0.12s; }
-    .copy-btn:hover { color: var(--text); background: var(--bg4); }
-    .sql-block pre { padding: 12px; font-family: var(--mono); font-size: 12px; color: #9ab0d8; line-height: 1.6; overflow-x: auto; }
-    .sql-keyword { color: #5b7fff; } .sql-string { color: #f0a22a; } .sql-num { color: #3ecf8e; }
-    .result-container { margin-top: 12px; }
-    .result-tabs { display: flex; gap: 2px; margin-bottom: 10px; border-bottom: 1px solid var(--border); }
-    .rtab { padding: 6px 12px; font-size: 12px; cursor: pointer; border: none; background: none; color: var(--text3); font-family: var(--sans); border-radius: 6px 6px 0 0; transition: all 0.12s; position: relative; bottom: -1px; border: 1px solid transparent; border-bottom: none; }
-    .rtab:hover { color: var(--text2); }
-    .rtab.active { color: var(--accent); background: var(--bg2); border-color: var(--border); }
-    .result-panel { display: none; }
-    .result-panel.active { display: block; }
-    .result-table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
-    .result-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }
-    .result-table th { background: var(--bg3); color: var(--text2); font-weight: 500; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
-    .result-table td { padding: 7px 12px; color: var(--text); border-bottom: 1px solid var(--border); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .result-table tr:last-child td { border-bottom: none; }
-    .result-table tr:hover td { background: rgba(255,255,255,0.02); }
-    .result-table td.num { color: var(--green); }
-    .result-count { font-size: 11.5px; color: var(--text3); margin-top: 7px; font-family: var(--mono); }
-    .chart-wrap { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
-    .chart-controls { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-    .chart-control-btn { padding: 4px 10px; font-size: 11.5px; cursor: pointer; font-family: var(--sans); background: var(--bg3); border: 1px solid var(--border); color: var(--text2); border-radius: 5px; transition: all 0.12s; }
-    .chart-control-btn:hover { color: var(--text); }
-    .chart-control-btn.active { background: rgba(91,127,255,0.15); border-color: rgba(91,127,255,0.3); color: var(--accent); }
-    .chart-canvas-wrap { position: relative; height: 260px; }
-    .text-result { color: var(--text2); line-height: 1.75; font-size: 13.5px; }
-    .text-result strong { color: var(--text); font-weight: 500; }
-    .feedback-row { flex-wrap: wrap; display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
-    .feedback-label { font-size: 11.5px; color: var(--text3); }
-    .fb-btn { padding: 4px 10px; font-size: 12px; cursor: pointer; font-family: var(--sans); background: var(--bg3); border: 1px solid var(--border); color: var(--text2); border-radius: 5px; transition: all 0.12s; display: flex; align-items: center; gap: 5px; }
-    .fb-btn:hover { border-color: var(--border2); color: var(--text); }
-    .fb-btn.positive.active { background: rgba(62,207,142,0.1); border-color: rgba(62,207,142,0.3); color: var(--green); }
-    .fb-btn.negative.active { background: rgba(240,96,96,0.1); border-color: rgba(240,96,96,0.3); color: var(--red); }
-    .fb-comment { width: 100%; display: none; margin-top: 8px; }
-    .fb-comment.show { width: 100%; display: flex; gap: 8px; }
-    .fb-comment input { flex: 1; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--sans); font-size: 12.5px; padding: 6px 10px; border-radius: 6px; outline: none; transition: border-color 0.12s; }
-    .fb-comment input:focus { border-color: var(--border2); }
-    .fb-comment input::placeholder { color: var(--text3); }
-    .fb-send { padding: 6px 12px; background: rgba(91,127,255,0.15); border: 1px solid rgba(91,127,255,0.25); color: var(--accent); font-family: var(--sans); font-size: 12px; border-radius: 6px; cursor: pointer; transition: all 0.12s; }
-    .fb-send:hover { background: rgba(91,127,255,0.25); }
-    #empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; gap: 16px; }
-    #empty-state .ql { font-family: var(--mono); font-size: 38px; color: var(--bg4); line-height: 1; }
-    #empty-state h2 { font-size: 18px; font-weight: 500; color: var(--text); }
-    #empty-state p { color: var(--text2); font-size: 13.5px; max-width: 380px; line-height: 1.65; }
-    .example-queries { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
-    .example-q { padding: 9px 14px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; color: var(--text2); font-size: 13px; cursor: pointer; transition: all 0.12s; text-align: left; font-family: var(--sans); }
-    .example-q:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
-    #input-area { padding: 16px 24px 20px; border-top: 1px solid var(--border); flex-shrink: 0; max-width: 900px; width: 100%; margin: 0 auto; }
-    #input-wrap { display: flex; align-items: flex-end; gap: 10px; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; transition: border-color 0.15s; }
-    #input-wrap:focus-within { border-color: rgba(91,127,255,0.35); }
-    #query-input { flex: 1; background: none; border: none; outline: none; resize: none; color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.5; min-height: 22px; max-height: 180px; overflow-y: auto; padding: 0; }
-    #query-input::placeholder { color: var(--text3); }
-    #query-input::-webkit-scrollbar { width: 3px; }
-    #query-input::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
-    #send-btn { width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0; background: var(--accent); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
-    #send-btn:hover { background: var(--accent2); }
-    #send-btn:disabled { background: var(--bg4); cursor: not-allowed; }
-    .input-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 7px; padding: 0 2px; }
-    .input-hint { font-size: 11px; color: var(--text3); }
-    .input-hint kbd { background: var(--bg3); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: var(--mono); font-size: 10px; }
-    .thinking { display: flex; gap: 5px; align-items: center; padding: 4px 0; }
-    .thinking span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: bounce 1.2s infinite ease-in-out; }
-    .thinking span:nth-child(2) { animation-delay: 0.2s; }
-    .thinking span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes bounce { 0%,80%,100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
-    .icon-btn { background: none; border: none; cursor: pointer; padding: 6px; border-radius: 6px; color: var(--text3); transition: all 0.12s; display: flex; align-items: center; }
-    .icon-btn:hover { color: var(--text); background: var(--bg3); }
-    #config-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 100; align-items: center; justify-content: center; }
-    #config-modal.show { display: flex; }
-    .modal-box { background: var(--bg2); border: 1px solid var(--border2); border-radius: 14px; padding: 24px; width: 440px; max-width: 95vw; }
-    .modal-title { font-size: 16px; font-weight: 500; margin-bottom: 20px; color: var(--text); }
-    .field-group { margin-bottom: 16px; }
-    .field-group label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
-    .field-group input, .field-group select { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--sans); font-size: 13px; padding: 8px 10px; border-radius: 7px; outline: none; transition: border-color 0.12s; }
-    .field-group input:focus, .field-group select:focus { border-color: rgba(91,127,255,0.4); }
-    .field-group input::placeholder { color: var(--text3); }
-    .field-group select option { background: var(--bg3); }
-    .modal-actions { display: flex; gap: 8px; margin-top: 4px; justify-content: flex-end; }
-    .btn-cancel { padding: 8px 16px; background: none; border: 1px solid var(--border); color: var(--text2); font-family: var(--sans); font-size: 13px; border-radius: 7px; cursor: pointer; transition: all 0.12s; }
-    .btn-cancel:hover { color: var(--text); border-color: var(--border2); }
-    .btn-save { padding: 8px 16px; background: var(--accent); border: none; color: white; font-family: var(--sans); font-size: 13px; border-radius: 7px; cursor: pointer; font-weight: 500; transition: all 0.12s; }
-    .btn-save:hover { background: var(--accent2); }
-    #admin-view { display: none; flex-direction: column; flex: 1; overflow: hidden; }
-    #admin-view.show { display: flex; }
-    #admin-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-    #admin-header .title { font-size: 14px; font-weight: 500; color: var(--text); }
-    #admin-content { flex: 1; overflow-y: auto; padding: 24px; }
-    .admin-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
-    .admin-tab { padding: 8px 16px; font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); font-family: var(--sans); border-radius: 7px; transition: all 0.12s; }
-    .admin-tab:hover { color: var(--text); }
-    .admin-tab.active { background: rgba(91,127,255,0.12); border-color: rgba(91,127,255,0.3); color: var(--accent); }
-    .admin-section { display: none; }
-    .admin-section.active { display: block; }
-    .admin-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .admin-toolbar h3 { font-size: 14px; font-weight: 500; color: var(--text); }
-    .btn-primary { padding: 7px 14px; background: var(--accent); border: none; color: white; font-family: var(--sans); font-size: 12.5px; border-radius: 7px; cursor: pointer; font-weight: 500; transition: all 0.12s; display: flex; align-items: center; gap: 6px; }
-    .btn-primary:hover { background: var(--accent2); }
-    .admin-table-wrap { border-radius: 10px; border: 1px solid var(--border); overflow: hidden; }
-    .admin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .admin-table th { background: var(--bg3); color: var(--text2); font-weight: 500; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; }
-    .admin-table td { padding: 11px 14px; color: var(--text); border-bottom: 1px solid var(--border); }
-    .admin-table tr:last-child td { border-bottom: none; }
-    .admin-table tr:hover td { background: rgba(255,255,255,0.02); }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: var(--mono); font-weight: 500; }
-    .badge-green { background: rgba(62,207,142,0.12); color: var(--green); border: 1px solid rgba(62,207,142,0.2); }
-    .badge-red { background: rgba(240,96,96,0.12); color: var(--red); border: 1px solid rgba(240,96,96,0.2); }
-    .badge-accent { background: rgba(91,127,255,0.12); color: var(--accent); border: 1px solid rgba(91,127,255,0.2); }
-    .badge-amber { background: rgba(240,162,42,0.12); color: var(--amber); border: 1px solid rgba(240,162,42,0.2); }
-    .action-btn { padding: 4px 10px; font-size: 12px; cursor: pointer; font-family: var(--sans); background: var(--bg3); border: 1px solid var(--border); color: var(--text2); border-radius: 5px; transition: all 0.12s; margin-right: 4px; }
-    .action-btn:hover { color: var(--text); border-color: var(--border2); }
-    .action-btn.danger:hover { color: var(--red); border-color: rgba(240,96,96,0.3); background: rgba(240,96,96,0.08); }
-    .loading-msg { text-align: center; color: var(--text3); padding: 40px; font-size: 13px; }
-    #user-modal, #role-modal, #reset-modal, #roles-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 150; align-items: center; justify-content: center; }
-    #user-modal.show, #role-modal.show, #reset-modal.show, #roles-modal.show { display: flex; }
-    .roles-modal-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
-    .roles-modal-item:last-child { border-bottom: none; }
-    #messages-inner { max-width: 900px; margin: 0 auto; width: 100%; }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 14px;
+    }
+
+    #login-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    #login-screen.show {
+      display: flex;
+    }
+
+    .login-box {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 32px;
+      width: 380px;
+      max-width: 95vw;
+    }
+
+    .login-logo {
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--accent);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .login-logo span {
+      color: var(--text2);
+    }
+
+    .login-subtitle {
+      text-align: center;
+      color: var(--text3);
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+
+    .login-field {
+      margin-bottom: 14px;
+    }
+
+    .login-field label {
+      display: block;
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .login-field input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.12s;
+    }
+
+    .login-field input:focus {
+      border-color: rgba(91, 127, 255, 0.4);
+    }
+
+    .login-field input::placeholder {
+      color: var(--text3);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 11px;
+      background: var(--accent);
+      border: none;
+      color: white;
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.12s;
+    }
+
+    .login-btn:hover {
+      background: var(--accent2);
+    }
+
+    .login-btn:disabled {
+      background: var(--bg4);
+      cursor: not-allowed;
+    }
+
+    .login-error {
+      color: var(--red);
+      font-size: 12.5px;
+      text-align: center;
+      margin-top: 10px;
+      min-height: 18px;
+    }
+
+    .forgot-link {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    .forgot-link a {
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .forgot-link a:hover {
+      text-decoration: underline;
+    }
+
+    #forgot-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #forgot-modal.show {
+      display: flex;
+    }
+
+    #app {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #sidebar {
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #sidebar-header .logo {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+
+    #sidebar-header .logo span {
+      color: var(--text2);
+    }
+
+    #new-chat-btn {
+      margin: 12px;
+      padding: 9px 14px;
+      background: rgba(91, 127, 255, 0.12);
+      border: 1px solid rgba(91, 127, 255, 0.25);
+      border-radius: 8px;
+      color: var(--accent);
+      font-family: var(--sans);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+
+    #new-chat-btn:hover {
+      background: rgba(91, 127, 255, 0.2);
+    }
+
+    #history-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 8px;
+    }
+
+    #history-list::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #history-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #history-list::-webkit-scrollbar-thumb {
+      background: var(--bg4);
+      border-radius: 2px;
+    }
+
+    .history-item {
+      padding: 9px 10px;
+      border-radius: 7px;
+      cursor: pointer;
+      color: var(--text2);
+      font-size: 12.5px;
+      line-height: 1.4;
+      transition: all 0.12s;
+      border: 1px solid transparent;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-item:hover {
+      background: var(--bg3);
+      color: var(--text);
+    }
+
+    .history-item.active {
+      background: var(--bg3);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .history-section-label {
+      font-size: 10.5px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 12px 10px 5px;
+    }
+
+    #sidebar-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 11.5px;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .env-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      background: var(--bg4);
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      border-radius: 4px;
+      color: var(--text2);
+    }
+
+    #user-info {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px;
+      color: var(--text2);
+    }
+
+    #logout-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 5px;
+      color: var(--text3);
+      font-size: 11px;
+      font-family: var(--sans);
+      transition: all 0.12s;
+      white-space: nowrap;
+    }
+
+    #logout-btn:hover {
+      color: var(--red);
+      background: rgba(240, 96, 96, 0.08);
+    }
+
+    #change-password-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 5px;
+      color: var(--text3);
+      font-size: 11px;
+      font-family: var(--sans);
+      transition: all 0.12s;
+      white-space: nowrap;
+    }
+
+    #change-password-btn:hover {
+      color: var(--accent);
+      background: rgba(91, 127, 255, 0.08);
+    }
+
+    #admin-nav {
+      display: none;
+      margin: 0 12px 8px;
+      padding: 8px 12px;
+      background: rgba(240, 162, 42, 0.08);
+      border: 1px solid rgba(240, 162, 42, 0.2);
+      border-radius: 8px;
+      color: var(--amber);
+      font-size: 12.5px;
+      cursor: pointer;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+
+    #admin-nav:hover {
+      background: rgba(240, 162, 42, 0.15);
+    }
+
+    #admin-nav.show {
+      display: flex;
+    }
+
+    #main {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #chat-view {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    #chat-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    #chat-header .title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    #chat-header .meta {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 1px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px rgba(62, 207, 142, 0.5);
+      flex-shrink: 0;
+    }
+
+    .status-dot.disconnected {
+      background: var(--text3);
+      box-shadow: none;
+    }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 0;
+    }
+
+    #messages::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    #messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #messages::-webkit-scrollbar-thumb {
+      background: var(--bg4);
+      border-radius: 2px;
+    }
+
+    .msg-wrapper {
+      padding: 0 24px 2px;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .msg-wrapper+.msg-wrapper {
+      margin-top: 4px;
+    }
+
+    .msg {
+      display: flex;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .msg.user {
+      background: rgba(91, 127, 255, 0.08);
+      border: 1px solid rgba(91, 127, 255, 0.12);
+    }
+
+    .msg.assistant {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+    }
+
+    .msg.error {
+      background: rgba(240, 96, 96, 0.07);
+      border: 1px solid rgba(240, 96, 96, 0.2);
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--mono);
+    }
+
+    .avatar.user {
+      background: rgba(91, 127, 255, 0.2);
+      color: var(--accent);
+    }
+
+    .avatar.ai {
+      background: rgba(62, 207, 142, 0.15);
+      color: var(--green);
+      font-size: 10px;
+    }
+
+    .msg-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .msg-meta {
+      font-size: 11px;
+      color: var(--text3);
+      margin-bottom: 5px;
+    }
+
+    .msg-text {
+      color: var(--text2);
+      line-height: 1.65;
+      font-size: 13.5px;
+    }
+
+    .msg.user .msg-text {
+      color: var(--text);
+    }
+
+    .msg-text p+p {
+      margin-top: 8px;
+    }
+
+    .sql-block {
+      margin-top: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .sql-block-header {
+      padding: 7px 12px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sql-block-header span {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 11px;
+      font-family: var(--sans);
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.12s;
+    }
+
+    .copy-btn:hover {
+      color: var(--text);
+      background: var(--bg4);
+    }
+
+    .sql-block pre {
+      padding: 12px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #9ab0d8;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+
+    .sql-keyword {
+      color: #5b7fff;
+    }
+
+    .sql-string {
+      color: #f0a22a;
+    }
+
+    .sql-num {
+      color: #3ecf8e;
+    }
+
+    .result-container {
+      margin-top: 12px;
+    }
+
+    .result-tabs {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rtab {
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text3);
+      font-family: var(--sans);
+      border-radius: 6px 6px 0 0;
+      transition: all 0.12s;
+      position: relative;
+      bottom: -1px;
+      border: 1px solid transparent;
+      border-bottom: none;
+    }
+
+    .rtab:hover {
+      color: var(--text2);
+    }
+
+    .rtab.active {
+      color: var(--accent);
+      background: var(--bg2);
+      border-color: var(--border);
+    }
+
+    .result-panel {
+      display: none;
+    }
+
+    .result-panel.active {
+      display: block;
+    }
+
+    .result-table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .result-table th {
+      background: var(--bg3);
+      color: var(--text2);
+      font-weight: 500;
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .result-table td {
+      padding: 7px 12px;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      max-width: 240px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .result-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .result-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .result-table td.num {
+      color: var(--green);
+    }
+
+    .result-count {
+      font-size: 11.5px;
+      color: var(--text3);
+      margin-top: 7px;
+      font-family: var(--mono);
+    }
+
+    .chart-wrap {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .chart-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .chart-control-btn {
+      padding: 4px 10px;
+      font-size: 11.5px;
+      cursor: pointer;
+      font-family: var(--sans);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      border-radius: 5px;
+      transition: all 0.12s;
+    }
+
+    .chart-control-btn:hover {
+      color: var(--text);
+    }
+
+    .chart-control-btn.active {
+      background: rgba(91, 127, 255, 0.15);
+      border-color: rgba(91, 127, 255, 0.3);
+      color: var(--accent);
+    }
+
+    .chart-canvas-wrap {
+      position: relative;
+      height: 260px;
+    }
+
+    .text-result {
+      color: var(--text2);
+      line-height: 1.75;
+      font-size: 13.5px;
+    }
+
+    .text-result strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .feedback-row {
+      flex-wrap: wrap;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .feedback-label {
+      font-size: 11.5px;
+      color: var(--text3);
+    }
+
+    .fb-btn {
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: var(--sans);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      border-radius: 5px;
+      transition: all 0.12s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .fb-btn:hover {
+      border-color: var(--border2);
+      color: var(--text);
+    }
+
+    .fb-btn.positive.active {
+      background: rgba(62, 207, 142, 0.1);
+      border-color: rgba(62, 207, 142, 0.3);
+      color: var(--green);
+    }
+
+    .fb-btn.negative.active {
+      background: rgba(240, 96, 96, 0.1);
+      border-color: rgba(240, 96, 96, 0.3);
+      color: var(--red);
+    }
+
+    .fb-comment {
+      width: 100%;
+      display: none;
+      margin-top: 8px;
+    }
+
+    .fb-comment.show {
+      width: 100%;
+      display: flex;
+      gap: 8px;
+    }
+
+    .fb-comment input {
+      flex: 1;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 12.5px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.12s;
+    }
+
+    .fb-comment input:focus {
+      border-color: var(--border2);
+    }
+
+    .fb-comment input::placeholder {
+      color: var(--text3);
+    }
+
+    .fb-send {
+      padding: 6px 12px;
+      background: rgba(91, 127, 255, 0.15);
+      border: 1px solid rgba(91, 127, 255, 0.25);
+      color: var(--accent);
+      font-family: var(--sans);
+      font-size: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .fb-send:hover {
+      background: rgba(91, 127, 255, 0.25);
+    }
+
+    #empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      text-align: center;
+      gap: 16px;
+    }
+
+    #empty-state .ql {
+      font-family: var(--mono);
+      font-size: 38px;
+      color: var(--bg4);
+      line-height: 1;
+    }
+
+    #empty-state h2 {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    #empty-state p {
+      color: var(--text2);
+      font-size: 13.5px;
+      max-width: 380px;
+      line-height: 1.65;
+    }
+
+    .example-queries {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .example-q {
+      padding: 9px 14px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text2);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.12s;
+      text-align: left;
+      font-family: var(--sans);
+    }
+
+    .example-q:hover {
+      background: var(--bg3);
+      color: var(--text);
+      border-color: var(--border2);
+    }
+
+    #input-area {
+      padding: 16px 24px 20px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    #input-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      transition: border-color 0.15s;
+    }
+
+    #input-wrap:focus-within {
+      border-color: rgba(91, 127, 255, 0.35);
+    }
+
+    #query-input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      resize: none;
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 22px;
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 0;
+    }
+
+    #query-input::placeholder {
+      color: var(--text3);
+    }
+
+    #query-input::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    #query-input::-webkit-scrollbar-thumb {
+      background: var(--bg4);
+      border-radius: 2px;
+    }
+
+    #send-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      flex-shrink: 0;
+      background: var(--accent);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    #send-btn:hover {
+      background: var(--accent2);
+    }
+
+    #send-btn:disabled {
+      background: var(--bg4);
+      cursor: not-allowed;
+    }
+
+    .input-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 7px;
+      padding: 0 2px;
+    }
+
+    .input-hint {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .input-hint kbd {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .thinking {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      padding: 4px 0;
+    }
+
+    .thinking span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: bounce 1.2s infinite ease-in-out;
+    }
+
+    .thinking span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .thinking span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0.6);
+        opacity: 0.4;
+      }
+
+      40% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      color: var(--text3);
+      transition: all 0.12s;
+      display: flex;
+      align-items: center;
+    }
+
+    .icon-btn:hover {
+      color: var(--text);
+      background: var(--bg3);
+    }
+
+    #config-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #config-modal.show {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 14px;
+      padding: 24px;
+      width: 440px;
+      max-width: 95vw;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    .field-group {
+      margin-bottom: 16px;
+    }
+
+    .field-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .field-group input,
+    .field-group select {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: 7px;
+      outline: none;
+      transition: border-color 0.12s;
+    }
+
+    .field-group input:focus,
+    .field-group select:focus {
+      border-color: rgba(91, 127, 255, 0.4);
+    }
+
+    .field-group input::placeholder {
+      color: var(--text3);
+    }
+
+    .field-group select option {
+      background: var(--bg3);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+      justify-content: flex-end;
+    }
+
+    .btn-cancel {
+      padding: 8px 16px;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      font-family: var(--sans);
+      font-size: 13px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .btn-cancel:hover {
+      color: var(--text);
+      border-color: var(--border2);
+    }
+
+    .btn-save {
+      padding: 8px 16px;
+      background: var(--accent);
+      border: none;
+      color: white;
+      font-family: var(--sans);
+      font-size: 13px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.12s;
+    }
+
+    .btn-save:hover {
+      background: var(--accent2);
+    }
+
+    #admin-view {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    #admin-view.show {
+      display: flex;
+    }
+
+    #admin-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    #admin-header .title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    #admin-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .admin-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+
+    .admin-tab {
+      padding: 8px 16px;
+      font-size: 13px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--text2);
+      font-family: var(--sans);
+      border-radius: 7px;
+      transition: all 0.12s;
+    }
+
+    .admin-tab:hover {
+      color: var(--text);
+    }
+
+    .admin-tab.active {
+      background: rgba(91, 127, 255, 0.12);
+      border-color: rgba(91, 127, 255, 0.3);
+      color: var(--accent);
+    }
+
+    .admin-section {
+      display: none;
+    }
+
+    .admin-section.active {
+      display: block;
+    }
+
+    .admin-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .admin-toolbar h3 {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .btn-primary {
+      padding: 7px 14px;
+      background: var(--accent);
+      border: none;
+      color: white;
+      font-family: var(--sans);
+      font-size: 12.5px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.12s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent2);
+    }
+
+    .admin-table-wrap {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .admin-table th {
+      background: var(--bg3);
+      color: var(--text2);
+      font-weight: 500;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .admin-table td {
+      padding: 11px 14px;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .admin-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .admin-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--mono);
+      font-weight: 500;
+    }
+
+    .badge-green {
+      background: rgba(62, 207, 142, 0.12);
+      color: var(--green);
+      border: 1px solid rgba(62, 207, 142, 0.2);
+    }
+
+    .badge-red {
+      background: rgba(240, 96, 96, 0.12);
+      color: var(--red);
+      border: 1px solid rgba(240, 96, 96, 0.2);
+    }
+
+    .badge-accent {
+      background: rgba(91, 127, 255, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(91, 127, 255, 0.2);
+    }
+
+    .badge-amber {
+      background: rgba(240, 162, 42, 0.12);
+      color: var(--amber);
+      border: 1px solid rgba(240, 162, 42, 0.2);
+    }
+
+    .action-btn {
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: var(--sans);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      border-radius: 5px;
+      transition: all 0.12s;
+      margin-right: 4px;
+    }
+
+    .action-btn:hover {
+      color: var(--text);
+      border-color: var(--border2);
+    }
+
+    .action-btn.danger:hover {
+      color: var(--red);
+      border-color: rgba(240, 96, 96, 0.3);
+      background: rgba(240, 96, 96, 0.08);
+    }
+
+    .loading-msg {
+      text-align: center;
+      color: var(--text3);
+      padding: 40px;
+      font-size: 13px;
+    }
+
+    #user-modal,
+    #role-modal,
+    #reset-modal,
+    #roles-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 150;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #user-modal.show,
+    #role-modal.show,
+    #reset-modal.show,
+    #roles-modal.show {
+      display: flex;
+    }
+
+    .roles-modal-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .roles-modal-item:last-child {
+      border-bottom: none;
+    }
+
+    #messages-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ── Metadata-fane ───────────────────────────────────────────── */
+    .meta-object-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .meta-object-selector select {
+      flex: 1;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: 7px;
+      outline: none;
+      transition: border-color 0.12s;
+    }
+
+    .meta-object-selector select:focus {
+      border-color: rgba(91, 127, 255, 0.4);
+    }
+
+    .meta-object-selector select option {
+      background: var(--bg3);
+    }
+
+    .meta-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .meta-panels {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .meta-panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .meta-panel-header {
+      padding: 10px 14px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .meta-panel-header h4 {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .meta-panel-body {
+      padding: 14px;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .meta-panel-body::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .meta-panel-body::-webkit-scrollbar-thumb {
+      background: var(--bg4);
+      border-radius: 2px;
+    }
+
+    .meta-col-item {
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .meta-col-item:last-child {
+      border-bottom: none;
+    }
+
+    .meta-col-name {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      min-width: 180px;
+    }
+
+    .meta-col-type {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+    .meta-col-comment {
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.5;
+      margin-top: 2px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .meta-annotation-item {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .meta-annotation-item:last-child {
+      border-bottom: none;
+    }
+
+    .meta-annotation-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .meta-annotation-col {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    .meta-annotation-name {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--amber);
+    }
+
+    .meta-annotation-value {
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .meta-qc-item {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .meta-qc-item:last-child {
+      border-bottom: none;
+    }
+
+    .meta-qc-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+
+    .meta-qc-value {
+      font-size: 12px;
+      color: var(--text2);
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .meta-qc-footer {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 4px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .meta-empty {
+      color: var(--text3);
+      font-size: 12.5px;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    /* Ny annotasjonsmodal */
+    #meta-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 150;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #meta-modal.show {
+      display: flex;
+    }
+
+    .meta-modal-box {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 14px;
+      padding: 24px;
+      width: 520px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .meta-modal-box::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .meta-modal-box::-webkit-scrollbar-thumb {
+      background: var(--bg4);
+      border-radius: 2px;
+    }
+
+    .meta-field-hint {
+      font-size: 11.5px;
+      color: var(--text3);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .meta-field-group {
+      margin-bottom: 14px;
+    }
+
+    .meta-field-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .meta-field-group input,
+    .meta-field-group select,
+    .meta-field-group textarea {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: 7px;
+      outline: none;
+      transition: border-color 0.12s;
+    }
+
+    .meta-field-group textarea {
+      resize: vertical;
+      min-height: 80px;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .meta-field-group input:focus,
+    .meta-field-group select:focus,
+    .meta-field-group textarea:focus {
+      border-color: rgba(91, 127, 255, 0.4);
+    }
+
+    .meta-field-group input::placeholder,
+    .meta-field-group textarea::placeholder {
+      color: var(--text3);
+    }
+
+    .meta-field-group select option {
+      background: var(--bg3);
+    }
+
+    .meta-field-group.hidden {
+      display: none;
+    }
+
+    #meta-modal-error {
+      color: var(--red);
+      font-size: 12.5px;
+      min-height: 18px;
+      margin-bottom: 8px;
+    }
+
+    #meta-modal-success {
+      color: var(--green);
+      font-size: 12.5px;
+      min-height: 18px;
+      margin-bottom: 8px;
+    }
+
+    .meta-ddl-preview {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: #9ab0d8;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-top: 8px;
+    }
   </style>
 </head>
 
 <body>
 
   <!-- Reset password screen (lenke fra e-post) -->
-  <div id="reset-screen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:250;align-items:center;justify-content:center;flex-direction:column;gap:32px;">
+  <div id="reset-screen"
+    style="display:none;position:fixed;inset:0;background:var(--bg);z-index:250;align-items:center;justify-content:center;flex-direction:column;gap:32px;">
     <div class="login-box">
       <div class="login-logo">query<span>chat</span></div>
       <div class="login-subtitle">Sett nytt passord</div>
@@ -273,15 +1793,23 @@
   <div id="app">
     <div id="sidebar">
       <div id="sidebar-header">
-        <img src="/logo.png" style="height:28px;width:auto" alt="RDAP" />        
+        <img src="/logo.png" style="height:28px;width:auto" alt="RDAP" />
         <div class="logo">query<span>chat</span></div>
       </div>
       <button id="new-chat-btn" onclick="newChat()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
         Ny samtale
       </button>
       <div id="admin-nav" onclick="showAdmin()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
         Administrasjon
       </div>
       <div id="history-list"></div>
@@ -303,10 +1831,18 @@
           </div>
           <div style="display:flex;gap:6px;align-items:center">
             <button class="icon-btn" title="Innstillinger" onclick="openConfig()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
             </button>
             <button class="icon-btn" title="Eksporter historikk" onclick="exportHistory()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
             </button>
           </div>
         </div>
@@ -315,11 +1851,14 @@
             <div id="empty-state">
               <img src="/logo_emptystate.png" style="max-width:240px;width:100%" alt="QueryChat" />
               <h2>QueryChat</h2>
-              <p>Hei! Hva kan jeg hjelpe deg med? Du kan stille spørsmål på naturlig norsk eller engelsk, og resultatene vises som tabell, tekst eller graf.</p>
+              <p>Hei! Hva kan jeg hjelpe deg med? Du kan stille spørsmål på naturlig norsk eller engelsk, og resultatene
+                vises som tabell, tekst eller graf.</p>
               <div class="example-queries">
                 <button class="example-q" onclick="useExample(this)">Vis de 10 siste meldingene fra loggene</button>
-                <button class="example-q" onclick="useExample(this)">Hva er gjennomsnittlig responstid per tjeneste siste uke?</button>
-                <button class="example-q" onclick="useExample(this)">Tell antall feil per dag de siste 30 dagene</button>
+                <button class="example-q" onclick="useExample(this)">Hva er gjennomsnittlig responstid per tjeneste
+                  siste uke?</button>
+                <button class="example-q" onclick="useExample(this)">Tell antall feil per dag de siste 30
+                  dagene</button>
                 <button class="example-q" onclick="useExample(this)">Vis alle tabeller i databasen</button>
               </div>
             </div>
@@ -329,7 +1868,10 @@
           <div id="input-wrap">
             <textarea id="query-input" placeholder="Spør om dataene dine..." rows="1"></textarea>
             <button id="send-btn" onclick="sendQuery()" title="Send (Enter)">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                <line x1="12" y1="19" x2="12" y2="5" />
+                <polyline points="5 12 12 5 19 12" />
+              </svg>
             </button>
           </div>
           <div class="input-footer">
@@ -343,33 +1885,76 @@
         <div id="admin-header">
           <div class="title">Administrasjon</div>
           <button class="icon-btn" onclick="showChat()" title="Tilbake til chat">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
           </button>
         </div>
         <div id="admin-content">
           <div class="admin-tabs">
             <button class="admin-tab active" onclick="switchAdminTab('users', this)">Brukere</button>
             <button class="admin-tab" onclick="switchAdminTab('roles', this)">Roller</button>
+            <button class="admin-tab" id="meta-tab-btn" onclick="switchAdminTab('metadata', this)"
+              style="display:none">Metadata</button>
           </div>
           <div class="admin-section active" id="admin-users">
             <div class="admin-toolbar">
               <h3>Brukere</h3>
               <button class="btn-primary" onclick="openUserModal()">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
                 Ny bruker
               </button>
             </div>
-            <div id="users-table-wrap" class="admin-table-wrap"><div class="loading-msg">Laster brukere…</div></div>
+            <div id="users-table-wrap" class="admin-table-wrap">
+              <div class="loading-msg">Laster brukere…</div>
+            </div>
           </div>
           <div class="admin-section" id="admin-roles">
             <div class="admin-toolbar">
               <h3>Roller</h3>
               <button class="btn-primary" onclick="openRoleModal()">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
                 Ny rolle
               </button>
             </div>
-            <div id="roles-table-wrap" class="admin-table-wrap"><div class="loading-msg">Laster roller…</div></div>
+            <div id="roles-table-wrap" class="admin-table-wrap">
+              <div class="loading-msg">Laster roller…</div>
+            </div>
+          </div>
+          <div class="admin-section" id="admin-metadata">
+            <div class="admin-toolbar">
+              <h3>Metadata - NL2SQL-annotasjoner</h3>
+              <button class="btn-primary" onclick="openMetaModal()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                Ny annotasjon
+              </button>
+            </div>
+            <!-- Objektvelger -->
+            <div class="meta-object-selector">
+              <select id="meta-object-select" onchange="loadMetaObject()" style="max-width:420px">
+                <option value="">- Velg tabell -</option>
+                <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK">KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK</option>
+                <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER">KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER</option>
+                <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_BEMANNING">KI_GRUNNLAG_ORACLE_RDAP_BEMANNING</option>
+                <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA">KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA
+                </option>
+              </select>
+            </div>
+
+            <!-- Paneler -->
+            <div id="meta-content">
+              <div class="meta-empty" style="padding:40px">Velg en tabell for å se annotasjoner og kommentarer</div>
+            </div>
           </div>
         </div>
       </div>
@@ -380,8 +1965,10 @@
   <div id="config-modal">
     <div class="modal-box">
       <div class="modal-title">Konfigurasjon</div>
-      <div class="field-group"><label>API Gateway URL</label><input type="text" id="cfg-url" placeholder="https://api.elcarocloud.no/v1/ask" /></div>
-      <div class="field-group"><label>Feedback endpoint</label><input type="text" id="cfg-fb" placeholder="https://api.elcarocloud.no/v1/feedback" /></div>
+      <div class="field-group"><label>API Gateway URL</label><input type="text" id="cfg-url"
+          placeholder="https://api.elcarocloud.no/v1/ask" /></div>
+      <div class="field-group"><label>Feedback endpoint</label><input type="text" id="cfg-fb"
+          placeholder="https://api.elcarocloud.no/v1/feedback" /></div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeConfig()">Avbryt</button>
         <button class="btn-save" onclick="saveConfig()">Lagre</button>
@@ -393,9 +1980,12 @@
   <div id="user-modal">
     <div class="modal-box">
       <div class="modal-title">Ny bruker</div>
-      <div class="field-group"><label>E-post</label><input type="email" id="um-email" placeholder="bruker@domene.no" /></div>
-      <div class="field-group"><label>Navn</label><input type="text" id="um-name" placeholder="Fornavn Etternavn" /></div>
-      <div class="field-group"><label>Midlertidig passord</label><input type="text" id="um-pass" placeholder="La stå tomt for autogenerert" /></div>
+      <div class="field-group"><label>E-post</label><input type="email" id="um-email" placeholder="bruker@domene.no" />
+      </div>
+      <div class="field-group"><label>Navn</label><input type="text" id="um-name" placeholder="Fornavn Etternavn" />
+      </div>
+      <div class="field-group"><label>Midlertidig passord</label><input type="text" id="um-pass"
+          placeholder="La stå tomt for autogenerert" /></div>
       <div id="um-error" style="color:var(--red);font-size:12.5px;min-height:18px;margin-bottom:8px"></div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeUserModal()">Avbryt</button>
@@ -409,7 +1999,8 @@
     <div class="modal-box">
       <div class="modal-title">Ny rolle</div>
       <div class="field-group"><label>Navn</label><input type="text" id="rm-name" placeholder="f.eks. analyst" /></div>
-      <div class="field-group"><label>Beskrivelse</label><input type="text" id="rm-desc" placeholder="Kort beskrivelse av rollen" /></div>
+      <div class="field-group"><label>Beskrivelse</label><input type="text" id="rm-desc"
+          placeholder="Kort beskrivelse av rollen" /></div>
       <div id="rm-error" style="color:var(--red);font-size:12.5px;min-height:18px;margin-bottom:8px"></div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeRoleModal()">Avbryt</button>
@@ -427,8 +2018,13 @@
         <label>Nytt passord (la stå tomt for autogenerert)</label>
         <div style="position:relative">
           <input type="password" id="reset-pass" style="padding-right:36px" />
-          <button onclick="toggleResetPassVisibility()" type="button" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
-            <svg id="reset-pass-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <button onclick="toggleResetPassVisibility()" type="button"
+            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
+            <svg id="reset-pass-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
           </button>
         </div>
       </div>
@@ -441,18 +2037,25 @@
   </div>
 
   <!-- Change password modal (bytt eget passord) -->
-  <div id="change-password-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:300;align-items:center;justify-content:center;">
+  <div id="change-password-modal"
+    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:300;align-items:center;justify-content:center;">
     <div class="modal-box">
       <div class="modal-title" id="change-password-title">Bytt passord</div>
-      <div id="change-password-required-msg" style="display:none;font-size:12.5px;color:var(--amber);margin-bottom:14px;padding:8px 12px;background:rgba(240,162,42,0.08);border:1px solid rgba(240,162,42,0.2);border-radius:7px;">
+      <div id="change-password-required-msg"
+        style="display:none;font-size:12.5px;color:var(--amber);margin-bottom:14px;padding:8px 12px;background:rgba(240,162,42,0.08);border:1px solid rgba(240,162,42,0.2);border-radius:7px;">
         Du må bytte passord før du kan fortsette.
       </div>
       <div class="field-group">
         <label>Gammelt passord</label>
         <div style="position:relative">
           <input type="password" id="cp-old" placeholder="Ditt nåværende passord" style="padding-right:36px" />
-          <button onclick="toggleCpVisibility('cp-old','cp-old-eye')" type="button" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
-            <svg id="cp-old-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <button onclick="toggleCpVisibility('cp-old','cp-old-eye')" type="button"
+            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
+            <svg id="cp-old-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
           </button>
         </div>
       </div>
@@ -460,8 +2063,13 @@
         <label>Nytt passord</label>
         <div style="position:relative">
           <input type="password" id="cp-new" placeholder="Minst 8 tegn" style="padding-right:36px" />
-          <button onclick="toggleCpVisibility('cp-new','cp-new-eye')" type="button" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
-            <svg id="cp-new-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <button onclick="toggleCpVisibility('cp-new','cp-new-eye')" type="button"
+            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
+            <svg id="cp-new-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
           </button>
         </div>
       </div>
@@ -469,8 +2077,13 @@
         <label>Bekreft nytt passord</label>
         <div style="position:relative">
           <input type="password" id="cp-confirm" placeholder="Gjenta nytt passord" style="padding-right:36px" />
-          <button onclick="toggleCpVisibility('cp-confirm','cp-confirm-eye')" type="button" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
-            <svg id="cp-confirm-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <button onclick="toggleCpVisibility('cp-confirm','cp-confirm-eye')" type="button"
+            style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:0;display:flex;align-items:center;">
+            <svg id="cp-confirm-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
           </button>
         </div>
       </div>
@@ -491,6 +2104,81 @@
       <div id="roles-modal-msg" style="font-size:12.5px;min-height:18px;margin-bottom:8px;color:var(--green)"></div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeRolesModal()">Lukk</button>
+      </div>
+    </div>
+  </div>
+  <div id="meta-modal">
+    <div class="meta-modal-box">
+      <div class="modal-title">Annotasjon</div>
+
+      <div class="meta-field-group">
+        <label>Tabell</label>
+        <select id="mm-object" onchange="onMetaObjectChange()">
+          <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK">KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK</option>
+          <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER">KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER</option>
+          <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_BEMANNING">KI_GRUNNLAG_ORACLE_RDAP_BEMANNING</option>
+          <option value="QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA">KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA</option>
+        </select>
+      </div>
+
+      <div class="meta-field-group">
+        <label>Kolonne <span style="color:var(--text3);font-weight:400">(la stå tomt for tabellnivå)</span></label>
+        <select id="mm-column">
+          <option value="">(tabellnivå)</option>
+        </select>
+      </div>
+
+      <div class="meta-field-group">
+        <label>Type</label>
+        <select id="mm-sync-target" onchange="onMetaSyncTargetChange()">
+          <option value="ANNOTATION">ANNOTATION – Oracle 23ai annotations (direktiv til LLM)</option>
+          <option value="COMMENT">COMMENT – COMMENT ON (kontekstuell forklaring)</option>
+          <option value="NONE">NONE – Internt notat (ikke synket til DB)</option>
+        </select>
+      </div>
+
+      <div class="meta-field-group" id="mm-annotation-name-group">
+        <label>Annotasjonsnavn</label>
+        <select id="mm-annotation-name">
+          <option value="DESCRIPTION">DESCRIPTION</option>
+          <option value="ALIASES">ALIASES</option>
+          <option value="UNITS">UNITS</option>
+          <option value="JOIN COLUMN">JOIN COLUMN</option>
+        </select>
+        <div class="meta-field-hint">DESCRIPTION = direktiv/formel til LLM. ALIASES = alternative navn. UNITS = enhet.
+          JOIN COLUMN = kolonner for JOIN.</div>
+      </div>
+
+      <div class="meta-field-group" id="mm-notat-type-group" style="display:none">
+        <label>Notattype</label>
+        <select id="mm-notat-type">
+          <option value="DATAKVALITET">DATAKVALITET</option>
+          <option value="VIEW_KANDIDAT">VIEW_KANDIDAT</option>
+          <option value="TODO">TODO</option>
+        </select>
+      </div>
+
+      <div class="meta-field-group">
+        <label>Verdi / innhold</label>
+        <textarea id="mm-value" placeholder="Skriv inn annotasjonsverdi, kommentar eller notat…" rows="4"></textarea>
+        <div class="meta-field-hint" id="mm-value-hint">For DESCRIPTION med ANNOTATION: skriv direktivet som SQL-syntaks
+          der det er mulig, f.eks. &quot;Bruk IN ('A','B') for X totalt&quot;.</div>
+      </div>
+
+      <div class="meta-field-group">
+        <label>Status</label>
+        <select id="mm-status">
+          <option value="AKTIV">AKTIV – synk til databasen nå</option>
+          <option value="UTKAST">UTKAST – lagre uten å synke</option>
+        </select>
+      </div>
+
+      <div id="meta-modal-error"></div>
+      <div id="meta-modal-success"></div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeMetaModal()">Avbryt</button>
+        <button class="btn-save" onclick="saveMetaAnnotation()">Lagre</button>
       </div>
     </div>
   </div>
@@ -521,7 +2209,7 @@
         if (!res.ok) return false;
         const data = await res.json();
         if (data.ok) { authState.accessToken = data.access_token; authState.refreshToken = data.refresh_token; sessionStorage.setItem('qc_access', data.access_token); localStorage.setItem('qc_refresh', data.refresh_token); return true; }
-      } catch {}
+      } catch { }
       return false;
     }
 
@@ -551,7 +2239,7 @@
     }
 
     async function doLogout() {
-      try { await fetch(API_BASE + '/auth/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: authState.refreshToken }) }); } catch {}
+      try { await fetch(API_BASE + '/auth/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ refresh_token: authState.refreshToken }) }); } catch { }
       authState.accessToken = null; authState.refreshToken = null; authState.user = null;
       sessionStorage.removeItem('qc_access'); localStorage.removeItem('qc_refresh');
       showLoginScreen();
@@ -572,12 +2260,19 @@
 
     function onLoggedIn() {
       if (!authState.user && authState.accessToken) {
-        try { const p = JSON.parse(atob(authState.accessToken.split('.')[1])); authState.user = { email: p.email, display_name: p.name, roles: p.roles, permissions: p.permissions }; } catch {}
+        try { const p = JSON.parse(atob(authState.accessToken.split('.')[1])); authState.user = { email: p.email, display_name: p.name, roles: p.roles, permissions: p.permissions }; } catch { }
       }
       updateUserInfo(); updateAdminNav(); updateStatusDot(); showChat(); init();
     }
     function updateUserInfo() { const el = document.getElementById('user-info'); if (authState.user) el.textContent = authState.user.display_name || authState.user.email; }
-    function updateAdminNav() { const perms = authState.user?.permissions || []; const hasAdmin = perms.includes('admin:users') || perms.includes('admin:roles'); document.getElementById('admin-nav').classList.toggle('show', hasAdmin); }
+    function updateAdminNav() {
+      const perms = authState.user?.permissions || [];
+      const hasAdmin = perms.includes('admin:users') || perms.includes('admin:roles');
+      document.getElementById('admin-nav').classList.toggle('show', hasAdmin);
+      // Vis Metadata-fane kun for brukere med admin:metadata
+      const metaTabBtn = document.getElementById('meta-tab-btn');
+      if (metaTabBtn) metaTabBtn.style.display = perms.includes('admin:metadata') ? '' : 'none';
+    }
     function updateStatusDot() { document.getElementById('status-dot').className = config.url ? 'status-dot' : 'status-dot disconnected'; }
 
     function showChat() { document.getElementById('chat-view').style.display = 'flex'; document.getElementById('admin-view').classList.remove('show'); }
@@ -586,14 +2281,16 @@
     function openConfig() { document.getElementById('cfg-url').value = config.url; document.getElementById('cfg-fb').value = config.fbUrl; document.getElementById('config-modal').classList.add('show'); }
     function closeConfig() { document.getElementById('config-modal').classList.remove('show'); }
     function saveConfig() { config.url = document.getElementById('cfg-url').value.trim(); config.fbUrl = document.getElementById('cfg-fb').value.trim(); localStorage.setItem('qc_url', config.url); localStorage.setItem('qc_fb', config.fbUrl); updateStatusDot(); closeConfig(); }
-    document.getElementById('config-modal').addEventListener('click', function(e) { if (e.target === this) closeConfig(); });
+    document.getElementById('config-modal').addEventListener('click', function (e) { if (e.target === this) closeConfig(); });
 
     function switchAdminTab(tab, btn) {
       document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-      btn.classList.add('active'); document.getElementById('admin-' + tab).classList.add('active');
+      btn.classList.add('active');
+      document.getElementById('admin-' + tab).classList.add('active');
       if (tab === 'users') loadAdminUsers();
       if (tab === 'roles') loadAdminRoles();
+      if (tab === 'metadata') initMetadataTab();
     }
 
     async function loadAdminUsers() {
@@ -1021,7 +2718,7 @@
     function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
     function escAttr(s) { return String(s).replace(/'/g, "\\'").replace(/\n/g, '\\n'); }
     function highlightSql(s) {
-      const kws = ['SELECT','FROM','WHERE','ORDER','BY','GROUP','HAVING','JOIN','LEFT','RIGHT','INNER','ON','AS','AND','OR','NOT','IN','LIKE','IS','NULL','COUNT','SUM','AVG','MIN','MAX','ROUND','TRUNC','DISTINCT','LIMIT','OFFSET','FETCH','FIRST','ROWS','ONLY','INSERT','UPDATE','DELETE','CREATE','DROP','TABLE','INDEX','WITH'];
+      const kws = ['SELECT', 'FROM', 'WHERE', 'ORDER', 'BY', 'GROUP', 'HAVING', 'JOIN', 'LEFT', 'RIGHT', 'INNER', 'ON', 'AS', 'AND', 'OR', 'NOT', 'IN', 'LIKE', 'IS', 'NULL', 'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'ROUND', 'TRUNC', 'DISTINCT', 'LIMIT', 'OFFSET', 'FETCH', 'FIRST', 'ROWS', 'ONLY', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'TABLE', 'INDEX', 'WITH'];
       let out = s;
       kws.forEach(k => { out = out.replace(new RegExp('\\b' + k + '\\b', 'g'), `<span class="sql-keyword">${k}</span>`); });
       out = out.replace(/'[^']*'/g, m => `<span class="sql-string">${m}</span>`);
@@ -1075,11 +2772,294 @@
             authState.user = { email: payload.email, display_name: payload.name, roles: payload.roles, permissions: payload.permissions };
             hideLoginScreen(); onLoggedIn(); return;
           }
-        } catch {}
+        } catch { }
       }
       if (authState.refreshToken) { const ok = await tryRefresh(); if (ok) { hideLoginScreen(); onLoggedIn(); return; } }
       showLoginScreen();
     })();
+    // ── Metadata-fane ─────────────────────────────────────────────
+
+    // Kolonner per tabell, lastet én gang og cachet
+    const _metaColumnsCache = {};
+    // Siste lastede objekt-data
+    let _metaCurrentData = null;
+
+    // Kjente tabeller (hardkodet for v1 – kan erstattes med GET /objects-liste når det er implementert)
+    const META_OBJECTS = [
+      { label: 'KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK', value: 'QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_HR_MNDVERK' },
+      { label: 'KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER', value: 'QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_LIGGETIMER' },
+      { label: 'KI_GRUNNLAG_ORACLE_RDAP_BEMANNING', value: 'QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_BEMANNING' },
+      { label: 'KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA', value: 'QUERYCHAT/KI_GRUNNLAG_ORACLE_RDAP_OKONOMIDATA' },
+    ];
+
+    function initMetadataTab() {
+      // Ingenting å laste ved init – bruker velger objekt selv
+    }
+
+    async function loadMetaObject() {
+      const val = document.getElementById('meta-object-select').value;
+      const content = document.getElementById('meta-content');
+      if (!val) {
+        content.innerHTML = '<div class="meta-empty" style="padding:40px">Velg en tabell for å se annotasjoner og kommentarer</div>';
+        _metaCurrentData = null;
+        return;
+      }
+      content.innerHTML = '<div class="loading-msg">Laster…</div>';
+      try {
+        const res = await apiFetch(API_BASE + '/admin/metadata/objects/' + val);
+        const data = await res.json();
+        if (!data.ok) {
+          content.innerHTML = `<div class="loading-msg" style="color:var(--red)">${escHtml(data.error)}</div>`;
+          return;
+        }
+        _metaCurrentData = data;
+        // Cache kolonnene for modal-dropdown
+        const key = val;
+        _metaColumnsCache[key] = data.columns.map(c => c.column_name);
+        renderMetaContent(data);
+      } catch (e) {
+        content.innerHTML = `<div class="loading-msg" style="color:var(--red)">Feil: ${escHtml(e.message)}</div>`;
+      }
+    }
+
+    function renderMetaContent(data) {
+      const content = document.getElementById('meta-content');
+
+      // Panel 1: Kolonner + eksisterende kommentarer
+      const colRows = data.columns.map(col => {
+        const comment = data.existing_comments?.columns?.[col.column_name];
+        return `<div class="meta-col-item">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span class="meta-col-name">${escHtml(col.column_name)}</span>
+          <span class="meta-col-type">${escHtml(col.data_type)}${col.data_length && col.data_type.includes('CHAR') ? '(' + col.data_length + ')' : ''}</span>
+        </div>
+        ${comment ? `<div class="meta-col-comment">${escHtml(comment)}</div>` : ''}
+      </div>
+    </div>`;
+      }).join('');
+
+      const tableComment = data.existing_comments?.table
+        ? `<div style="margin-bottom:10px;padding:8px 10px;background:var(--bg3);border-radius:7px;border:1px solid var(--border)"><span style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em">Tabell</span><div class="meta-col-comment" style="margin-top:4px">${escHtml(data.existing_comments.table)}</div></div>`
+        : '';
+
+      // Panel 2: Eksisterende Oracle-annotasjoner
+      const annotRows = data.existing_annotations?.length
+        ? data.existing_annotations.map(a => `
+        <div class="meta-annotation-item">
+          <div class="meta-annotation-header">
+            ${a.column_name ? `<span class="meta-annotation-col">${escHtml(a.column_name)}</span><span style="color:var(--text3)">·</span>` : '<span style="color:var(--text3);font-size:11px">tabellnivå</span><span style="color:var(--text3)">·</span>'}
+            <span class="meta-annotation-name">${escHtml(a.annotation_name)}</span>
+          </div>
+          <div class="meta-annotation-value">${escHtml(a.annotation_value)}</div>
+        </div>`).join('')
+        : '<div class="meta-empty">Ingen annotations</div>';
+
+      // Panel 3: qc_object_annotations-rader
+      const qcRows = data.qc_annotations?.length
+        ? data.qc_annotations.map(a => {
+          const syncBadge = a.sync_target === 'ANNOTATION' ? 'badge-accent'
+            : a.sync_target === 'COMMENT' ? 'badge-green'
+              : 'badge-amber';
+          const statusBadge = a.status === 'AKTIV' ? 'badge-green'
+            : a.status === 'UTKAST' ? 'badge-amber'
+              : 'badge-red';
+          return `<div class="meta-qc-item">
+          <div class="meta-qc-header">
+            ${a.column_name ? `<span class="badge badge-accent" style="font-size:10px">${escHtml(a.column_name)}</span>` : '<span class="badge" style="font-size:10px;background:var(--bg4);color:var(--text3);border:1px solid var(--border)">tabellnivå</span>'}
+            <span class="badge ${syncBadge}" style="font-size:10px">${escHtml(a.sync_target)}</span>
+            ${a.annotation_name ? `<span class="badge badge-amber" style="font-size:10px">${escHtml(a.annotation_name)}</span>` : ''}
+            ${a.notat_type ? `<span class="badge badge-amber" style="font-size:10px">${escHtml(a.notat_type)}</span>` : ''}
+            <span class="badge ${statusBadge}" style="font-size:10px">${escHtml(a.status)}</span>
+          </div>
+          <div class="meta-qc-value">${escHtml(a.annotation_value)}</div>
+          <div class="meta-qc-footer">
+            <span>oppdatert: ${escHtml(a.updated_at?.substring(0, 16) || '–')}</span>
+            ${a.status !== 'ARKIVERT' ? `<button class="action-btn danger" onclick="archiveMetaAnnotation('${escAttr(a.id)}')">Arkiver</button>` : ''}
+          </div>
+        </div>`;
+        }).join('')
+        : '<div class="meta-empty">Ingen qc-annotasjoner ennå</div>';
+
+      content.innerHTML = `
+    <div class="meta-panels">
+      <div class="meta-panel">
+        <div class="meta-panel-header"><h4>Kolonner og kommentarer</h4></div>
+        <div class="meta-panel-body">${tableComment}${colRows}</div>
+      </div>
+      <div>
+        <div class="meta-panel" style="margin-bottom:16px">
+          <div class="meta-panel-header"><h4>Oracle annotations (live)</h4></div>
+          <div class="meta-panel-body">${annotRows}</div>
+        </div>
+        <div class="meta-panel">
+          <div class="meta-panel-header">
+            <h4>Redigerbare annotasjoner</h4>
+            <button class="action-btn" onclick="openMetaModal()" style="margin-right:0">+ Ny</button>
+          </div>
+          <div class="meta-panel-body">${qcRows}</div>
+        </div>
+      </div>
+    </div>`;
+    }
+
+    // ── Modal ──────────────────────────────────────────────────────
+
+    function openMetaModal(id) {
+      document.getElementById('meta-modal-error').textContent = '';
+      document.getElementById('meta-modal-success').textContent = '';
+      document.getElementById('mm-value').value = '';
+      document.getElementById('mm-status').value = 'AKTIV';
+      document.getElementById('mm-sync-target').value = 'ANNOTATION';
+      document.getElementById('mm-annotation-name').value = 'DESCRIPTION';
+      onMetaSyncTargetChange();
+
+      // Sett objekt-dropdown til nåværende valg i fanen
+      const currentObj = document.getElementById('meta-object-select').value;
+      if (currentObj) {
+        document.getElementById('mm-object').value = currentObj;
+        onMetaObjectChange();
+      }
+
+      document.getElementById('meta-modal').classList.add('show');
+    }
+
+    function closeMetaModal() {
+      document.getElementById('meta-modal').classList.remove('show');
+    }
+
+    function onMetaSyncTargetChange() {
+      const target = document.getElementById('mm-sync-target').value;
+      document.getElementById('mm-annotation-name-group').style.display = target === 'ANNOTATION' ? '' : 'none';
+      document.getElementById('mm-notat-type-group').style.display = target === 'NONE' ? '' : 'none';
+      // Oppdater hint-tekst basert på valg
+      const hint = document.getElementById('mm-value-hint');
+      if (target === 'ANNOTATION') hint.textContent = 'For DESCRIPTION: skriv direktivet som SQL-syntaks der det er mulig. Enkle fnutter escapes automatisk.';
+      else if (target === 'COMMENT') hint.textContent = 'COMMENT ON overskriver eksisterende kommentar for dette objektet/kolonnen.';
+      else hint.textContent = 'Internt notat – vises kun i admin-panelet, påvirker ikke databasen.';
+    }
+
+    async function onMetaObjectChange() {
+      const val = document.getElementById('mm-object').value;
+      const colSelect = document.getElementById('mm-column');
+      colSelect.innerHTML = '<option value="">(tabellnivå)</option>';
+      if (!val) return;
+
+      // Bruk cache hvis tilgjengelig
+      if (_metaColumnsCache[val]) {
+        _metaColumnsCache[val].forEach(col => {
+          const opt = document.createElement('option');
+          opt.value = col; opt.textContent = col;
+          colSelect.appendChild(opt);
+        });
+        return;
+      }
+
+      // Ellers hent fra API
+      colSelect.innerHTML = '<option value="">Laster kolonner…</option>';
+      try {
+        const res = await apiFetch(API_BASE + '/admin/metadata/objects/' + val);
+        const data = await res.json();
+        colSelect.innerHTML = '<option value="">(tabellnivå)</option>';
+        if (data.ok && data.columns) {
+          _metaColumnsCache[val] = data.columns.map(c => c.column_name);
+          data.columns.forEach(col => {
+            const opt = document.createElement('option');
+            opt.value = col.column_name; opt.textContent = col.column_name;
+            colSelect.appendChild(opt);
+          });
+        }
+      } catch {
+        colSelect.innerHTML = '<option value="">Feil ved lasting</option>';
+      }
+    }
+
+    async function saveMetaAnnotation() {
+      const errEl = document.getElementById('meta-modal-error');
+      const okEl = document.getElementById('meta-modal-success');
+      errEl.textContent = ''; okEl.textContent = '';
+
+      const objVal = document.getElementById('mm-object').value;
+      if (!objVal) { errEl.textContent = 'Velg en tabell'; return; }
+      const [owner, name] = objVal.split('/');
+      const column_name = document.getElementById('mm-column').value || null;
+      const sync_target = document.getElementById('mm-sync-target').value;
+      const annotation_name = sync_target === 'ANNOTATION'
+        ? document.getElementById('mm-annotation-name').value
+        : null;
+      const notat_type = sync_target === 'NONE'
+        ? document.getElementById('mm-notat-type').value
+        : null;
+      const annotation_value = document.getElementById('mm-value').value.trim();
+      const status = document.getElementById('mm-status').value;
+
+      if (!annotation_value) { errEl.textContent = 'Fyll inn verdi/innhold'; return; }
+
+      const body = { object_owner: owner, object_name: name, column_name, sync_target, annotation_name, annotation_value, notat_type, status };
+
+      const saveBtn = document.querySelector('#meta-modal .btn-save');
+      saveBtn.disabled = true; saveBtn.textContent = 'Lagrer…';
+
+      try {
+        const res = await apiFetch(API_BASE + '/admin/metadata/annotations', {
+          method: 'POST',
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          okEl.textContent = status === 'AKTIV' && data.ddl?.length
+            ? `Lagret og synket til databasen (${data.ddl.length} DDL-setning${data.ddl.length !== 1 ? 'er' : ''} kjørt)`
+            : 'Lagret';
+          // Oppdater panelet hvis vi ser på samme objekt
+          const currentObj = document.getElementById('meta-object-select').value;
+          if (currentObj === objVal) setTimeout(() => loadMetaObject(), 800);
+          setTimeout(() => closeMetaModal(), 1400);
+        } else {
+          errEl.textContent = data.error || 'Noe gikk galt';
+          if (data.detail) errEl.textContent += ': ' + data.detail;
+        }
+      } catch (e) {
+        errEl.textContent = 'Kunne ikke nå serveren: ' + e.message;
+      }
+
+      saveBtn.disabled = false; saveBtn.textContent = 'Lagre';
+    }
+
+    async function archiveMetaAnnotation(id) {
+      if (!confirm('Arkiver denne annotasjonen? Den vil bli merket ARKIVERT og DDL vil bli rullet tilbake (DROP) hvis den var AKTIV.')) return;
+
+      // Vi trenger old_row-data – finn raden i _metaCurrentData
+      const row = _metaCurrentData?.qc_annotations?.find(a => a.id === id);
+      if (!row) { alert('Finner ikke annotasjonen – last siden på nytt'); return; }
+
+      const body = {
+        id,
+        object_owner: _metaCurrentData.object_owner,
+        object_name: _metaCurrentData.object_name,
+        column_name: row.column_name || null,
+        sync_target: row.sync_target,
+        annotation_name: row.annotation_name || null,
+        annotation_value: row.annotation_value,
+        notat_type: row.notat_type || null,
+        status: 'ARKIVERT',
+      };
+
+      try {
+        const res = await apiFetch(API_BASE + '/admin/metadata/annotations', {
+          method: 'POST',
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          loadMetaObject(); // Refresh panelet
+        } else {
+          alert('Feil: ' + (data.error || 'Ukjent feil'));
+        }
+      } catch (e) {
+        alert('Nettverksfeil: ' + e.message);
+      }
+    }
   </script>
 </body>
+
 </html>

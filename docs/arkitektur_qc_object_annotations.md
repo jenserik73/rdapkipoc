@@ -13,7 +13,8 @@ Før denne revisjonen var planen å bygge `qc_object_annotations` rundt `COMMENT
 - **`COMMENT ON` er allerede i omfattende bruk** for de fire `KI_GRUNNLAG_ORACLE_RDAP_*`-tabellene, med svært detaljert forretningslogikk, formler og filtreringshint. `comments: true` er satt på `QUERYCHAT_PROFILE`.
 - **`ANNOTATIONS` (23ai) er aktivert** (`annotations: true`) men ubrukt (0 rader i `USER_ANNOTATIONS_USAGE`).
 - **Test: `ANNOTATIONS (DESCRIPTION '...')` med direktiv/SQL-syntaks-fraseologi ga 100% korrekt SQL-generering** for en formel (`BELOEP`/`MAANEDSVERK_BRUTTO`-beregning) som `COMMENT` alene ikke fikset, selv om samme info lå i kommentaren.
-- **Test: `ANNOTATIONS (ALIASES ...)` for kategori→verdiliste-mapping** (`STILLINGSGRUPPE` "Sykepleiere totalt" → 8 spesifikke verdier) var **upålitelig** når spørsmålet samtidig krevde en annen kompleks annotasjon (formelen). Fungerte 100% når det var den *eneste* komplekse regelen i prompten.
+- **Test: `ANNOTATIONS (DESCRIPTION ...)` for kategori→verdiliste-mapping** (`STILLINGSGRUPPE` "Sykepleiere totalt" → 8 spesifikke verdier, skrevet som ferdig `IN (...)`-syntaks) er **pålitelig i isolasjon** - 3 av 3 korrekte resultater på tvers av tre forskjellige prompt-formuleringer i en oppfølgingstest. Var **upålitelig** kun i det opprinnelige tilfellet der spørsmålet *samtidig* krevde en annen kompleks `DESCRIPTION`-annotasjon (BELOEP-formelen) på samme tabell. Konklusjon: slike annotasjoner er solide, men bør testes spesifikt mot prompts som kombinerer flere komplekse regler på samme tabell.
+- **Non-determinisme er reell selv ved `temperature: 0`.** Et mønster som var 100% korrekt i en tidligere test (HELSEFORETAK-mapping fra fullt navn til forkortelse) **regredierte** i en senere, identisk gjentakelse av samme prompt (genererte `HELSEFORETAK = 'Oslo universitetssykehus HF'`, en verdi som ikke finnes i kolonnen). Ingen enkelttest - uansett hvor "100%" den ser ut - bør tolkes som en permanent garanti.
 - **Dataprofilering avdekket reelle datakvalitetsproblemer** som ingen annotasjon kan fikse (se eget dokument `datakvalitet_liggetimer.md`/`.docx`, sendt til dataeier 2026-06-15): `POLIKLINISK_LT` har 11,6% ikke-numerisk innhold, `COLNAME_COL30/31/32_MISSING` er ikke tomme som kommentert, og flere kolonner i `LIGGETIMER` inneholder sannsynlig feilplasserte verdier fra en ETL-kolonneforskyvning.
 - **sqlcl-quirk** (verdt å huske for fremtidige scripts/admin-handler-tester): en `PROMPT <tekst>`-linje rett før en `SELECT`-setning kan svelge setningen. Unngå `PROMPT` rett før `SELECT` - bruk SQL-kommentarer (`/* ... */`) inni setningen for inline-beskrivelser i scripts.
 
@@ -95,7 +96,7 @@ Admin-UI bør vise denne som hjelpetekst/wizard når en ny annotasjon lages:
 | Synonymer/alternative navn for kolonne/tabell | `ANNOTATION` → `ALIASES` | "rad-id, nøkkel" for en ID-kolonne | Offisiell Oracle-konvensjon for AI-enrichment |
 | Måleenhet | `ANNOTATION` → `UNITS` | "NOK", "timer" | Offisiell Oracle-konvensjon |
 | Foretrukket join-relasjon | `ANNOTATION` → `"JOIN COLUMN"` | "HELSEFORETAK joines mot DEPARTMENT.HELSEFORETAK" | Offisiell Oracle-konvensjon, ikke testet ennå men dokumentert use-case |
-| Kategori → verdiliste-mapping (f.eks. "X totalt" = flere verdier) | **Vurder view først.** Hvis annotasjon: `ANNOTATION` → `DESCRIPTION` med ferdig `IN (...)`-syntaks, men forvent < 100% pålitelighet i sammensatte spørsmål | "Sykepleiere totalt" → `STILLINGSGRUPPE IN (...)` | Test viste delvis upålitelig - admin bør varsles om dette i UI |
+| Kategori → verdiliste-mapping (f.eks. "X totalt" = flere verdier) | `ANNOTATION` → `DESCRIPTION` med ferdig `IN (...)`-syntaks (SQL-literal, ikke forklarende setning) | "Sykepleiere totalt" → `STILLINGSGRUPPE IN (...)` | Pålitelig i isolasjon (3/3 i oppfølgingstest). **Test eksplisitt mot prompts som også trigger andre komplekse `DESCRIPTION`-annotasjoner på samme tabell** - det er der konflikt kan oppstå, ikke i selve kategori-annotasjonen |
 | Kjent datakvalitetsproblem | `sync_target='NONE'`, `notat_type='DATAKVALITET'` | "11,6% av POLIKLINISK_LT er ikke-numerisk, se [rapport]" | Kan ikke løses med metadata - kun til internt bruk/dokumentasjon |
 | "Denne logikken bør være en view" | `sync_target='NONE'`, `notat_type='VIEW_KANDIDAT'` | "STILLINGSGRUPPE-kategorisering bør være CASE-kolonne i view" | Markerer for fremtidig arbeid utenfor annotasjon-rammeverket |
 
@@ -143,10 +144,34 @@ Selv for *allerede aktiverte* tabeller bør profileringsverktøyet (steg A-D) v�
 
 ---
 
-## 7. Åpne punkter
+## 8. Feedback-loop / agentbasert kontinuerlig forbedring (utforsket, delvis blokkert)
+
+Utforsket som mulig "lag 3" på toppen av annotasjonsrammeverket: bruke `QUERYCHAT_FEEDBACK` + Select AI sine innebygde feedback-/agent-mekanismer til å kontinuerlig forbedre annotasjoner basert på reelle brukerspørsmål.
+
+**Tilgjengelighet bekreftet på instansen** (`23.26.2.2.0`, oc19):
+- `DBMS_CLOUD_AI_AGENT` (Select AI Agent, ReAct-rammeverk: Planning/Tool Use/Reflection/Memory) - pakken finnes, `EXECUTE` er grantet direkte, 46 subprogrammer inkl. `CREATE_TEAM`/`CREATE_TOOL`/`SQL_TOOL`/`RUN_TEAM`. **Ikke videre testet**, men prinsipielt levedyktig.
+- `DBMS_CLOUD_AI.FEEDBACK` - pakken finnes, `EXECUTE` er grantet, signaturen tillater å sende `sql_text` (CLOB) direkte sammen med `feedback_content` (korrigert SQL) - ingen behov for å finne `sql_id` separat.
+
+**Blokkering funnet:**
+`DBMS_CLOUD_AI.FEEDBACK` feiler med `ORA-20404: Object not found` mot en `embedText`-endepunkt-URL som inneholder en usubstituert literal `my$cloud_domain`. Dette er **bekreftet som en kjent Oracle-side plattformbug** (identisk feilmønster rapportert av andre brukere på Cloud Customer Connect, på en annen Select AI-action i en annen region) - ikke en konfigurasjonsfeil på vår side. Samme kategori problem som tidligere observert med Resource Principal for ADB i oc19: nyere "26ai"-funksjonalitet som ikke er fullstendig rullet ut i alle realmer/regioner.
+
+**Sekundærfunn fra samme testrunde** (se avsnitt 1, oppdatert):
+- STILLINGSGRUPPE-kategori-annotasjonen er mer pålitelig enn først antatt (pålitelig i isolasjon)
+- Ny non-determinisme-observasjon (HELSEFORETAK-regresjon på en tidligere "100%"-prompt)
+
+**Konklusjon og status:**
+- `DBMS_CLOUD_AI.FEEDBACK`-basert forbedringsloop: **lagt på vent**, blokkert av ekstern plattformbug. Revurder periodisk (eller etter SR til Oracle Support) - krever ingen arkitekturendring fra vår side når/hvis bugen fikses, siden `FEEDBACK` er additiv til eksisterende `comments`/`annotations`-oppsett.
+- `DBMS_CLOUD_AI_AGENT`-basert "metadata-kurator-agent" (avsnitt 5.3, steg 3 / "AI-assistert utkast"): prinsipielt levedyktig (pakke + privilegier OK), men ikke testet. Forblir et **stretch-mål for senere iterasjon**, ikke en forutsetning for `qc_object_annotations` v1.
+- Ingen endringer i datamodell (avsnitt 2) eller synk-prosess (avsnitt 3) er nødvendig som følge av denne utforskningen - `status='UTKAST'`-mekanismen er allerede designet for å ta imot forslag fra en fremtidig agent, manuelt eller automatisk.
+
+---
+
+## 9. Åpne punkter
 
 - [ ] `"JOIN COLUMN"`-annotasjonen er ikke testet med en faktisk kryss-tabell-spørring (kun satt på en enkelt-tabell-kolonne i testen). Bør verifiseres med en prompt som krever JOIN mellom to `KI_GRUNNLAG_*`-tabeller.
 - [ ] Terskel for "kategorisk kolonne" i profilering (forslag: `NUM_DISTINCT < 50`) bør justeres basert på erfaring.
 - [ ] AI-assistert utkast (5.3, steg 3) er et stretch-mål - vurder om dette tas med i første versjon eller senere iterasjon.
 - [ ] `LIGGETIMER`-datakvalitetsfunnet (sendt til dataeier 2026-06-15) - avvent svar; påvirker hvilke `notat_type='DATAKVALITET'`-annotasjoner som faktisk skrives for denne tabellen.
 - [ ] Avklar terskel/strategi for når full-scan-profilering (steg C) er greit å trigge fra UI på svært store tabeller (49M+ rader i `HR_MNDVERK`) - timeout-risiko i admin-handler (OCI Function-tidsbegrensning).
+- [ ] **Regresjonstest-suite**: gitt at selv "100%"-mønstre kan regrediere ved identisk gjentakelse (HELSEFORETAK-funnet i avsnitt 8), bør en liten samling kjente prompts (med forventet SQL-mønster) kjøres periodisk - f.eks. som del av profileringsverktøyet (5.4) eller en enkel scheduled job - for å fange opp drift i Select AI/modell-oppdateringer over tid, ikke bare ved første publisering av en annotasjon.
+- [ ] Avklar om/når SR bør meldes til Oracle Support for `ORA-20404 my$cloud_domain`-bugen i `DBMS_CLOUD_AI.FEEDBACK` (avsnitt 8).
