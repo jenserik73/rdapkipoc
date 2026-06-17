@@ -1449,10 +1449,11 @@
     .meta-panels {
       display: flex;
       gap: 0;
-      align-items: flex-start;
+      height: calc(100vh - 250px);
+      min-height: 300px;
     }
     .meta-col-left {
-      flex: 0 0 50%;
+      flex: 0 0 calc(50% - 7px);
       min-width: 200px;
       max-width: 80%;
       padding-right: 8px;
@@ -1468,6 +1469,10 @@
       flex-direction: column;
       padding-left: 8px;
       overflow: hidden;
+    }
+
+    .meta-col-right .meta-panel {
+      flex: 1;
     }
 
     .meta-splitter-v {
@@ -1501,9 +1506,12 @@
       background: var(--bg2);
       border: 1px solid var(--border);
       border-radius: 10px;
-      overflow: hidden;
+      overflow: auto;
       display: flex;
       flex-direction: column;
+      resize: both;
+      min-width: 150px;
+      min-height: 80px;
     }
 
     .meta-panel-header {
@@ -1526,8 +1534,9 @@
 
     .meta-panel-body {
       padding: 14px;
-      max-height: 400px;
+      flex: 1;
       overflow-y: auto;
+      min-height: 0;
     }
     
     .meta-panel-body::-webkit-scrollbar {
