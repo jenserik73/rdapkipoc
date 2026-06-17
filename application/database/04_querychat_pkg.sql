@@ -1,9 +1,12 @@
-CREATE OR REPLACE PACKAGE BODY querychat.querychat_pkg AS
+create or replace PACKAGE BODY querychat_pkg AS
 
   FUNCTION error_json(p_code IN VARCHAR2, p_msg IN VARCHAR2) RETURN CLOB IS
     v_clob CLOB;
+    v_msg  VARCHAR2(32767);
   BEGIN
-    v_clob := TO_CLOB('{"ok":false,"code":'||p_code||',"error":"'||p_msg||'"}');
+    -- Escape backslash og doble anførselstegn slik at JSON blir gyldig
+    v_msg  := REPLACE(REPLACE(p_msg, '\', '\\'), '"', '\"');
+    v_clob := TO_CLOB('{"ok":false,"code":"' || p_code || '","error":"' || v_msg || '"}');
     RETURN v_clob;
   END;
 
@@ -164,9 +167,11 @@ CREATE OR REPLACE PACKAGE BODY querychat.querychat_pkg AS
       IF v_row_count >= p_max_rows THEN v_truncated := 'true'; END IF;
     EXCEPTION WHEN OTHERS THEN
       IF DBMS_SQL.IS_OPEN(v_cursor) THEN DBMS_SQL.CLOSE_CURSOR(v_cursor); END IF;
-      RETURN error_json('DB_ERROR', SQLERRM);
+      IF SQLCODE = -1722 THEN
+        RETURN error_json('DB_ERROR', 'Kolonnen inneholder tekst der tall var forventet. SQL: ' || REPLACE(REPLACE(v_sql, CHR(10), ' '), '"', '\"'));
+      END IF;
+      RETURN error_json('DB_ERROR', SQLERRM || ' SQL: ' || REPLACE(REPLACE(v_sql, CHR(10), ' '), '"', '\"'));
     END;
-
     v_log_id := logg(p_question, v_sql, 0);
 
     DBMS_LOB.CREATETEMPORARY(v_result, TRUE);
@@ -201,4 +206,3 @@ CREATE OR REPLACE PACKAGE BODY querychat.querychat_pkg AS
   END;
 
 END querychat_pkg;
-/
