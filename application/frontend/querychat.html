@@ -2875,9 +2875,8 @@
           <div class="meta-qc-value">${escHtml(a.annotation_value)}</div>
           <div class="meta-qc-footer">
             <span>oppdatert: ${escHtml(a.updated_at?.substring(0, 16) || '–')}</span>
-            ${a.status !== 'ARKIVERT' ? `<button class="action-btn danger" onclick="archiveMetaAnnotation('${escAttr(a.id)}')">Arkiver</button>` : ''}
-          </div>
-        </div>`;
+            ${a.status !== 'AKTIV' ? `<button class="action-btn" onclick="publishMetaAnnotation('${escAttr(a.id)}')">Publiser</button>` : ''}
+            ${a.status !== 'ARKIVERT' ? `<button class="action-btn danger" onclick="archiveMetaAnnotation('${escAttr(a.id)}')">Arkiver</button>` : ''}        </div>`;
         }).join('')
         : '<div class="meta-empty">Ingen qc-annotasjoner ennå</div>';
 
@@ -3059,6 +3058,40 @@
         alert('Nettverksfeil: ' + e.message);
       }
     }
+   
+    async function publishMetaAnnotation(id) {
+      if (!confirm('Publiser denne annotasjonen til databasen?')) return;
+
+      const row = _metaCurrentData?.qc_annotations?.find(a => a.id === id);
+      if (!row) { alert('Finner ikke annotasjonen – last siden på nytt'); return; }
+
+      const body = {
+        id,
+        object_owner: _metaCurrentData.object_owner,
+        object_name: _metaCurrentData.object_name,
+        column_name: row.column_name || null,
+        sync_target: row.sync_target,
+        annotation_name: row.annotation_name || null,
+        annotation_value: row.annotation_value,
+        notat_type: row.notat_type || null,
+        status: 'AKTIV',
+      };
+
+      try {
+        const res = await apiFetch(API_BASE + '/admin/metadata/annotations', {
+          method: 'POST',
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          loadMetaObject();
+        } else {
+          alert('Feil: ' + (data.error || 'Ukjent feil'));
+        }
+      } catch (e) {
+        alert('Nettverksfeil: ' + e.message);
+      }
+    }    
   </script>
 </body>
 
