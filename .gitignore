@@ -1,2 +1,3 @@
 terraform/bootstrap/.terraform/
 terraform/infra/.terraform/
+**/__pycache__/
