@@ -5,6 +5,8 @@ create or replace PACKAGE BODY querychat_pkg AS
     v_msg  VARCHAR2(32767);
   BEGIN
     -- Escape backslash og doble anførselstegn slik at JSON blir gyldig
+    -- NB: p_msg skal IKKE være forhåndsescaped av kalleren - denne funksjonen
+    -- gjør all escaping selv for å unngå dobbel-escaping (\" -> \\\")
     v_msg  := REPLACE(REPLACE(p_msg, '\', '\\'), '"', '\"');
     v_clob := TO_CLOB('{"ok":false,"code":"' || p_code || '","error":"' || v_msg || '"}');
     RETURN v_clob;
@@ -167,11 +169,14 @@ create or replace PACKAGE BODY querychat_pkg AS
       IF v_row_count >= p_max_rows THEN v_truncated := 'true'; END IF;
     EXCEPTION WHEN OTHERS THEN
       IF DBMS_SQL.IS_OPEN(v_cursor) THEN DBMS_SQL.CLOSE_CURSOR(v_cursor); END IF;
+      -- NB: error_json escaper selv " og \ - ikke forhåndsescape v_sql her,
+      -- ellers blir resultatet dobbelt-escapet (\" vises bokstavelig i UI)
       IF SQLCODE = -1722 THEN
-        RETURN error_json('DB_ERROR', 'Kolonnen inneholder tekst der tall var forventet. SQL: ' || REPLACE(REPLACE(v_sql, CHR(10), ' '), '"', '\"'));
+        RETURN error_json('DB_ERROR', 'Kolonnen inneholder tekst der tall var forventet. SQL: ' || REPLACE(v_sql, CHR(10), ' '));
       END IF;
-      RETURN error_json('DB_ERROR', SQLERRM || ' SQL: ' || REPLACE(REPLACE(v_sql, CHR(10), ' '), '"', '\"'));
+      RETURN error_json('DB_ERROR', SQLERRM || ' SQL: ' || REPLACE(v_sql, CHR(10), ' '));
     END;
+
     v_log_id := logg(p_question, v_sql, 0);
 
     DBMS_LOB.CREATETEMPORARY(v_result, TRUE);

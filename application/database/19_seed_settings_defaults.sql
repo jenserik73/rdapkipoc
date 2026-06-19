@@ -18,19 +18,19 @@ INSERT INTO qc_settings_defaults (key, value, description, category) VALUES
     ('notifications.email', 'false', 'Send e-postvarsler ved feil',                   'notifications');
 
 -- ── admin:profiles permission ─────────────────────────────────────────────────
--- Legg til permission dersom den ikke allerede finnes
--- (følger mønster fra 16_seed_admin_metadata_permission.sql)
+-- qc_permissions har kolonnene: id, perm_resource, perm_action (IKKE name/description)
 DECLARE
     v_count NUMBER;
     v_id    VARCHAR2(32);
 BEGIN
     SELECT COUNT(*) INTO v_count
-    FROM qc_permissions WHERE name = 'admin:profiles';
+    FROM qc_permissions
+    WHERE perm_resource = 'admin' AND perm_action = 'profiles';
 
     IF v_count = 0 THEN
         v_id := UPPER(RAWTOHEX(SYS_GUID()));
-        INSERT INTO qc_permissions (id, name, description)
-        VALUES (v_id, 'admin:profiles', 'Administrere brukerinnstillinger og profiler');
+        INSERT INTO qc_permissions (id, perm_resource, perm_action)
+        VALUES (v_id, 'admin', 'profiles');
         DBMS_OUTPUT.PUT_LINE('Opprettet admin:profiles med id: ' || v_id);
     ELSE
         DBMS_OUTPUT.PUT_LINE('admin:profiles finnes allerede – hopper over');
@@ -38,23 +38,24 @@ BEGIN
 END;
 /
 
--- Gi admin:profiles til alle brukere som allerede har admin:users
--- (via qc_user_roles → qc_role_permissions)
--- NB: Tilpasset til din faktiske skjemastruktur fra 09_auth_roles_permissions.sql
+-- Gi admin:profiles til alle roller som allerede har admin:users
+-- (via qc_role_permissions)
 DECLARE
     v_profiles_id qc_permissions.id%TYPE;
     v_users_id    qc_permissions.id%TYPE;
 BEGIN
     BEGIN
-        SELECT id INTO v_profiles_id FROM qc_permissions WHERE name = 'admin:profiles';
-        SELECT id INTO v_users_id    FROM qc_permissions WHERE name = 'admin:users';
+        SELECT id INTO v_profiles_id
+        FROM qc_permissions WHERE perm_resource = 'admin' AND perm_action = 'profiles';
+
+        SELECT id INTO v_users_id
+        FROM qc_permissions WHERE perm_resource = 'admin' AND perm_action = 'users';
     EXCEPTION
         WHEN NO_DATA_FOUND THEN
             DBMS_OUTPUT.PUT_LINE('En av permissionene finnes ikke – hopper over role-propagering');
             RETURN;
     END;
 
-    -- Gi admin:profiles til alle roller som allerede har admin:users
     FOR r IN (
         SELECT DISTINCT role_id
         FROM qc_role_permissions
