@@ -381,6 +381,17 @@
     .hdr-dd-item:hover { background: var(--bg3); color: var(--text); }
     .hdr-dd-item--danger { color: var(--red); }
     .hdr-dd-item--danger:hover { background: rgba(240,96,96,0.08); color: var(--red); }
+
+    /* ── AI-profil objektliste ────────────────────────────── */
+    .aip-obj-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .aip-obj-table tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+    .aip-obj-table tr:last-child { border-bottom: none; }
+    .aip-obj-table tr:hover { background: var(--bg3); }
+    .aip-obj-table td { padding: 7px 6px; vertical-align: middle; }
+    .aip-obj-table td.aip-obj-cb-cell { width: 28px; }
+    .aip-obj-table td.aip-obj-cb-cell input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; }
+    .aip-obj-table td.aip-obj-name-cell { font-family: var(--mono); color: var(--text); }
+    .aip-obj-table td.aip-obj-type-cell { width: 70px; text-align: right; }
   </style>
 </head>
 
@@ -456,7 +467,14 @@
           <button class="icon-btn" id="settings-dd-btn" title="Innstillinger">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </button>
-          <div class="hdr-dropdown-menu hdr-dropdown-menu--right" id="settings-dd-menu">
+          <div class="hdr-dropdown-menu hdr-dropdown-menu--right" id="settings-dd-menu" style="min-width:240px">
+            <div class="hdr-dd-user" style="padding-bottom:6px">
+              <strong style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">AI-profil</strong>
+            </div>
+            <div id="aiprofile-picker-list" style="max-height:220px;overflow-y:auto;padding:0 4px">
+              <div style="padding:8px 10px;color:var(--text3);font-size:12px">Laster…</div>
+            </div>
+            <div class="hdr-dd-divider"></div>
             <button class="hdr-dd-item" onclick="openConfig();closeAllDropdowns()">Konfigurasjon</button>
           </div>
         </div>
@@ -527,6 +545,7 @@
             <button class="admin-tab" onclick="switchAdminTab('roles', this)">Roller</button>
             <button class="admin-tab" id="meta-tab-btn" onclick="switchAdminTab('metadata', this)" style="display:none">Metadata</button>
             <button class="admin-tab" id="profiles-tab-btn" onclick="switchAdminTab('profiles', this)" style="display:none">Brukerprofiler</button>
+            <button class="admin-tab" id="aiprofiles-tab-btn" onclick="switchAdminTab('aiprofiles', this)" style="display:none">AI-profiler</button>
           </div>
           <div class="admin-section active" id="admin-users">
             <div class="admin-toolbar"><h3>Brukere</h3><button class="btn-primary" onclick="openUserModal()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ny bruker</button></div>
@@ -549,6 +568,18 @@
             </div>
             <div id="meta-content"><div class="meta-empty" style="padding:40px">Velg en tabell for å se annotasjoner og kommentarer</div></div>
           </div>
+          <!-- ── AI-profiler-fane ── -->
+          <div class="admin-section" id="admin-aiprofiles">
+            <div class="admin-toolbar">
+              <h3>AI-profiler</h3>
+              <button class="btn-primary" onclick="openAiProfileModal()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Ny profil
+              </button>
+            </div>
+            <div id="aiprofiles-table-wrap" class="admin-table-wrap"><div class="loading-msg">Laster AI-profiler…</div></div>
+          </div>
+
           <!-- ── Brukerprofiler-fane ── -->
           <div class="admin-section" id="admin-profiles">
             <div class="admin-toolbar">
@@ -679,6 +710,95 @@
     </div>
   </div>
 
+  <!-- AI-profil modal (opprett/rediger) -->
+  <div id="aiprofile-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:150;align-items:center;justify-content:center;">
+    <div class="meta-modal-box" style="width:560px">
+      <div class="modal-title" id="aip-modal-title">Ny AI-profil</div>
+
+      <div class="meta-field-group">
+        <label>Profilnavn <span style="color:var(--text3);font-weight:400">(kun bokstaver/tall/understrek, kan ikke endres senere)</span></label>
+        <input type="text" id="aip-profile-name" placeholder="f.eks. QUERYCHAT_PROFILE_V2" />
+      </div>
+      <div class="meta-field-group">
+        <label>Visningsnavn</label>
+        <input type="text" id="aip-display-name" placeholder="f.eks. Llama 3.3 70B (rask)" />
+      </div>
+      <div class="meta-field-group">
+        <label>Beskrivelse</label>
+        <textarea id="aip-description" rows="2" placeholder="Valgfri beskrivelse av profilen"></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="meta-field-group">
+          <label>Provider</label>
+          <input type="text" id="aip-provider" value="oci" />
+        </div>
+        <div class="meta-field-group">
+          <label>Credential name</label>
+          <input type="text" id="aip-credential" value="OCI_GEN_AI_CRED" />
+        </div>
+      </div>
+      <div class="meta-field-group">
+        <label>Modell <span style="color:var(--text3);font-weight:400">(fritekst — skriv inn eksakt modellnavn)</span></label>
+        <input type="text" id="aip-model" placeholder="f.eks. meta.llama-3.3-70b-instruct-fp8-dynamic" />
+        <div class="meta-field-hint">I dag er kun Llama 3.3 70B tilgjengelig i sovereign cloud. Feltet er fritekst slik at nye modeller/klynger kan legges til senere uten kodeendring.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="meta-field-group">
+          <label>Max tokens</label>
+          <input type="number" id="aip-max-tokens" value="1024" min="1" />
+        </div>
+        <div class="meta-field-group">
+          <label>Temperature</label>
+          <input type="number" id="aip-temperature" value="0" min="0" max="2" step="0.1" />
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="meta-field-group">
+          <label>OCI Compartment ID</label>
+          <input type="text" id="aip-compartment" placeholder="ocid1.tenancy..." />
+        </div>
+        <div class="meta-field-group">
+          <label>Region</label>
+          <input type="text" id="aip-region" value="eu-frankfurt-2" />
+        </div>
+      </div>
+
+      <div class="meta-field-group">
+        <label style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <span style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="checkbox" id="aip-enable-sources" checked /> enable_sources</span>
+          <span style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="checkbox" id="aip-annotations" checked /> annotations</span>
+          <span style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="checkbox" id="aip-comments" checked /> comments</span>
+          <span style="display:flex;align-items:center;gap:6px;font-weight:400"><input type="checkbox" id="aip-case-sensitive" /> case_sensitive_values</span>
+        </label>
+      </div>
+
+      <div class="meta-field-group">
+        <label>Databaseobjekter denne profilen kan spørre mot</label>
+        <div id="aip-object-list" style="max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:4px 10px;background:var(--bg)">
+          <div style="color:var(--text3);font-size:12px">Laster objekter…</div>
+        </div>
+        <div class="meta-field-hint">Kun tabeller/views i QUERYCHAT-skjemaet vises. Listen oppdateres automatisk når nye tabeller/views legges til.</div>
+      </div>
+
+      <div id="aip-modal-error" style="color:var(--red);font-size:12.5px;min-height:18px;margin-bottom:8px"></div>
+      <div id="aip-modal-success" style="color:var(--green);font-size:12.5px;min-height:18px;margin-bottom:8px"></div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeAiProfileModal()">Avbryt</button>
+        <button class="btn-save" onclick="saveAiProfile()">Lagre</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI-profil tilgangsmodal -->
+  <div id="aiprofile-access-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:150;align-items:center;justify-content:center;">
+    <div class="modal-box">
+      <div class="modal-title" id="aipa-modal-title">Brukertilgang</div>
+      <div id="aipa-content" style="margin-bottom:16px;min-height:60px;max-height:340px;overflow-y:auto"></div>
+      <div class="modal-actions"><button class="btn-cancel" onclick="closeAiProfileAccessModal()">Lukk</button></div>
+    </div>
+  </div>
+
   <script>
     const API_BASE = 'https://api.elcarocloud.no/v1';
     let config = { url: localStorage.getItem('qc_url') || API_BASE + '/ask', fbUrl: localStorage.getItem('qc_fb') || API_BASE + '/feedback' };
@@ -799,6 +919,8 @@
       if (metaBtn) metaBtn.style.display = perms.includes('admin:metadata') ? '' : 'none';
       const profBtn = document.getElementById('profiles-tab-btn');
       if (profBtn) profBtn.style.display = perms.includes('admin:profiles') ? '' : 'none';
+      const aiProfBtn = document.getElementById('aiprofiles-tab-btn');
+      if (aiProfBtn) aiProfBtn.style.display = perms.includes('admin:aiprofiles') ? '' : 'none';
     }
     function updateStatusDot() { document.getElementById('status-dot').className = config.url ? 'status-dot' : 'status-dot disconnected'; }
 
@@ -815,13 +937,14 @@
       document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('admin-' + tab).classList.add('active');
-      const labels = { users: 'Brukere', roles: 'Roller', metadata: 'Metadata', profiles: 'Brukerprofiler' };
+      const labels = { users: 'Brukere', roles: 'Roller', metadata: 'Metadata', profiles: 'Brukerprofiler', aiprofiles: 'AI-profiler' };
       const bc = document.getElementById('admin-breadcrumb-tab');
       if (bc) bc.textContent = 'Administrasjon › ' + (labels[tab] || tab);
       if (tab === 'users') loadAdminUsers();
       if (tab === 'roles') loadAdminRoles();
       if (tab === 'metadata') initMetadataTab();
       if (tab === 'profiles') initProfilesTab();
+      if (tab === 'aiprofiles') initAiProfilesTab();
     }
 
     // ── Admin: Users ───────────────────────────────────────────
@@ -1205,10 +1328,24 @@
       appendAssistantMessage(aiMsg); scrollToBottom();
     }
 
+    function coerceNumeric(val) {
+      // sql-executor returnerer alle kolonneverdier som VARCHAR2 (DBMS_SQL),
+      // så tall kommer som strenger ("5993676"). Konverter til ekte tall
+      // slik at graf-visningen kan oppdage numeriske kolonner.
+      if (val === null || val === undefined || val === '') return val;
+      if (typeof val === 'number') return val;
+      if (typeof val === 'string' && /^-?\d+(\.\d+)?$/.test(val.trim())) {
+        const n = Number(val);
+        if (Number.isFinite(n)) return n;
+      }
+      return val;
+    }
+
     function normalizeResponse(json) {
       const columns = json.columns || json.fields || [];
       let rows = json.rows || json.data || json.results || null;
       if (rows && Array.isArray(rows[0]) && columns.length > 0) { rows = rows.map(row => { const obj = {}; columns.forEach((col, i) => { obj[col] = row[i]; }); return obj; }); }
+      if (rows) { rows = rows.map(r => { const o = {}; for (const k in r) { o[k] = coerceNumeric(r[k]); } return o; }); }
       let text = json.text || json.answer || json.response || json.message || '';
       if (!text && rows) {
         const count = json.rowCount || rows.length;
@@ -1674,6 +1811,318 @@
       if (authState.refreshToken) { const ok = await tryRefresh(); if (ok) { hideLoginScreen(); onLoggedIn(); return; } }
       showLoginScreen();
     })();
+
+    // ── AI-profil: tannhjul-velger (alle brukere) ───────────────
+    let _myAiProfiles = [];
+    let _myActiveAiProfileId = null;
+
+    async function loadMyAiProfiles() {
+      const list = document.getElementById('aiprofile-picker-list');
+      if (!list) return;
+      try {
+        const res = await apiFetch(API_BASE + '/me/ai-profiles');
+        const data = await res.json();
+        if (!data.ok) { list.innerHTML = `<div style="padding:8px 10px;color:var(--red);font-size:12px">${escHtml(data.error || 'Feil')}</div>`; return; }
+        _myAiProfiles = data.profiles || [];
+        _myActiveAiProfileId = data.active_profile_id;
+        renderMyAiProfilePicker();
+      } catch (e) {
+        list.innerHTML = `<div style="padding:8px 10px;color:var(--red);font-size:12px">${escHtml(e.message)}</div>`;
+      }
+    }
+
+    function renderMyAiProfilePicker() {
+      const list = document.getElementById('aiprofile-picker-list');
+      if (!list) return;
+      if (!_myAiProfiles.length) {
+        list.innerHTML = '<div style="padding:8px 10px;color:var(--text3);font-size:12px">Ingen AI-profiler tilgjengelig</div>';
+        return;
+      }
+      list.innerHTML = _myAiProfiles.map(p => {
+        const active = p.id === _myActiveAiProfileId;
+        return `<button class="hdr-dd-item" style="display:flex;align-items:center;justify-content:space-between;gap:8px;${active ? 'color:var(--accent)' : ''}" onclick="selectMyAiProfile('${escAttr(p.id)}')">
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(p.display_name)}</span>
+          ${active ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+        </button>`;
+      }).join('');
+    }
+
+    async function selectMyAiProfile(profileId) {
+      if (profileId === _myActiveAiProfileId) { closeAllDropdowns(); return; }
+      try {
+        const res = await apiFetch(API_BASE + '/me/ai-profile', { method: 'PUT', body: JSON.stringify({ profile_id: profileId }) });
+        const data = await res.json();
+        if (data.ok) {
+          _myActiveAiProfileId = profileId;
+          renderMyAiProfilePicker();
+        } else {
+          alert('Kunne ikke bytte AI-profil: ' + (data.error || 'Ukjent feil'));
+        }
+      } catch (e) {
+        alert('Feil: ' + e.message);
+      }
+      closeAllDropdowns();
+    }
+
+    // Last AI-profiler når tannhjul åpnes første gang
+    // (script kjører nederst i body, så DOM er allerede klar - DOMContentLoaded
+    // ville aldri fyre. Bind direkte i stedet, slik vi gjorde for initHeaderDropdowns.)
+    (function bindAiProfilePickerTrigger() {
+      const settingsBtn = document.getElementById('settings-dd-btn');
+      if (!settingsBtn) return;
+      let loaded = false;
+      settingsBtn.addEventListener('click', () => {
+        if (!loaded && authState.accessToken) { loaded = true; loadMyAiProfiles(); }
+      });
+    })();
+
+    // ── Admin: AI-profiler (full CRUD + tilgang) ────────────────
+    let _aiProfiles = [];
+    let _aiProfileObjects = [];
+    let _aiProfileEditingId = null;
+
+    async function initAiProfilesTab() {
+      const wrap = document.getElementById('aiprofiles-table-wrap');
+      wrap.innerHTML = '<div class="loading-msg">Laster AI-profiler…</div>';
+      try {
+        const res = await apiFetch(API_BASE + '/admin/ai-profiles');
+        const data = await res.json();
+        if (!data.ok) { wrap.innerHTML = `<div class="loading-msg" style="color:var(--red)">${escHtml(data.error)}</div>`; return; }
+        _aiProfiles = data.profiles || [];
+        renderAiProfilesTable();
+      } catch (e) {
+        wrap.innerHTML = `<div class="loading-msg" style="color:var(--red)">Feil: ${escHtml(e.message)}</div>`;
+      }
+    }
+
+    function renderAiProfilesTable() {
+      const wrap = document.getElementById('aiprofiles-table-wrap');
+      if (!_aiProfiles.length) { wrap.innerHTML = '<div class="loading-msg">Ingen AI-profiler ennå</div>'; return; }
+      const rows = _aiProfiles.map(p => {
+        const syncBadge = p.sync_status === 'SYNCED' ? 'badge-green' : p.sync_status === 'ERROR' ? 'badge-red' : 'badge-amber';
+        const objCount = (p.object_list || []).length;
+        return `<tr>
+          <td>
+            <strong>${escHtml(p.display_name)}</strong>
+            ${p.is_default ? '<span class="badge badge-accent" style="margin-left:6px">standard</span>' : ''}
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:2px">${escHtml(p.profile_name)}</div>
+          </td>
+          <td><span style="font-family:var(--mono);font-size:12px">${escHtml(p.model)}</span></td>
+          <td>${objCount} objekt${objCount !== 1 ? 'er' : ''}</td>
+          <td><span class="badge ${p.is_active ? 'badge-green' : 'badge-red'}">${p.is_active ? 'Aktiv' : 'Inaktiv'}</span></td>
+          <td><span class="badge ${syncBadge}" title="${escAttr(p.sync_error || '')}">${escHtml(p.sync_status)}</span></td>
+          <td>
+            <button class="action-btn" onclick="openAiProfileModal('${escAttr(p.id)}')">Rediger</button>
+            <button class="action-btn" onclick="openAiProfileAccessModal('${escAttr(p.id)}','${escAttr(p.display_name)}')">Tilgang</button>
+            ${!p.is_default ? `<button class="action-btn" onclick="setDefaultAiProfile('${escAttr(p.id)}')">Sett standard</button>` : ''}
+            ${!p.is_default ? `<button class="action-btn danger" onclick="deleteAiProfile('${escAttr(p.id)}','${escAttr(p.display_name)}')">Slett</button>` : ''}
+          </td>
+        </tr>`;
+      }).join('');
+      wrap.innerHTML = `<table class="admin-table"><thead><tr><th>Profil</th><th>Modell</th><th>Objekter</th><th>Status</th><th>Synk</th><th>Handlinger</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+
+    async function setDefaultAiProfile(profileId) {
+      if (!confirm('Sett denne profilen som standard for nye brukere?')) return;
+      try {
+        const res = await apiFetch(API_BASE + '/admin/ai-profiles/' + profileId + '/default', { method: 'PUT' });
+        const data = await res.json();
+        if (data.ok) initAiProfilesTab(); else alert('Feil: ' + (data.error || 'Ukjent'));
+      } catch (e) { alert('Feil: ' + e.message); }
+    }
+
+    async function deleteAiProfile(profileId, name) {
+      if (!confirm(`Slett AI-profilen "${name}"? Dette fjerner den fra ADB (DBMS_CLOUD_AI.DROP_PROFILE) og kan ikke angres.`)) return;
+      try {
+        const res = await apiFetch(API_BASE + '/admin/ai-profiles/' + profileId, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.ok) {
+          if (data.drop_warning) alert('Profilen ble slettet fra katalogen, men ADB rapporterte en advarsel:\n' + data.drop_warning);
+          initAiProfilesTab();
+        } else { alert('Feil: ' + (data.error || 'Ukjent')); }
+      } catch (e) { alert('Feil: ' + e.message); }
+    }
+
+    // ── Modal: opprett/rediger AI-profil ────────────────────────
+    async function openAiProfileModal(profileId) {
+      _aiProfileEditingId = profileId || null;
+      document.getElementById('aip-modal-title').textContent = profileId ? 'Rediger AI-profil' : 'Ny AI-profil';
+      document.getElementById('aip-modal-error').textContent = '';
+      document.getElementById('aip-modal-success').textContent = '';
+
+      const nameInput = document.getElementById('aip-profile-name');
+      nameInput.disabled = !!profileId;
+
+      // Last objektlisten (tabeller/views i QUERYCHAT)
+      const objWrap = document.getElementById('aip-object-list');
+      objWrap.innerHTML = '<div style="color:var(--text3);font-size:12px">Laster objekter…</div>';
+      try {
+        const res = await apiFetch(API_BASE + '/admin/ai-profiles/objects');
+        const data = await res.json();
+        _aiProfileObjects = data.ok ? (data.objects || []) : [];
+      } catch { _aiProfileObjects = []; }
+
+      let selectedObjects = [];
+      if (profileId) {
+        const p = _aiProfiles.find(x => x.id === profileId);
+        if (p) {
+          document.getElementById('aip-display-name').value = p.display_name;
+          document.getElementById('aip-description').value = p.description || '';
+          document.getElementById('aip-provider').value = p.provider;
+          document.getElementById('aip-credential').value = p.credential_name;
+          document.getElementById('aip-model').value = p.model;
+          document.getElementById('aip-max-tokens').value = p.max_tokens;
+          document.getElementById('aip-temperature').value = p.temperature;
+          document.getElementById('aip-compartment').value = p.oci_compartment_id || '';
+          document.getElementById('aip-region').value = p.region || 'eu-frankfurt-2';
+          document.getElementById('aip-enable-sources').checked = p.enable_sources;
+          document.getElementById('aip-annotations').checked = p.annotations;
+          document.getElementById('aip-comments').checked = p.comments;
+          document.getElementById('aip-case-sensitive').checked = p.case_sensitive_values;
+          nameInput.value = p.profile_name;
+          selectedObjects = (p.object_list || []).map(o => o.owner + '.' + o.name);
+        }
+      } else {
+        nameInput.value = '';
+        document.getElementById('aip-display-name').value = '';
+        document.getElementById('aip-description').value = '';
+        document.getElementById('aip-provider').value = 'oci';
+        document.getElementById('aip-credential').value = 'OCI_GEN_AI_CRED';
+        document.getElementById('aip-model').value = '';
+        document.getElementById('aip-max-tokens').value = 1024;
+        document.getElementById('aip-temperature').value = 0;
+        document.getElementById('aip-compartment').value = '';
+        document.getElementById('aip-region').value = 'eu-frankfurt-2';
+        document.getElementById('aip-enable-sources').checked = true;
+        document.getElementById('aip-annotations').checked = true;
+        document.getElementById('aip-comments').checked = true;
+        document.getElementById('aip-case-sensitive').checked = false;
+      }
+
+      if (_aiProfileObjects.length) {
+        const rows = _aiProfileObjects.map(o => {
+          const key = o.owner + '.' + o.name;
+          const checked = selectedObjects.includes(key);
+          const typeBadge = o.type === 'VIEW' ? 'badge-green' : 'badge-amber';
+          return `<tr onclick="this.querySelector('input').click()">
+            <td class="aip-obj-cb-cell"><input type="checkbox" class="aip-obj-cb" value="${escAttr(key)}" ${checked ? 'checked' : ''} onclick="event.stopPropagation()" /></td>
+            <td class="aip-obj-name-cell">${escHtml(o.name)}</td>
+            <td class="aip-obj-type-cell"><span class="badge ${typeBadge}" style="font-size:9px">${escHtml(o.type)}</span></td>
+          </tr>`;
+        }).join('');
+        objWrap.innerHTML = `<table class="aip-obj-table"><tbody>${rows}</tbody></table>`;
+      } else {
+        objWrap.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px">Ingen tabeller/views funnet i QUERYCHAT-skjemaet</div>';
+      }
+
+      document.getElementById('aiprofile-modal').style.display = 'flex';
+    }
+
+    function closeAiProfileModal() { document.getElementById('aiprofile-modal').style.display = 'none'; }
+
+    async function saveAiProfile() {
+      const errEl = document.getElementById('aip-modal-error');
+      const okEl = document.getElementById('aip-modal-success');
+      errEl.textContent = ''; okEl.textContent = '';
+
+      const profile_name = document.getElementById('aip-profile-name').value.trim().toUpperCase();
+      const display_name = document.getElementById('aip-display-name').value.trim();
+      const model = document.getElementById('aip-model').value.trim();
+      if (!profile_name || !display_name || !model) { errEl.textContent = 'Profilnavn, visningsnavn og modell er påkrevd'; return; }
+
+      const object_list = Array.from(document.querySelectorAll('.aip-obj-cb:checked')).map(cb => {
+        const [owner, name] = cb.value.split('.');
+        return { owner, name };
+      });
+      if (!object_list.length) { errEl.textContent = 'Velg minst ett databaseobjekt'; return; }
+
+      const body = {
+        profile_name, display_name,
+        description: document.getElementById('aip-description').value.trim() || null,
+        provider: document.getElementById('aip-provider').value.trim() || 'oci',
+        credential_name: document.getElementById('aip-credential').value.trim() || 'OCI_GEN_AI_CRED',
+        model,
+        max_tokens: parseInt(document.getElementById('aip-max-tokens').value, 10) || 1024,
+        temperature: parseFloat(document.getElementById('aip-temperature').value) || 0,
+        oci_compartment_id: document.getElementById('aip-compartment').value.trim() || null,
+        region: document.getElementById('aip-region').value.trim() || 'eu-frankfurt-2',
+        enable_sources: document.getElementById('aip-enable-sources').checked,
+        annotations: document.getElementById('aip-annotations').checked,
+        comments: document.getElementById('aip-comments').checked,
+        case_sensitive_values: document.getElementById('aip-case-sensitive').checked,
+        object_list,
+      };
+
+      const saveBtn = document.querySelector('#aiprofile-modal .btn-save');
+      saveBtn.disabled = true; saveBtn.textContent = 'Lagrer…';
+
+      try {
+        const url = _aiProfileEditingId
+          ? API_BASE + '/admin/ai-profiles/' + _aiProfileEditingId
+          : API_BASE + '/admin/ai-profiles';
+        const method = _aiProfileEditingId ? 'PUT' : 'POST';
+        const res = await apiFetch(url, { method, body: JSON.stringify(body) });
+        const data = await res.json();
+        if (data.ok) {
+          if (data.sync_status === 'ERROR') {
+            errEl.textContent = 'Lagret i katalogen, men synk mot ADB feilet: ' + (data.sync_error || 'ukjent feil');
+          } else {
+            okEl.textContent = 'Lagret og synket mot ADB';
+            setTimeout(() => { closeAiProfileModal(); initAiProfilesTab(); }, 1000);
+          }
+        } else {
+          errEl.textContent = data.error || 'Noe gikk galt';
+        }
+      } catch (e) {
+        errEl.textContent = 'Kunne ikke nå serveren: ' + e.message;
+      }
+      saveBtn.disabled = false; saveBtn.textContent = 'Lagre';
+    }
+
+    // ── Modal: brukertilgang til AI-profil ──────────────────────
+    let _aiProfileAccessId = null;
+
+    async function openAiProfileAccessModal(profileId, name) {
+      _aiProfileAccessId = profileId;
+      document.getElementById('aipa-modal-title').textContent = 'Brukertilgang – ' + name;
+      const content = document.getElementById('aipa-content');
+      content.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:16px 0">Laster…</div>';
+      document.getElementById('aiprofile-access-modal').style.display = 'flex';
+
+      try {
+        const res = await apiFetch(API_BASE + '/admin/ai-profiles/' + profileId + '/access');
+        const data = await res.json();
+        if (!data.ok) { content.innerHTML = `<div style="color:var(--red);font-size:13px">${escHtml(data.error)}</div>`; return; }
+        content.innerHTML = (data.users || []).map(u => `
+          <div class="roles-modal-item" style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <strong style="font-size:13px">${escHtml(u.display_name)}</strong>
+              <span style="font-size:12px;color:var(--text3);margin-left:8px">${escHtml(u.email)}</span>
+            </div>
+            <input type="checkbox" ${u.has_access ? 'checked' : ''}
+              onchange="toggleAiProfileAccess('${escAttr(u.id)}', this)"
+              style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0" />
+          </div>`).join('');
+      } catch (e) {
+        content.innerHTML = `<div style="color:var(--red);font-size:13px">${escHtml(e.message)}</div>`;
+      }
+    }
+
+    function closeAiProfileAccessModal() { document.getElementById('aiprofile-access-modal').style.display = 'none'; }
+
+    async function toggleAiProfileAccess(userId, checkbox) {
+      checkbox.disabled = true;
+      try {
+        const method = checkbox.checked ? 'PUT' : 'DELETE';
+        const res = await apiFetch(API_BASE + '/admin/ai-profiles/' + _aiProfileAccessId + '/access/' + userId, { method });
+        const data = await res.json();
+        if (!data.ok) { alert('Feil: ' + (data.error || 'Ukjent')); checkbox.checked = !checkbox.checked; }
+      } catch (e) {
+        alert('Feil: ' + e.message);
+        checkbox.checked = !checkbox.checked;
+      }
+      checkbox.disabled = false;
+    }
   </script>
 </body>
 </html>

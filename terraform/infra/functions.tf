@@ -18,7 +18,7 @@ resource "oci_functions_function" "sql_executor" {
   memory_in_mbs      = "256"
   timeout_in_seconds = 300
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/sql-executor:latest"
-  image_digest       = "sha256:8c36282a530055dc75cab2c7c7109c1f026eb0fbf103155ffe4e4f8c3b557f05"
+  image_digest       = "sha256:94dae5d18929ac0a6b254888f68e98c8fc6f88eabfe11bfc5515281db71ce450"
 
   config = {
     AI_PROFILE             = "QUERYCHAT_PROFILE"
@@ -129,6 +129,25 @@ resource "oci_functions_function" "profile_handler" {
   timeout_in_seconds = 60
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/profile-handler:latest"
   image_digest       = "sha256:78a3853a3dfbc851f6ecf32977dd92ac5bbe438ca5d674ffe4d7a35b38b73426"
+
+  config = {
+    DB_DSN                 = "rdapkipocdb_high"
+    DB_USER                = "querychat"
+    DBPASS_SECRET_OCID     = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yauk7ukm6zwo65vuygwr6pay4ajv3cyg3vbvixygqzfovq"
+    WALLET_SECRET_OCID     = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yaxjtwi247netyi2vuamlrspftpykh2t37miwi2m4yll2q"
+    WALLETPASS_SECRET_OCID = "ocid1.vaultsecret.oc19.eu-frankfurt-2.amaaaaaalgam66yac4hzlxmaenlhwgv4lujti7jbtudp7xzexjgi6elqpmda"
+    JWT_SECRET_OCID        = oci_vault_secret.querychat_jwt_secret.id
+    LOG_LEVEL              = "INFO"
+  }
+}
+
+resource "oci_functions_function" "ai_profile_handler" {
+  application_id     = oci_functions_application.rdap_chatbot_application.id
+  display_name       = "ai-profile-handler"
+  memory_in_mbs      = "256"
+  timeout_in_seconds = 60
+  image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/ai-profile-handler:latest"
+  image_digest       = "sha256:2436de9fd8032371a2f4b4515d191d8eb6970136331d93fb5926eb708eed58e4"
 
   config = {
     DB_DSN                 = "rdapkipocdb_high"
