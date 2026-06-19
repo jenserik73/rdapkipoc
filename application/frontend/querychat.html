@@ -829,7 +829,15 @@
       return false;
     }
 
-    function showLoginScreen() { document.getElementById('login-screen').classList.add('show'); document.getElementById('login-error').textContent = ''; document.getElementById('login-email').value = ''; document.getElementById('login-password').value = ''; }
+    function showLoginScreen() {
+      document.getElementById('login-screen').classList.add('show');
+      document.getElementById('login-error').textContent = '';
+      const savedEmail = localStorage.getItem('qc_remembered_email') || '';
+      document.getElementById('login-email').value = savedEmail;
+      document.getElementById('login-password').value = '';
+      if (savedEmail) document.getElementById('login-password').focus();
+      else document.getElementById('login-email').focus();
+    }
     function hideLoginScreen() { document.getElementById('login-screen').classList.remove('show'); }
     document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
@@ -846,6 +854,7 @@
         if (data.ok) {
           authState.accessToken = data.access_token; authState.refreshToken = data.refresh_token; authState.user = data.user;
           sessionStorage.setItem('qc_access', data.access_token); localStorage.setItem('qc_refresh', data.refresh_token);
+          localStorage.setItem('qc_remembered_email', email);
           hideLoginScreen(); onLoggedIn();
           if (data.must_change_password) openChangePasswordModal(true);
         } else { errEl.textContent = data.error || 'Innlogging feilet'; }
