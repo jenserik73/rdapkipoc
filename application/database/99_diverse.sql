@@ -45,3 +45,13 @@ SELECT HELSEFORETAK,
     VOTE,
     CREATED_AT,
     UPDATED_AT FROM QUERYCHAT_FEEDBACK;
+
+grant select on querychat.ki_grunnlag_oracle_rdap_bemanning to nicolai;
+grant select on querychat.ki_grunnlag_oracle_rdap_hr_mndverk to nicolai;
+grant select on querychat.ki_grunnlag_oracle_rdap_liggetimer to nicolai;
+grant select on querychat.ki_grunnlag_oracle_rdap_okonomidata to nicolai;
+
+grant select on querychat.ki_grunnlag_oracle_rdap_bemanning to christian;
+grant select on querychat.ki_grunnlag_oracle_rdap_hr_mndverk to christian;
+grant select on querychat.ki_grunnlag_oracle_rdap_liggetimer to christian;
+grant select on querychat.ki_grunnlag_oracle_rdap_okonomidata to christian;
