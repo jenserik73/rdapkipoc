@@ -46,12 +46,27 @@ SELECT HELSEFORETAK,
     CREATED_AT,
     UPDATED_AT FROM QUERYCHAT_FEEDBACK;
 
-grant select on querychat.ki_grunnlag_oracle_rdap_bemanning to nicolai;
-grant select on querychat.ki_grunnlag_oracle_rdap_hr_mndverk to nicolai;
-grant select on querychat.ki_grunnlag_oracle_rdap_liggetimer to nicolai;
-grant select on querychat.ki_grunnlag_oracle_rdap_okonomidata to nicolai;
+grant select on rdapkipoc.ki_grunnlag_oracle_rdap_bemanning to nicolai;
+grant select on rdapkipoc.ki_grunnlag_oracle_rdap_hr_mndverk to nicolai;
+grant select on rdapkipoc.ki_grunnlag_oracle_rdap_liggetimer to nicolai;
+grant select on rdapkipoc.ki_grunnlag_oracle_rdap_okonomidata to nicolai;
 
-grant select on querychat.ki_grunnlag_oracle_rdap_bemanning to christian;
-grant select on querychat.ki_grunnlag_oracle_rdap_hr_mndverk to christian;
-grant select on querychat.ki_grunnlag_oracle_rdap_liggetimer to christian;
-grant select on querychat.ki_grunnlag_oracle_rdap_okonomidata to christian;
+grant select on rdapkipoc.ki_grunnlag_oracle_rdap_bemanning to christian;
+grant select on rdapkipoc.ki_grunnlag_oracle_rdap_hr_mndverk to christian;
+grant select on rdapkipoc.ki_grunnlag_oracle_rdap_liggetimer to christian;
+grant select on rdapkipoc.ki_grunnlag_oracle_rdap_okonomidata to christian;
+
+
+GRANT SELECT ANY TABLE ON SCHEMA HR TO nicolai;
+GRANT SELECT ANY TABLE ON SCHEMA HR TO christian;
+
+revoke select on querychat.ki_grunnlag_oracle_rdap_bemanning from nicolai;
+revoke select on querychat.ki_grunnlag_oracle_rdap_hr_mndverk from nicolai;
+revoke select on querychat.ki_grunnlag_oracle_rdap_liggetimer from nicolai;
+revoke select on querychat.ki_grunnlag_oracle_rdap_okonomidata from nicolai;
+
+revoke select on querychat.ki_grunnlag_oracle_rdap_bemanning from christian;
+revoke select on querychat.ki_grunnlag_oracle_rdap_hr_mndverk from christian;
+revoke select on querychat.ki_grunnlag_oracle_rdap_liggetimer from christian;
+revoke select on querychat.ki_grunnlag_oracle_rdap_okonomidata from christian;
+
