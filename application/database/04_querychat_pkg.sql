@@ -29,23 +29,43 @@ create or replace PACKAGE BODY querychat_pkg AS
   END;
 
   -- Hent few-shot eksempler og bygg prompt
+  -- Herdet juli 2026: hver kandidat valideres (SELECT/WITH, ingen forbudte
+  -- nøkkelord, ingen kolon) før den slipper inn i prompten. Bakgrunn:
+  -- testrader med fritekst i corrected_sql forgiftet genereringen og ga
+  -- sporadisk ORA-01745.
   FUNCTION build_prompt(p_question IN VARCHAR2) RETURN VARCHAR2 IS
     v_examples VARCHAR2(32767);
+    v_example  VARCHAR2(32767);
+    v_count    PLS_INTEGER := 0;
   BEGIN
     BEGIN
-      SELECT LISTAGG(
-               'Spørsmål: "' || question || '"' || CHR(10) ||
-               'SQL: ' || correct_sql,
-               CHR(10) || CHR(10)
-             ) INTO v_examples
-      FROM (
+      FOR r IN (
         SELECT question,
                NVL(corrected_sql, generated_sql) AS correct_sql
         FROM   querychat.querychat_feedback
         WHERE  vote > 0
         ORDER  BY vote DESC, created_at DESC
-        FETCH  FIRST 5 ROWS ONLY
-      );
+        FETCH  FIRST 20 ROWS ONLY   -- flere kandidater, filtreres ned til 5
+      )
+      LOOP
+        BEGIN
+          validate_sql(r.correct_sql);           -- må være SELECT/WITH uten forbudte ord
+          IF INSTR(r.correct_sql, ':') > 0 THEN  -- aldri bind-variabler/kolon i eksempler
+            RAISE_APPLICATION_ERROR(-20003, 'Eksempel inneholder kolon');
+          END IF;
+          v_example := 'Spørsmål: "' || r.question || '"' || CHR(10) ||
+                       'SQL: ' || r.correct_sql;
+          IF v_examples IS NULL THEN
+            v_examples := v_example;
+          ELSE
+            v_examples := v_examples || CHR(10) || CHR(10) || v_example;
+          END IF;
+          v_count := v_count + 1;
+          EXIT WHEN v_count >= 5;
+        EXCEPTION WHEN OTHERS THEN
+          NULL;  -- ugyldig eksempel: hopp over, ikke forgift prompten
+        END;
+      END LOOP;
     EXCEPTION WHEN OTHERS THEN v_examples := NULL;
     END;
 
@@ -136,6 +156,12 @@ create or replace PACKAGE BODY querychat_pkg AS
       RETURN error_json('VALIDATION_ERROR', SQLERRM);
     END;
 
+    -- Logg REN generert SQL, før FETCH FIRST-append. (Flyttet juli 2026:
+    -- lå tidligere etter eksekvering, slik at feedback-tabellen fikk
+    -- etterbehandlet SQL som fasit. Bieffekt: SQL som feiler i eksekvering
+    -- logges nå også - nyttig feilsøkingsdata, filtreres bort av vote > 0.)
+    v_log_id := logg(p_question, v_sql, 0);
+
     IF INSTR(UPPER(v_sql), 'FETCH FIRST') = 0
        AND INSTR(UPPER(v_sql), 'ROWNUM') = 0 THEN
       v_sql := v_sql || CHR(10) || 'FETCH FIRST ' || p_max_rows || ' ROWS ONLY';
@@ -176,8 +202,6 @@ create or replace PACKAGE BODY querychat_pkg AS
       END IF;
       RETURN error_json('DB_ERROR', SQLERRM || ' SQL: ' || REPLACE(v_sql, CHR(10), ' '));
     END;
-
-    v_log_id := logg(p_question, v_sql, 0);
 
     DBMS_LOB.CREATETEMPORARY(v_result, TRUE);
     DBMS_LOB.APPEND(v_result, TO_CLOB(

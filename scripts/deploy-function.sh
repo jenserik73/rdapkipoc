@@ -46,10 +46,16 @@ echo "Image:      ${FULL_IMAGE}"
 echo "Kildemappe: ${FUNCTION_DIR}"
 echo ""
 
+# Versjonsstempel: git-SHA + tidspunkt, med -dirty hvis ukommitterte endringer
+FUNC_VERSION="$(git -C "${SCRIPT_DIR}" rev-parse --short HEAD)-$(date +%Y%m%d-%H%M)"
+[ -n "$(git -C "${SCRIPT_DIR}" status --porcelain)" ] && FUNC_VERSION="${FUNC_VERSION}-dirty"
+echo "Versjon:    ${FUNC_VERSION}"
+echo ""
+
 # 1. Bygg
 echo "[1/4] Bygger Docker-image (--no-cache)..."
 cd "${FUNCTION_DIR}"
-sudo docker build --no-cache -t "${FULL_IMAGE}" .
+sudo docker build --no-cache --build-arg FUNC_VERSION="${FUNC_VERSION}" -t "${FULL_IMAGE}" .
 
 # 2. Push
 echo "[2/4] Pusher til OCIR (500-feil fra OCIR er vanligvis ufarlige)..."

@@ -18,7 +18,7 @@ resource "oci_functions_function" "sql_executor" {
   memory_in_mbs      = "256"
   timeout_in_seconds = 300
   image              = "ocir.eu-frankfurt-2.oci.oraclecloud.eu/axpqbvkhoxdj/sql-executor:latest"
-  image_digest       = "sha256:94dae5d18929ac0a6b254888f68e98c8fc6f88eabfe11bfc5515281db71ce450"
+  image_digest       = "sha256:de4ad43fe9a0cba9f01ba6127f2db89605887e9ce782c523efdf4df43d30fccf"
 
   config = {
     AI_PROFILE             = "QUERYCHAT_PROFILE"

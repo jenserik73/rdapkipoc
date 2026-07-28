@@ -145,6 +145,21 @@ resource "oci_apigateway_deployment" "v1" {
         header_transformations {
           set_headers {
             items {
+              name      = "Access-Control-Allow-Origin"
+              values    = ["*"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Access-Control-Allow-Methods"
+              values    = ["POST, OPTIONS"]
+              if_exists = "OVERWRITE"
+            }
+            items {
+              name      = "Access-Control-Allow-Headers"
+              values    = ["Content-Type, Authorization"]
+              if_exists = "OVERWRITE"
+            }            
+            items {
               name      = "Strict-Transport-Security"
               values    = ["max-age=31536000; includeSubDomains"]
               if_exists = "OVERWRITE"

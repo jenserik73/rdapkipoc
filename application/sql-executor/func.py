@@ -33,6 +33,7 @@ import oracledb
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 logging.basicConfig(level=getattr(logging, LOG_LEVEL, logging.INFO))
 logger = logging.getLogger(__name__)
+FUNC_VERSION = os.getenv("FUNC_VERSION", "dev-ukjent")
 
 # ── konfigurasjon ──────────────────────────────────────────────
 def _require_env(name: str) -> str:
@@ -148,15 +149,15 @@ def _resolve_ai_profile(conn: oracledb.Connection, user_id: str) -> str:
         cur.execute(
             """
             SELECT p.profile_name
-            FROM   qc_ai_profiles p
-            JOIN   qc_user_active_ai_profile a ON a.ai_profile_id = p.id
-            JOIN   qc_user_ai_profiles up
+            FROM   querychat.qc_ai_profiles p
+            JOIN   querychat.qc_user_active_ai_profile a ON a.ai_profile_id = p.id
+            JOIN   querychat.qc_user_ai_profiles up
                    ON up.ai_profile_id = p.id AND up.user_id = a.user_id
-            WHERE  a.user_id = :uid
+            WHERE  a.user_id = :p_uid
             AND    p.is_active = 'Y'
             AND    p.sync_status = 'SYNCED'
             """,
-            uid=user_id,
+            p_uid=user_id,
         )
         row = cur.fetchone()
         if row:
@@ -164,7 +165,7 @@ def _resolve_ai_profile(conn: oracledb.Connection, user_id: str) -> str:
 
         cur.execute(
             """
-            SELECT profile_name FROM qc_ai_profiles
+            SELECT profile_name FROM querychat.qc_ai_profiles
             WHERE is_default = 'Y' AND is_active = 'Y' AND sync_status = 'SYNCED'
             """
         )
@@ -213,29 +214,6 @@ def _ask_nl(question: str, user_id: str) -> dict:
             parsed["aiProfile"] = profile_name
             return parsed
 
-
-def _save_feedback(question: str, sql: str, vote: int, corrected: str = None):
-    pool = _get_pool()
-    with pool.acquire() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                BEGIN
-                  querychat.querychat_pkg.save_feedback(
-                    p_question  => :question,
-                    p_sql       => :sql,
-                    p_vote      => :vote,
-                    p_corrected => :corrected
-                  );
-                END;
-                """,
-                question=question,
-                sql=sql,
-                vote=vote,
-                corrected=corrected,
-            )
-
-
 # ── Function handler ───────────────────────────────────────────
 
 def handler(ctx, data: io.BytesIO = None):
@@ -254,26 +232,11 @@ def handler(ctx, data: io.BytesIO = None):
     except Exception:
         return _resp(ctx, {"ok": False, "error": "Ugyldig JSON"}, 400)
 
-    action = body.get("action", "ask")
-
-    if action == "feedback":
-        try:
-            _save_feedback(
-                question=body.get("question", ""),
-                sql=body.get("sql", ""),
-                vote=int(body.get("vote", 0)),
-                corrected=body.get("corrected"),
-            )
-            return _resp(ctx, {"ok": True})
-        except Exception as e:
-            logger.exception("Feil ved lagring av tilbakemelding")
-            return _resp(ctx, {"ok": False, "error": str(e)}, 500)
-
     question = body.get("question", "").strip()
     if not question:
         return _resp(ctx, {"ok": False, "error": "Mangler 'question'-felt"}, 400)
 
-    logger.info("Spørsmål fra bruker %s: %s", jwt_payload.get("email", "ukjent"), question)
+    logger.info("[%s] Spørsmål fra bruker %s: %s", FUNC_VERSION, jwt_payload.get("email", "ukjent"), question)
     try:
         result = _ask_nl(question, user_id)
         logger.info("ask_nl fullført")
