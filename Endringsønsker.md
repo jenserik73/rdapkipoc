@@ -6,3 +6,5 @@
 4. Kan det vinduet som vise sql'en for et spørsmål gjøres om slik at det er kollapset og kan vises hvis man ønsker?
 5. Nedlastingsknappen laster bare ned spørsmål og sql, kan den endres til å ta med svaret?
 6. Kan teksten under navnet på aktiv samtale faktisk vise hvilket api som kalles og ikke slik som nå hvor det ser ut til å være statisk?
+7. Kan codespacet endres slik at det har med database connections når det blir slettet og opprettet på nytt?
+
